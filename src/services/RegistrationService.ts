@@ -13,7 +13,7 @@ export const getPurchasesReg = (param: {
         filterParam?: TPurchaseRegFilter;
     }): Promise<TPageableResponse<TPurchaseReg>> => {
         const response = HttpService.post<TPageableResponse<TPurchaseReg>>(
-            `api/purchase-reg/filter?page=${param.page}&size=${param.size}&sort=${
+            `/api/purchase-reg/filter?page=${param.page}&size=${param.size}&sort=${
                 param.sortParam
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''

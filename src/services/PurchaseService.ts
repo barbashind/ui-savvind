@@ -14,7 +14,7 @@ export const getPurchases = (param: {
         filterParam?: TPurchaseFilter;
     }): Promise<TPageableResponse<TPurchase>> => {
         const response = HttpService.post<TPageableResponse<TPurchase>>(
-            `api/purchase/filter?page=${param.page}&size=${param.size}&sort=${
+            `/api/purchase/filter?page=${param.page}&size=${param.size}&sort=${
                 param.sortParam
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''
@@ -32,7 +32,7 @@ export const getItemsPurchase = (param: {
         filterParam?: TPurchaseItemFilter;
     }): Promise<TPageableResponse<TPurchaseItem>> => {
         const response = HttpService.post<TPageableResponse<TPurchaseItem>>(
-            `api/items-batch/filter?page=${param.page}&size=${param.size}&sort=${
+            `/api/items-batch/filter?page=${param.page}&size=${param.size}&sort=${
                 param.sortParam
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''
@@ -191,7 +191,7 @@ export const getItemsPurchaseReturn = (param: {
     filterParam?: TPurchaseItemFilter;
 }): Promise<TPurchaseItem[]> => {
     const response = HttpService.post<TPurchaseItem[]>(
-        `api/items-batch-return`,
+        `/api/items-batch-return`,
         param.filterParam ?? { searchCriteria: {} }
     );
     return response;

@@ -12,7 +12,7 @@ export const getNomenclatures = (param: {
         filterParam?: TNomenclatureFilter;
     }): Promise<TPageableResponse<TNomenclature>> => {
         const response = HttpService.post<TPageableResponse<TNomenclature>>(
-            `api/nomenclature/filter?page=${param.page}&size=${param.size}&sort=${
+            `/api/nomenclature/filter?page=${param.page}&size=${param.size}&sort=${
                 param.sortParam
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''

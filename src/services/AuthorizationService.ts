@@ -36,7 +36,7 @@ export  const checkToken = async (): Promise<Valid> => {
     // Проверка действительности токена, например, через запрос к вашему API
     const token = localStorage.getItem('token');
     console.log(token)
-    const response = await fetch('api/check-token', {
+    const response = await fetch('/api/check-token', {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ export  const checkToken = async (): Promise<Valid> => {
   export  const getUserInfo = async (): Promise<UserInfo> => {
     const token = localStorage.getItem('token');
     console.log(token)
-    const response = await fetch('api/get-user-info', {
+    const response = await fetch('/api/get-user-info', {
         headers: {
             'Authorization': `Bearer ${token}`,
         },

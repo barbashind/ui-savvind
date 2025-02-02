@@ -13,7 +13,7 @@ export const getCheckes = (param: {
         filterParam?: TCheckFilter;
     }): Promise<TPageableResponse<TCheck>> => {
         const response = HttpService.post<TPageableResponse<TCheck>>(
-            `api/check/filter?page=${param.page}&size=${param.size}&sort=${
+            `/api/check/filter?page=${param.page}&size=${param.size}&sort=${
                 param.sortParam
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''
@@ -32,7 +32,7 @@ export const getSales = (param: {
     filterParam?: TCheckFilter;
 }): Promise<TPageableResponse<TSale>> => {
     const response = HttpService.post<TPageableResponse<TSale>>(
-        `api/sales/filter?page=${param.page}&size=${param.size}&sort=${
+        `/api/sales/filter?page=${param.page}&size=${param.size}&sort=${
             param.sortParam
                 ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                 .join('&sort=') ?? ''
