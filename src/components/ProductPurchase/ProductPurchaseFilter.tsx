@@ -50,7 +50,7 @@ const ProductPurchaseFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, f
                 
                 const getProducts = async () => {
                                         await  getNomenclatures((resp) => {
-                                                setProductList(resp.map((item : TNomenclature) => ({name: item.name, hasSerialNumber: item.hasSerialNumber, itemId: item.itemId, costPrice: item.lastCostPrice, weight: item.weight})));
+                                                setProductList(resp.map((item : TNomenclature) => ({name: item.name, hasSerialNumber: item.hasSerialNumber, itemId: item.itemId, costPrice: item.lastCostPrice, weight: item.weight, productPrice: item.productPrice})));
                                             });
                 }
                 getProducts();

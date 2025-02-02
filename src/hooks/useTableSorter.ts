@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SortOrder } from '../components/TableColumnHeader';
+import { SortOrder } from '../components/global/TableColumnHeader';
 
 export type GetColumnSortOrder<T> = (column: keyof T) => SortOrder;
 export type GetColumnSortOrderIndex<T> = (column: keyof T) => number;
