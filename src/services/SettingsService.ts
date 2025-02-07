@@ -1,5 +1,5 @@
 import { HttpService } from '../system/HttpService';
-import { TAccount, TCategory, TContractor, TDeliver, TUser, TWarehouse } from '../types/settings-types.ts';
+import { TAccount, TCategory, TContractor, TCurrency, TDeliver, TUser, TWarehouse } from '../types/settings-types.ts';
 
 import { ErrorResponse, getErrorResponse } from './utils';
 
@@ -238,6 +238,52 @@ export const deleteContractor = async (contractorId: number | undefined): Promis
 export const deleteDeliver = async (deliverId: number | undefined): Promise<object> => {
     const token = localStorage.getItem('token');
         const response = await fetch(`/api/delete-deliver/${deliverId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        return response;
+        };
+
+
+export const getCurrencies = async (
+            getCallback: (arg0: TCurrency[]) => void
+        ) => {
+            await HttpService.get<TCurrency[]>('/api/currencies/all')
+                .then((response) => {
+                    getCallback(response);
+                })
+                .catch(() => {
+                    console.log('failed');
+                });
+        };
+        
+export const updateCurrencies = async (data: TCurrency[]): Promise<TCurrency[]> => {
+            const token = localStorage.getItem('token');
+        const response = await fetch(`/api/update-currencies`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        const resp: TCurrency[] = (await response.json()) as TCurrency[];
+        return resp;
+        };
+        
+export const deleteCurrency = async (id: number | undefined): Promise<object> => {
+            const token = localStorage.getItem('token');
+        const response = await fetch(`/api/delete-currencies/${id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,

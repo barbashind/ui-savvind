@@ -60,6 +60,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
         const [types, setTypes] = useState<IdLabel[]>([]);
         const [type, setType] = useState<IdLabel>();
         const [isLoading, setIsLoading] = useState<boolean>(id ? true : false);
+        const [caption, setCaption] = useState<string | undefined>(undefined);
         // Инициализация данных
         
         
@@ -90,7 +91,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
 
         const createNomenclature = async (e: React.MouseEvent<Element, MouseEvent>) => {
                 e.preventDefault();
-                await addNomenclature({
+                        await addNomenclature({
                         name: data.name,
                         lastCostPrice: Number(data.lastCostPrice),
                         weight: Number(data.weight),
@@ -111,10 +112,17 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         isMessageActive: data.isMessageActive,
                         remainsSum: (data.lastCostPrice && data.remains) ? data.lastCostPrice * data.remains : null,
                         hasSerialNumber: data.hasSerialNumber,
-                }).then(
-                       () => { setUpdateFlag(true) }
-                );
-        }
+                                }).then(() => {  setUpdateFlag(true)
+                                setIsOpen(false);
+                                setData(defaultData);
+                                setId(undefined);
+                                setType(undefined);
+                        }).catch(
+                                (error) => {
+                                        setCaption(error?.error?.statusText);
+                                }
+                        )
+                }
 
         const updateNomenclatureData = async (e: React.MouseEvent<Element, MouseEvent>, id: number | undefined) => {
                 e.preventDefault();
@@ -140,7 +148,10 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         remainsSum: (data.lastCostPrice && data.remains) ? data.lastCostPrice * data.remains : null,
                         hasSerialNumber: data.hasSerialNumber,
                 }).then(
-                       () => { setUpdateFlag(true) }
+                       () => { 
+                                setUpdateFlag(true);
+                                setIsOpen(false);
+                        }
                 );
         }
         
@@ -183,7 +194,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 }}
                                         />
                                 </Layout>
-                                <Text size="s" className={cnMixSpace({ mT:'xl' })}>Наименование:</Text>
+                                <Text size="s" className={cnMixSpace({ mT:'xl' })} onClick={()=>{console.log(caption)}}>Наименование:</Text>
                                 <TextField 
                                         size="s"
                                         type="textarea"
@@ -195,6 +206,9 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 }))
                                         }}
                                         className={cnMixSpace({ mT:'2xs' })}
+                                        caption={caption}
+                                        status={caption ? 'alert' : undefined}
+                                        onFocus={()=>{setCaption(undefined)}}
                                 />
                                 <Text size="s" className={cnMixSpace({ mT:'xl' })}>Альтернативное наименование:</Text>
                                 <TextField 
@@ -542,11 +556,6 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                         } else {
                                                                 createNomenclature(e); 
                                                         }
-                                                        setIsOpen(false);
-                                                        setData(defaultData);
-                                                        // setIsLoading(true);
-                                                        setId(undefined);
-                                                        setType(undefined);
                                                 }}
                                         />
                                 </Layout>

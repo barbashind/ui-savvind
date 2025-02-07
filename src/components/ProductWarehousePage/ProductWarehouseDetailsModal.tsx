@@ -181,6 +181,7 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                 <Layout direction="row" className={cnMixSpace({ mT:'m' })} >
                                         <div style={{minWidth:'15px', maxWidth:'15px'}} className={cnMixSpace({ mR:'m' })}/>
                                         <Text size="s" style={{ width: '100%'}} className={cnMixSpace({  pL:'s' })}>Наименование</Text>
+                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Контрагент</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Кол-во закуп.</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Сер. номер</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Кол-во принято</Text>
@@ -198,20 +199,23 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                                                                                         {itemBatch?.name && itemBatch?.itemId ? itemBatch.name : ''}
                                                                                                 </Text>
                                                                                         </div>
-                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs' })}>
+                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs', mR: 'm' })}>
+                                                                                                        {itemBatch?.partner}
+                                                                                                </Text>
+                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs', mR: 'm' })}>
                                                                                                         {itemBatch?.quant?.toString() + ' шт'}
                                                                                                 </Text>
                                                                                                 {itemBatch.itemId && (
-                                                                                                <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
+                                                                                                <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}}  className={cnMixSpace({  mR: 'm' })}>
                                                                                                         {itemBatch.hasSerialNumber ? (<IconAllDone view="success" style={{alignSelf: 'center'}}/>) : (<IconClose view="alert" style={{alignSelf: 'center'}}/>)}
                                                                                                 </Layout>
                                                                                                 )}
 
-                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs' })} >
+                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs', mR: 'm'  })} >
                                                                                                         {itemBatch?.quantFinal?.toString() + ' шт'}
                                                                                                 </Text>
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs' })}>
-                                                                                                        {(!itemBatch.hasSerialNumber ? itemBatch?.remainder?.toString() : itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId ) && elem.serialNumber && !elem.isSaled))?.length.toString()) + ' шт'}
+                                                                                                        {(!itemBatch.hasSerialNumber ? itemBatch?.remainder?.toString() : itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId && elem.partner === itemBatch.partner ) && elem.serialNumber && !elem.isSaled))?.length.toString()) + ' шт'}
                                                                                                 </Text>
                                                                                 </Layout>
                                                                         </Layout>  

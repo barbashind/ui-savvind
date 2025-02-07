@@ -103,10 +103,7 @@ useEffect(() => {
                 spacerRow.spacer = true;
                 serverData.content.forEach((item, index) => {
                     dataRes.push(
-                        {
-                            ...spacerRow,
-                            rowNumber: (serverData.pageable.pageNumber || 0) + index + 1,
-                        },
+                        
                         {
                             ...item,
                             spacer: false,

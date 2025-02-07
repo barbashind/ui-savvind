@@ -13,6 +13,7 @@ import { Text } from "@consta/uikit/Text";
 import Categories from "../components/SettingsPage/Categories";
 import { useEffect, useState } from "react";
 import { getUserInfo } from "../services/AuthorizationService";
+import Currencies from "../components/SettingsPage/Currencies";
 
 // собственные компоненты
 
@@ -42,6 +43,7 @@ const Settings = () => {
                                                 <Accounts />
                                                 <Categories />
                                         </Layout>
+                                        <Currencies />
                                         <Warehouses />
                                         <Contractors />
                                         <Delivers />

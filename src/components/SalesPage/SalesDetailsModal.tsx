@@ -181,12 +181,12 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                     
                                 // Если партнер уже существует, суммируем salePrice
                                 if (acc[sale.partner]) {
-                                    acc[sale.partner].summPartner += sale.salePrice ?? 0;
+                                    acc[sale.partner].summPartner += Number(sale.salePrice ?? 0);
                                 } else {
                                     // Создаем новый объект для уникального партнера
                                     acc[sale.partner] = {
                                         partner: sale.partner,
-                                        summPartner: sale.salePrice ?? 0,
+                                        summPartner: Number(sale.salePrice ?? 0),
                                     };
                                 }
                     
@@ -499,6 +499,7 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
 
                                                                                         <TextField 
                                                                                                 size="s" 
+                                                                                                id={`serialNumber ${sales.indexOf(itemCheck)}`}
                                                                                                 value={itemCheck.serialNumber ?? null}
                                                                                                 onChange={(value)=>{
                                                                                                         if (value) {
@@ -524,6 +525,12 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                                                                 getProduct(e, itemCheck)
                                                                                                         }
                                                                                                 }}
+                                                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                                                onKeyPress={async (event: any) => {
+                                                                                                        if (event.key === 'Enter') {
+                                                                                                                if (itemCheck.serialNumber) {
+                                                                                                                        getProduct(event, itemCheck)
+                                                                                                        }}}}
                                                                                                 caption={ captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck))))?.caption : undefined}
                                                                                                 status={captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? "alert" : undefined}
                                                                                                 onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "serialNumber") && (capt.index !== sales.indexOf(itemCheck)) ))}}

@@ -14,6 +14,7 @@ export interface TPurchase {
     insurance?:number;
     totalQuant?: number | null;
     totalQuantFinal?: number | null;
+    rate?: number | null;
 }
 
 export type TPurchaseData = TPurchase & {

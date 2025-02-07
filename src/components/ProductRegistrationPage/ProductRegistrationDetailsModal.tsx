@@ -22,6 +22,11 @@ import { TPurchaseItem } from "../../types/product-purchase-types";
 import { Combobox } from "@consta/uikit/Combobox";
 import { TWarehouse } from "../../types/settings-types";
 import { getWarehouses } from "../../services/SettingsService";
+import { getProductBySerial } from "../../services/SalesService";
+import NumberMaskTextField from "../../utils/NumberMaskTextField";
+import { getNomenclatures } from "../../services/PurchaseService.ts";
+import { TNomenclature } from "../../types/nomenclature-types";
+import { InfoCircleFilled } from "@ant-design/icons";
 
 
 
@@ -58,6 +63,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 quantFinal: null,
                 createdAt: null,
                 updatedAt: null,
+                costPriceAll: undefined,
         }
 
         const closeWindow = () => {
@@ -66,12 +72,49 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 setIsOpen(false);
                 setBatchId(undefined);
         }
+        interface TNomenclatureP {
+                itemId?: number;
+                name: string | null;
+                weightProduct: number | null;
+            }
         const [data, setData] = useState<TPurchase>(defaultData);
         const [itemsBatch, setItemsBatch] = useState<TPurchaseItem[]>([defaultItem]);
         const [isLoading, setIsLoading] = useState<boolean>(batchId ? true : false);
         const [captionList, setCaptionList] = useState<TCaption[]>([]);
         const [warehouses, setWarehouses] = useState<TWarehouse[]>([]);
         const [serialNumber, setSerialNumber] = useState<string | null>(null);
+        const [serialCaption, setSerialCaption] = useState<string | null>(null);
+        const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+        const [productList, setProductList] = useState<TNomenclatureP[]>([]);
+        const [mainCost, setMainCost] = useState<number | null>(null);
+
+        const checkSerialNumberExists = async (serialNumber: string | null) => {
+                if (!serialNumber) {
+                    setSerialCaption('Введите не пустое значение');
+                    return false;
+                }
+            
+                // Проверка на уникальность в текущем массиве itemsBatch
+                if (itemsBatch.find(item => item.serialNumber === serialNumber)) {
+                    setSerialCaption('Значение повторяется');
+                    return false;
+                }
+
+                let checked = false
+            
+                // Проверка на уникальность с помощью API
+                await getProductBySerial(serialNumber, (resp)=>{
+                        if (resp) {
+                                setSerialCaption('Значение уже есть');
+                                checked = false   
+                        } else {
+                                checked = true
+                        }
+                })
+
+                return checked;
+            }
+        
         
         // Инициализация данных
         useEffect(() => {
@@ -82,6 +125,22 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 }
         }, [batchId, isOpen, setIsLoading]);
 
+        const ruToEnMap: Record<string, string> = {
+                а: 'F', б: ',', в: 'D', г: 'U', д: 'L', е: 'T', ё: '`', ж: ';', з: 'P',
+                и: 'B', й: 'Q', к: 'R', л: 'K', м: 'V', н: 'Y', о: 'J', п: 'G', р: 'H',
+                с: 'C', т: 'N', у: 'E', ф: 'A', х: '[', ц: 'W', ч: 'X', ш: 'I', щ: 'O',
+                ы: 'S', э: '\'', ю: '.', я: 'Z',
+                А: 'F', Б: ',', В: 'D', Г: 'U', Д: 'L', Е: 'T', Ё: '`', Ж: ';', З: 'P',
+                И: 'B', Й: 'Q', К: 'R', Л: 'K', М: 'V', Н: 'Y', О: 'J', П: 'G', Р: 'H',
+                С: 'C', Т: 'N', У: 'E', Ф: 'A', Х: '[', Ц: 'W', Ч: 'X', Ш: 'I', Щ: 'O',
+                Ы: 'S', Э: '\'', Ю: '.', Я: 'Z',
+            };
+            
+        const convertRuToEn = (value : string) => {
+                return value.split('').map(char => ruToEnMap[char] || char).join('').toUpperCase();
+            };
+            
+    
         useEffect(() => {
                 const getData = async (batchId : number) => {
                                         await getPurchase(batchId, (resp) => {
@@ -103,9 +162,13 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                         })))
                                                 });
                                         }
+                                const getProducts = async () => {
+                                                        await  getNomenclatures((resp) => setProductList(resp.map((item: TNomenclature) => ({ name: item.name, itemId: item.itemId, weightProduct: Number(item.weight) }))));
+                                                        }
                 if (batchId) {
                         getItems(batchId);
-                        void getWarehousesData()
+                        void getWarehousesData();
+                        void getProducts();
                         getData(batchId).then(
                                 () => {
                                 setIsLoading(false);
@@ -198,10 +261,9 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
         }
 
         const checkSerialNumber = () => {
-
-                if (itemsBatch?.filter(elem => elem.hasSerialNumber && !elem.serialNumber)?.find((item) => (item?.quant !== itemsBatch?.filter(el => (el.itemId === item.itemId && el.serialNumber))?.length))) {
+                if (itemsBatch?.filter(elem => elem.hasSerialNumber && !elem.serialNumber)?.find((item) =>
+                        (item?.quant !== itemsBatch?.filter(el => ((el.itemId === item.itemId) && el.serialNumber && (el.partner === item.partner)))?.length))) {
                         return true;
-                        
                 } else {
                         return false;
                 }
@@ -289,10 +351,13 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                 <Layout direction="row" className={cnMixSpace({ mT:'m' })} >
                                         <div style={{minWidth:'15px', maxWidth:'15px'}} className={cnMixSpace({ mR:'m' })}/>
                                         <Text size="s" style={{ width: '100%'}} className={cnMixSpace({  pL:'s' })}>Наименование</Text>
+                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Контрагент</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Количество</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Сер. номер</Text>
                                         <div style={{minWidth:'135px', maxWidth:'135px'}} className={cnMixSpace({ mR:'m' })}/>
                                         <Text size="s" style={{minWidth:'235px', maxWidth:'235px'}} className={cnMixSpace({ mR:'m' })} align="center">Склад</Text>
+                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} align="center" onClick={()=> console.log(itemsBatch)}>Себестоимость</Text>
+
                                 </Layout>
                                 <Layout direction="column">
                                 {itemsBatch.length > 0 && (itemsBatch?.filter((elem) => (elem.serialNumber === null || elem.serialNumber === undefined )).map(itemBatch => (
@@ -306,6 +371,9 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         {itemBatch?.name && itemBatch?.itemId ? itemBatch.name : ''}
                                                                                                 </Text>
                                                                                         </div>
+                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mR:'m' })} align="center">
+                                                                                                        {itemBatch?.partner}
+                                                                                                </Text>
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs' })} align="center">
                                                                                                         {itemBatch?.quant?.toString() + ' шт'}
                                                                                                 </Text>
@@ -318,46 +386,64 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         {itemBatch.hasSerialNumber && (
                                                                                                                 <Layout direction="row">
                                                                                                                      <TextField 
+                                                                                                                        id={itemsBatch.indexOf(itemBatch)}
                                                                                                                         placeholder="Серия" 
                                                                                                                         title='Нажмите Enter, чтобы добавить введенное значение' 
                                                                                                                         size="s"
-                                                                                                                        value={itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber))).length !== itemBatch.quant ? serialNumber : 'Заполнено'}
+                                                                                                                        value={(focusedIndex !== itemsBatch.indexOf(itemBatch)) ? null : itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber) && (elem.partner === itemBatch.partner))).length !== itemBatch.quant ? serialNumber : 'Заполнено'}
                                                                                                                         onChange={(value)=>{
                                                                                                                                 if (value) {
-                                                                                                                                        setSerialNumber(value);
+                                                                                                                                        const convertedValue = convertRuToEn(value);
+                                                                                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9]/g, '');
+                                                                                                                                        setSerialNumber(filteredValue);
+                                                                                                                                        // setSerialNumber(value);
+                                                                                                                                        setSerialCaption(null)
                                                                                                                                 } else {
                                                                                                                                         setSerialNumber(null)
+                                                                                                                                        setSerialCaption(null)
                                                                                                                                 }
                                                                                                                         }}
-                                                                                                                        disabled={itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber))).length === itemBatch.quant}
-                                                                                                                        onKeyPress={(event) => {
-                                                                                                                                if ((event.key === 'Enter') && (serialNumber)) {
-                                                                                                                                        setItemsBatch(prev => ([...prev, {
-                                                                                                                                                itemBatchId: null,
-                                                                                                                                                batchId: itemBatch.batchId,
-                                                                                                                                                itemId: itemBatch.itemId,
-                                                                                                                                                costPrice: itemBatch.costPrice,
-                                                                                                                                                costPriceAll: itemBatch.costPriceAll,
-                                                                                                                                                costDeliver: itemBatch.costDeliver,
-                                                                                                                                                batchNumber: itemBatch.batchNumber,
-                                                                                                                                                name: itemBatch.name,
-                                                                                                                                                hasSerialNumber: itemBatch.hasSerialNumber,
-                                                                                                                                                quant: itemBatch.quant,
-                                                                                                                                                serialNumber: serialNumber,
-                                                                                                                                                warehouse: itemBatch.warehouse,
-                                                                                                                                                partner: itemBatch.partner,
-                                                                                                                                                createdAt: null,
-                                                                                                                                                updatedAt: null,  
-                                                                                                                                        }]));
-                                                                                                                                        setSerialNumber(null);
-                                                                                                                                        setItemsBatch(prev => 
-                                                                                                                                                prev.map(product => (product.itemId === itemBatch.itemId && !product.serialNumber) ? 
-                                                                                                                                                        { ...product, 
-                                                                                                                                                        quantFinal: (product?.quantFinal ?? 0 )+ 1, 
-                                                                                                                                                        } : product
-                                                                                                                                                ));
+                                                                                                                        disabled={itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber) && (elem.partner === itemBatch.partner))).length === itemBatch.quant}
+                                                                                                                        onKeyPress={async (event) => {
+                                                                                                                                if (event.key === 'Enter') {
+                                                                                                                                const isUnique = await checkSerialNumberExists(serialNumber);
+
+                                                                                                                                if (!isUnique) {
+                                                                                                                                return; // Если серийный номер не уникален, прекращаем выполнение
+                                                                                                                                } else {
+                                                                                                                                
+                                                                                                                                       
+                                                                                                                                setItemsBatch(prev => ([...prev, {
+                                                                                                                                        itemBatchId: null,
+                                                                                                                                        batchId: itemBatch.batchId,
+                                                                                                                                        itemId: itemBatch.itemId,
+                                                                                                                                        costPrice: itemBatch.costPrice,
+                                                                                                                                        costPriceAll: itemBatch.costPriceAll,
+                                                                                                                                        costDeliver: itemBatch.costDeliver,
+                                                                                                                                        batchNumber: itemBatch.batchNumber,
+                                                                                                                                        name: itemBatch.name,
+                                                                                                                                        hasSerialNumber: itemBatch.hasSerialNumber,
+                                                                                                                                        quant: itemBatch.quant,
+                                                                                                                                        serialNumber: serialNumber,
+                                                                                                                                        warehouse: itemBatch.warehouse,
+                                                                                                                                        partner: itemBatch.partner,
+                                                                                                                                        createdAt: null,
+                                                                                                                                        updatedAt: null,  
+                                                                                                                                }]));
+                                                                                                                                setSerialNumber(null);
+                                                                                                                                setItemsBatch(prev => 
+                                                                                                                                        prev.map(product => (product.itemId === itemBatch.itemId &&  !product.serialNumber && (product.partner === itemBatch.partner)) ? 
+                                                                                                                                                { ...product, 
+                                                                                                                                                quantFinal: (product?.quantFinal ?? 0 )+ 1, 
+                                                                                                                                                } : product
+                                                                                                                                        ));
                                                                                                                                 }
-                                                                                                                            }}
+                                                                                                                                }
+                                                                                                                                }
+                                                                                                                                }
+                                                                                                                            caption={(focusedIndex === itemsBatch.indexOf(itemBatch)) ? (serialCaption ?? undefined) : undefined}
+                                                                                                                            status={(serialCaption && (focusedIndex === itemsBatch.indexOf(itemBatch))) ? 'alert' : undefined}
+                                                                                                                            onFocus={() => {setFocusedIndex(itemsBatch.indexOf(itemBatch))}}
                                                                                                                         />
                                                                                                                 </Layout>
                                                                                                                 
@@ -401,7 +487,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         onChange={(value)=> {
                                                                                                         if (value) {
                                                                                                                 setItemsBatch(prev => 
-                                                                                                                        prev.map(product => (itemBatch.itemId === product.itemId) ? 
+                                                                                                                        prev.map(product => (itemBatch.itemId === product.itemId && (product.partner === itemBatch.partner) ) ? 
                                                                                                                                 { ...product, 
                                                                                                                                         warehouse: value.name,
                                                                                                                                 } : product
@@ -409,7 +495,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                         );
                                                                                                                 } else {
                                                                                                                         setItemsBatch(prev => 
-                                                                                                                                prev.map(product => (itemBatch.itemId === product.itemId) ? 
+                                                                                                                                prev.map(product => (itemBatch.itemId === product.itemId && (product.partner === itemBatch.partner)) ? 
                                                                                                                                         { ...product, 
                                                                                                                                                 warehouse: null,
                                                                                                                                         } : product
@@ -420,17 +506,55 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                 } 
                                                                                                         size="s"
                                                                                                         style={{minWidth:'235px', maxWidth:'235px'}}
+                                                                                                        caption={ captionList?.length > 0 && captionList?.find(item=>(item.state === "warehouse" && item.index === itemsBatch?.indexOf(itemBatch))) ? captionList?.find(item=>(item.state === "warehouse" && item.index === itemsBatch?.indexOf(itemBatch)))?.caption : undefined}
+                                                                                                        status={captionList?.length > 0 && captionList?.find(item=>(item.state === "warehouse" && item.index === itemsBatch?.indexOf(itemBatch))) ? "alert" : undefined}
+                                                                                                        onFocus={()=> {setCaptionList(prev => (prev.filter(item => (item.state !== 'warehouse'))))}}
+                                                                                                        className={cnMixSpace({mR:'m'})}
                                                                                                 />
+                                                                                                {!mainCost ? (
+                                                                                                        <NumberMaskTextField 
+                                                                                                                placeholder="Себестоимость"
+                                                                                                                incrementButtons={false}
+                                                                                                                value={itemBatch.costPriceAll?.toString()} 
+                                                                                                                onChange={(value : string | null)=> {
+                                                                                                                        if (value) {
+                                                                                                                                setItemsBatch(prev => 
+                                                                                                                                        prev.map(product => (itemBatch.itemId === product.itemId && (product.partner === itemBatch.partner)) ? 
+                                                                                                                                                { ...product, 
+                                                                                                                                                        costPriceAll: Number(value),
+                                                                                                                                                } : product
+                                                                                                                                        )
+                                                                                                                                        );
+                                                                                                                        } else {
+                                                                                                                                setItemsBatch(prev => 
+                                                                                                                                        prev.map(product => (itemBatch.itemId === product.itemId && (product.partner === itemBatch.partner)) ? 
+                                                                                                                                                { ...product, 
+                                                                                                                                                        costPriceAll: undefined,
+                                                                                                                                                } : product
+                                                                                                                                        )
+                                                                                                                                        );
+                                                                                                                        }
+                                                                                                                }
+                                                                                                                } 
+                                                                                                                size="s"
+                                                                                                                style={{minWidth:'150px', maxWidth:'150px'}}
+                                                                                                        />
+                                                                                                ) : (
+                                                                                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mR:'m' })} align="center">
+                                                                                                                {itemBatch?.costPriceAll}
+                                                                                                        </Text>
+                                                                                                )}
+                                                                                                
                                                                                 </Layout>
-                                                                                <Layout direction="row" className={itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber))).length > 0 ? '' : cnMixSpace({ mB:'s' })} style={{ flexWrap: 'wrap' }}>
-                                                                                        {itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber))).map(prod =>(
+                                                                                <Layout direction="row" className={itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber) && (elem.partner === itemBatch.partner))).length > 0 ? '' : cnMixSpace({ mB:'s' })} style={{ flexWrap: 'wrap' }}>
+                                                                                        {itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId) && (elem.serialNumber) && (elem.partner === itemBatch.partner))).map(prod =>(
                                                                                                 <Tag 
                                                                                                         label={prod.serialNumber ?? ''} 
                                                                                                         mode="cancel" 
                                                                                                         onCancel={()=>{
                                                                                                                 setItemsBatch(itemsBatch?.filter(el => (el.serialNumber !== prod.serialNumber)));
                                                                                                                 setItemsBatch(prev => 
-                                                                                                                        prev.map(product => (product.itemId === itemBatch.itemId && !product.serialNumber) ? 
+                                                                                                                        prev.map(product => (product.itemId === itemBatch.itemId && !product.serialNumber && (product.partner === itemBatch.partner)) ? 
                                                                                                                                 { ...product, 
                                                                                                                                 quantFinal: (product?.quantFinal ?? 0 ) - 1, 
                                                                                                                                 } : product
@@ -444,7 +568,45 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                 </Layout>
                                                 )))}
                                 </Layout>
+                                <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
+                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общая себестоимость:</Text>
+                                                        <NumberMaskTextField 
+                                                                size="s"
+                                                                value={mainCost}
+                                                                placeholder='Введите и нажмите Enter для расчёта'
+                                                                onChange={(value : string | null) => {setMainCost(Number(value))}}
+                                                                className={cnMixSpace({ mL:'2xs' })}
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                onKeyPress={async (event: any) => {
+                                                                        if (event.key === 'Enter') {
+                                                                                let totalWeight = 0;
 
+                                                                                // Считаем общий вес продукции
+                                                                                for (const item of itemsBatch) {
+                                                                                    const product = productList.find(p => p.itemId === item.itemId);
+                                                                                    if (product) {
+                                                                                        totalWeight += Number(product.weightProduct || 0 ) * Number(item?.quantFinal || 0);
+                                                                                    }
+                                                                                }
+                                                                                // Находим цену за единицу веса
+                                                                                const pricePerUnitWeight = Number(mainCost) / totalWeight;
+
+                                                                                // Обновляем costPriceAll для каждого элемента itemsBatch
+                                                                                const updatedItemsBatch = itemsBatch.map(item => {
+                                                                                        const product = productList.find(p => p.itemId === item.itemId);
+                                                                                        return {
+                                                                                                ...item,
+                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)),
+                                                                                        };
+                                                                                })
+                                                                                setItemsBatch(updatedItemsBatch)
+                                                                                
+                                                                        }
+                                                                        }}
+                                                        />
+                                                        <InfoCircleFilled className={cnMixSpace({ mL:'s' })}/>
+                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите кол-во принято или серийники</Text>
+                                        </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
                                                         <Text size="s" className={cnMixSpace({ mB:'xs' })} >Комментарий:</Text>
                                                         <TextField 
@@ -489,9 +651,15 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         if (((checkQuant()) && (!data.comment)) || ((checkSerialNumber()) && (!data.comment))) {
                                                                                 setCaptionList(prev => [...prev, {caption: 'Укажите в комментарии причину несоответствия объёмов товара', state:'comment'}])
                                                                         } else {
-                                                                                if (batchId) {
-                                                                                acceptBatch(e, batchId);
+                                                                                if (itemsBatch.filter(item => !item.warehouse)?.length > 0) {
+                                                                                        setCaptionList(prev => [...prev, {caption: 'Укажите склад', state:'warehouse', index: itemsBatch?.indexOf(itemsBatch.find(item => !item.warehouse) ?? itemsBatch[0]) }])
+
+                                                                                } else {
+                                                                                        if (batchId) {
+                                                                                        acceptBatch(e, batchId);
                                                                                 }
+                                                                                }
+                                                                                
                                                                         }
                                                                         
                                                                 }}

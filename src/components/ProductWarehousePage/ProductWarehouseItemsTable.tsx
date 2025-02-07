@@ -208,17 +208,18 @@ const { getStoredPageSize, setStoredPageSize } = usePaginationStore('Records');
                 <TableColumnHeader
                     header="Серийный номер"
                     withoutSort
+                    align='center'
                 />
             ),
             dataIndex: 'hasSerialNumber',
             key: 'hasSerialNumber',
-            align: 'left',
-            width: '200px',
+            align: 'center',
+            width: '150px',
             render: (value: string, record: TPurchaseItemRow) => {
                 return record.spacer ? (
                     <></>
                 ) : (
-                    <Layout direction="row" style={{ minWidth: '200px' }}>
+                    <Layout direction="row" style={{ minWidth: '150px', justifyContent: 'center' }}>
                         {value ? (<IconCheck/>) : <>-</>}
                     </Layout>
                 );

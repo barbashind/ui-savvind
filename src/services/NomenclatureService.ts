@@ -47,8 +47,8 @@ export const addNomenclature = async (data: object): Promise<object> => {
             body: JSON.stringify(data),
         });
         if (!response.ok) {
-            const errorResponse = await getErrorResponse(response);
-            throw new ErrorResponse(errorResponse);
+            const errorData = await response.json();
+            throw errorData;
         }
         const resp: object = (await response.json()) as Promise<object>;
         return resp;

@@ -24,6 +24,7 @@ import { addPurchase, addPurchaseItems, deletePurchaseItem, getContractors, getD
 import { TPurchase } from "../../types/purchase-types";
 import { TAccount } from "../../types/settings-types";
 import { getAccounts } from "../../services/SettingsService";
+import NumberMaskTextField from "../../utils/NumberMaskTextField";
 
 
 
@@ -69,6 +70,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 setIsOpen(false);
                 setBatchId(undefined);
                 setCaptionList([]);
+                setRate(null);
         }
         const [data, setData] = useState<TPurchase>(defaultData);
         const [productList, setProductList] = useState<TProduct[]>([]);
@@ -78,7 +80,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
         const [isLoading, setIsLoading] = useState<boolean>(batchId ? true : false);
         const [captionList, setCaptionList] = useState<TCaption[]>([]);
         const [accounts, setAccounts] = useState<TAccount[]>([]);
-        
+        const [rate, setRate] = useState<number | null>(null);
         useEffect(() => {
                 if (batchId) {
                         setIsLoading(true);
@@ -91,10 +93,10 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 if (data.batchStatus === 'CREATED' || !data.batchStatus)
                 setItemsBatch(prev => prev?.map(item => ({
                         ...item,
-                        costDeliver: Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight ) || 0) + (item?.costPrice  ?? 0) * (deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0)) * 100) / 100,
-                        costPriceAll:  Math.round((Number(Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight) || 0) + (item?.costPrice  ?? 0) * (deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0)) * 100) / 100) + Number(item?.costPrice ?? 0)) * 100) / 100}
+                        costDeliver: Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight ) || 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100,
+                        costPriceAll:  Math.round((Number(Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight) || 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100) + Number(item?.costPrice ?? 0)) * 100) / 100}
                         ))) 
-                }, [data?.batchStatus, data?.deliver, itemsBatch.length, deliversList, productList]);
+                }, [data?.batchStatus, data?.deliver, itemsBatch.length, deliversList, productList, rate]);
 
         // Инициализация данных
         useEffect(() => {
@@ -110,9 +112,11 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 const getData = async (batchId : number) => {
                         await getPurchase(batchId, (resp) => {
                                 setData(resp);
+                                setRate(resp?.rate ?? null);
                                 setIsLoading(false);
                             });
                 }
+
                 const getItems = async (batchId : number) => {
                         await getPurchaseItems(batchId, (resp) => {
                                 setItemsBatch(resp);
@@ -177,6 +181,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                         insurance: data.insurance,
                         createdAt: data.createdAt,
                         updatedAt: data.updatedAt,
+                        rate: rate,
                         body: body,
                         }).then(async(resp) => {
 
@@ -224,6 +229,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                 insurance: data.insurance,
                                 createdAt: data.createdAt,
                                 updatedAt: data.updatedAt,
+                                rate: rate,
                                 body: body,
 
                         }).then(async(resp) => {
@@ -381,6 +387,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                         setData(defaultData);
                                                         setBatchId(undefined);
                                                         setItemsBatch([defaultItem]);
+                                                        setRate(null);
                                                 }}
                                         />
                                 </Layout>
@@ -392,7 +399,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                         <Text size="s" style={{ width: '100%', minWidth:'200px',}} className={cnMixSpace({  pL:'s' })}>Наименование</Text>
                                         <Text size="s" style={{minWidth:'200px', maxWidth:'200px'}} className={cnMixSpace({ mL:'m' })} align="center">Поставщик</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Количество</Text>
-                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })}>Цена закупки</Text>
+                                        <Text size="s" style={{minWidth:'110px', maxWidth:'110px'}} className={cnMixSpace({ mL:'m' })}>Цена закупки $</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })}>Доставка</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })}>Итог. цена</Text>
                                         <Text size="s" style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m' })}>Общая стоимость</Text>
@@ -546,12 +553,12 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         );
                                                                                                 }
                                                                                                 }}
-                                                                                                style={{minWidth:'100px', maxWidth:'100px'}} 
+                                                                                                style={{minWidth:'110px', maxWidth:'110px'}} 
                                                                                                 className={cnMixSpace({ mL:'m' })}
                                                                                         />
                                                                                         )}
                                                                                         {(data.batchStatus !== 'CREATED' && data.batchStatus) && (
-                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs' })}>
+                                                                                                <Text size="s" style={{minWidth:'110px', maxWidth:'110px'}} className={cnMixSpace({  mT: '2xs' })}>
                                                                                                         {(itemBatch?.costPrice ? (itemBatch?.costPrice)?.toString() : '-') + ' руб'}
                                                                                                 </Text>
                                                                                         )}
@@ -559,9 +566,9 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         {(itemBatch?.costDeliver ? itemBatch?.costDeliver?.toString() : '-') + ' руб'}
                                                                                                 </Text>
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })}>
-                                                                                                        {(itemBatch?.costPriceAll ? itemBatch?.costPriceAll?.toString() : '-') + ' руб'}
+                                                                                                        {(itemBatch?.costPriceAll ? (itemBatch?.costPriceAll?.toString()) : '-') + ' руб'}
                                                                                                 </Text>
-                                                                                        <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>{itemBatch.costPrice && itemBatch.quant && itemBatch.costDeliver ? ((Number(itemBatch.costPrice)  + Number(itemBatch.costDeliver)) * itemBatch.quant).toString() + ' руб' : '0 руб'}</Text>
+                                                                                        <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>{itemBatch.costPrice && itemBatch.quant && itemBatch.costDeliver ? ((Number(itemBatch.costPrice)  + Number(itemBatch.costDeliver)) * itemBatch.quant).toFixed(2) + ' руб' : '0 руб'}</Text>
                                                                                         {itemBatch.itemId && (
                                                                                                 <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
                                                                                                         {itemBatch.hasSerialNumber ? (<IconAllDone view="success" style={{alignSelf: 'center'}}/>) : (<IconClose view="alert" style={{alignSelf: 'center'}}/>)}
@@ -644,6 +651,8 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         size="s"
+                                                        disabled={!!data.deliver}
+                                                        title={!data.deliver ? '' : 'Удалите доставщика для добавления'}
                                                         className={cnMixSpace({ mV:'m' })}
                                                         onClick={()=>{
                                                                 setItemsBatch(prev => [...prev, 
@@ -708,7 +717,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                         />        
                                         </Layout>
                                         <Layout direction="column" flex={1} className={cnMixSpace({ pR:'m' })}>
-                                                <Text size="s"  >Цена доставки за кг:</Text>
+                                                <Text size="s"  >Цена доставки за кг ($):</Text>
                                                         <TextField 
                                                                 size="s"
                                                                 type="number"
@@ -718,6 +727,23 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                 className={cnMixSpace({ mT:'2xs'})}
                                                                 style={{width: '100%'}}
                                                                 disabled
+                                                        />        
+                                        </Layout>
+                                        <Layout direction="column" flex={1} className={cnMixSpace({ pR:'m' })}>
+                                                <Text size="s" onClick={()=>{console.log(rate?.toString())}} >Курс $:</Text>
+                                                        <NumberMaskTextField 
+                                                                size="s"
+                                                                placeholder="Введите курс доллара"
+                                                                value={rate?.toString()}
+                                                                onChange={(value : string | null) => {
+                                                                        if (value) {
+                                                                                setRate(Number(value))
+                                                                        } else {
+                                                                                setRate(null)
+                                                                        }
+                                                                }}
+                                                                className={cnMixSpace({ mT:'2xs'})}
+                                                                style={{width: '100%'}}
                                                         />        
                                         </Layout>
                                         <Layout direction="column" flex={1}>
@@ -758,7 +784,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })}>Общая сумма:</Text> 
-                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * (Number(item.costPrice ?? 0) + Number(item.costDeliver ?? 0) ), 0).toString() + ' руб'}</Text>  
+                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * (Number(item.costPrice ?? 0) + Number(item.costDeliver ?? 0) ), 0)?.toFixed(2) + ' руб'}</Text>  
                                         </Layout>
                                         <Layout direction="row" style={{justifyContent: 'right'}}>
                                                 <Button 

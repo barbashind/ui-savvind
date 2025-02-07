@@ -2,6 +2,7 @@ export interface TAccount {
         accountId?: number;
         name?: string;
         value?: number;
+        currency?: string;
     }
     
 export interface TCategory {
@@ -12,6 +13,10 @@ export interface TCategory {
 export interface TWarehouse {
         warehouseId?: number;
         name?: string;
+    }
+export interface TCurrency {
+        id?: number;
+        currency?: string;
     }
 
 export interface TUser {

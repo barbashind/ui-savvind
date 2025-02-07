@@ -114,7 +114,7 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                         <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s">{acc?.accountId?.toString()}</Text>
                                                         <Text style={{width: '100%'}} size="s">{acc?.name}</Text>
                                                         <NumberMaskTextField
-                                                                value={acc.value ?? 0}
+                                                                value={acc.value?.toString()}
                                                                 onChange={(value : string | null) => {
                                                                         if (value) {
                                                                                 setAccounts(prev => 

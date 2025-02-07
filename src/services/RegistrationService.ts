@@ -61,7 +61,3 @@ export const getNomenclatures = async (
                 console.log('failed');
             });
     };
-
-
-
-    

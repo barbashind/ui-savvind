@@ -16,102 +16,83 @@ import { IconAdd } from "@consta/icons/IconAdd";
 // собственные компоненты
 import { cnMixFontSize } from "../../utils/MixFontSize"
 import { AntIcon } from "../../utils/AntIcon"
-import { TAccount, TCurrency } from "../../types/settings-types"
+import { TCurrency } from "../../types/settings-types"
 import { TextField } from "@consta/uikit/TextField"
 import { IconTrash } from "@consta/icons/IconTrash"
 import { cnMixSpace } from "@consta/uikit/MixSpace"
-import { deleteAccount, getAccounts, getCurrencies, updateAccounts } from "../../services/SettingsService"
+import { deleteCurrency, getCurrencies, updateCurrencies } from "../../services/SettingsService"
 import { Loader } from "@consta/uikit/Loader"
-import { Combobox } from "@consta/uikit/Combobox"
-import { IconRevert } from "@consta/icons/IconRevert"
 
 // сервисы
 
 
-const Accounts = () => {
+const Currencies = () => {
         
-const [accounts, setAccounts] = useState<TAccount[]>([]);
-const [isLoading, setIsLoading] = useState<boolean>(true);
 const [currencies, setCurrencies] = useState<TCurrency[]>([]);
 
+const [isLoading, setIsLoading] = useState<boolean>(true);
 // Инициализация данных
 useEffect(() => {
-        const getAccountsData = async () => {
-                await getAccounts((resp) => {
-                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        
-                })
-        }
         const getCurrenciesData = async () => {
                 await getCurrencies((resp) => {
-                        setCurrencies(resp.map((item : TCurrency) => ({id: item.id, currency: item.currency})))
-                        
-                })
+                        setCurrencies(resp.map((item : TCurrency) => ({
+                                id: item.id, 
+                                currency: item.currency, 
+                        })))
+                });
         }
-        void getCurrenciesData();
-        void getAccountsData().then(()=> {
+        void getCurrenciesData().then(()=>{
                 setIsLoading(false);
         });
 }, [])
 
-const refreshCurrenciesData = async () => {
-        await getCurrencies((resp) => {
-                setCurrencies(resp.map((item : TCurrency) => ({id: item.id, currency: item.currency})))
-                
-        })
-}
-
-const deleteAccountData = async (accountId: number | undefined) => {
+const deleteCurrencyData = async (id: number | undefined) => {
         setIsLoading(true);
-        await deleteAccount(accountId).then(()=>{
-                const getAccountsData = async () => {
-                        await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        })
+        await deleteCurrency(id).then(()=>{
+                const getCurrenciesData = async () => {
+                        await getCurrencies((resp) => {
+                                setCurrencies(resp.map((item : TCurrency) => ({
+                                        id: item.id, 
+                                currency: item.currency, 
+                                })))
+                        });
                 }
-                void getAccountsData().then(()=> {
+                void getCurrenciesData().then(()=>{
                         setIsLoading(false);
                 });
         })
 }
 
-const updateAccountsData = async (accounts : TAccount[]) => {
+const updateCurrenciesData = async (warehouses : TCurrency[]) => {
         setIsLoading(true);
-        await updateAccounts(accounts).then(()=>{
-                const getAccountsData = async () => {
-                        await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        })
+        await updateCurrencies(warehouses).then(()=>{
+                const getCurrenciesData = async () => {
+                        await getCurrencies((resp) => {
+                                setCurrencies(resp.map((item : TCurrency) => ({
+                                        id: item.id, 
+                                        currency: item.currency, 
+                                })))
+                        });
                 }
-                void getAccountsData().then(()=> {
+                void getCurrenciesData().then(()=>{
                         setIsLoading(false);
                 });
         })
 }
 
         return (
-                <Card border style={{width: '100%', flex: '2'}} className={cnMixSpace({mT: 'm'})}>
+                <Card border style={{width: '100%'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Счета</Text>
+                                        <Text view="brand" size="l" weight="semibold">Валюты</Text>
                                         <Layout direction="row">
-                                                 <Button
-                                                        iconLeft={IconRevert}
-                                                        view="secondary"
-                                                        onClick={()=>{
-                                                                refreshCurrenciesData();
-                                                        }}
-                                                        size="s"
-                                                        className={cnMixSpace({mR: 'm'})}
-                                                        title="Обновить список валют"
-                                                />
                                                 <Button
                                                         label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
-                                                                setAccounts(prev => 
-                                                                        [...prev, {accountId: undefined, name: undefined, currency: 'RUB'}]
+                                                                setCurrencies(prev => 
+                                                                        [...prev, {id: undefined, currency: undefined}]
                                                                 )
                                                         }}
                                                         size="s"
@@ -127,41 +108,40 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                         view="primary"
                                                         size="s"
                                                         onClick={()=>{
-                                                                updateAccountsData(accounts);
+                                                                updateCurrenciesData(currencies);
                                                         }}
                                                 />
                                         </Layout>
                                         
                                 </Layout>
-                                {(accounts?.length > 0) && !isLoading && (
-                                <Layout direction="row" className={cnMixSpace({mT:'m'})}>
-                                        <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left">ID</Text>
-                                        <Text style={{width: '100%'}} size="xs" align="left">Наименование</Text>
-                                        <Text style={{minWidth: '200px', maxWidth: '200px'}} className={cnMixSpace({mL:'m'})} size="xs" align="left">Валюта</Text>
+                                {!isLoading && (currencies?.length > 0) && (
+                                <Layout direction="row" style={{justifyContent: 'space-between'}} className={cnMixSpace({mT:'m'})}>
+                                        <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} align="left" size="xs">ID</Text>
+                                        <Text style={{width: '100%'}} align="left" size="xs">Наименование</Text>
                                         <div style={{minWidth: '40px', maxWidth: '40px'}}/>
                                 </Layout>
                                 )}
                                 <Layout direction="column">
-                                        {!isLoading && accounts?.map((acc : TAccount) => (
+                                        {!isLoading && currencies?.map((acc : TCurrency) => (
                                                 <Layout direction="row" className={cnMixSpace({mT: 's'})}>
                                                         <TextField
-                                                                value={acc?.accountId?.toString()}
+                                                                value={acc?.id?.toString()}
                                                                 size="s"
                                                                 placeholder="ID"
                                                                 onChange={(value)=>{
                                                                         if (value) {
-                                                                            setAccounts(prev => 
-                                                                                prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                            setCurrencies(prev => 
+                                                                                prev.map(account => (currencies.indexOf(account) === currencies.indexOf(acc)) ? 
                                                                                         { ...account, 
-                                                                                                accountId: Number(value),
+                                                                                                id: Number(value),
                                                                                         } : account
                                                                                 )
                                                                                 );    
                                                                         } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setCurrencies(prev => 
+                                                                                        prev.map(account => (currencies.indexOf(account) === currencies.indexOf(acc)) ? 
                                                                                                 { ...account, 
-                                                                                                        accountId: undefined,
+                                                                                                        id: undefined,
                                                                                                 } : account
                                                                                         )
                                                                                         );   
@@ -172,55 +152,25 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                 disabled
                                                         />
                                                         <TextField
-                                                                value={acc?.name}
+                                                                value={acc?.currency}
                                                                 size="s"
                                                                 style={{width: '100%'}}
                                                                 placeholder="Введите наименованование"
                                                                 onChange={(value)=>{
                                                                         if (value) {
-                                                                            setAccounts(prev => 
-                                                                                prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setCurrencies(prev => 
+                                                                                prev.map(account => (currencies.indexOf(account) === currencies.indexOf(acc)) ? 
                                                                                         { ...account, 
-                                                                                                name: value,
+                                                                                                currency: value,
                                                                                         } : account
                                                                                 )
                                                                                 );    
                                                                         } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setCurrencies(prev => 
+                                                                                        prev.map(account => (currencies.indexOf(account) === currencies.indexOf(acc)) ? 
                                                                                                 { ...account, 
-                                                                                                        name: undefined,
-                                                                                                } : account
-                                                                                        )
-                                                                                        );   
-                                                                        }
-                                                                        
-                                                                }}
-                                                                className={cnMixSpace({mL:'m'})}
-                                                        />
-                                                        <Combobox
-                                                                items={currencies}
-                                                                getItemLabel={(item)=> (item.currency ?? '')}
-                                                                getItemKey={(item) => (item.id ?? 0)}
-                                                                value={currencies.find(el => (el.currency === acc?.currency))}
-                                                                size="s"
-                                                                style={{minWidth: '200px', maxWidth: '200px'}}
-                                                                placeholder="Выберите валюту"
-                                                                onChange={(value)=>{
-                                                                        if (value) {
-                                                                                setAccounts(prev => 
-                                                                                prev.map(elem => (accounts.indexOf(elem) === accounts.indexOf(acc)) ? 
-                                                                                        { ...elem, 
-                                                                                                currency: value.currency,
-                                                                                        } : elem
-                                                                                )
-                                                                                );    
-                                                                        } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(elem => (accounts.indexOf(elem) === accounts.indexOf(acc)) ? 
-                                                                                                { ...elem, 
                                                                                                         currency: undefined,
-                                                                                                } : elem
+                                                                                                } : account
                                                                                         )
                                                                                         );   
                                                                         }
@@ -234,17 +184,17 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                         view="clear"
                                                                         size="s"
                                                                         onClick={()=>{
-                                                                                if (!acc.accountId) {
-                                                                                        setAccounts(prev => prev.filter(account => (accounts.indexOf(account) !== accounts.indexOf(acc))));  
+                                                                                if (!acc.id) {
+                                                                                        setCurrencies(prev => prev.filter(account => (currencies.indexOf(account) !== currencies.indexOf(acc))));  
                                                                                 } else {
-                                                                                        deleteAccountData(acc.accountId)
+                                                                                        deleteCurrencyData(acc.id)
                                                                                 }
                                                                         }}
                                                                 />
                                                         </div>
                                                 </Layout>
                                         ))}
-                                        {(accounts?.length === 0 || !accounts) && !isLoading && (
+                                        {!isLoading && (currencies?.length === 0 || !currencies) && (
                                                 <Text 
                                                         view="secondary" 
                                                         size="s" 
@@ -266,4 +216,4 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                 
         )
 }
-export default Accounts
+export default Currencies;
