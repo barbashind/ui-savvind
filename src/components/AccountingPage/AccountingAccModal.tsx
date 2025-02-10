@@ -40,7 +40,7 @@ useEffect(() => {
         setIsLoading(true);
         const getAccountsData = async () => {
                 await getAccounts((resp) => {
-                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value})))
+                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value, currency: item.currency})))
                         
                 })
         }
@@ -106,6 +106,7 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                         <Text style={{minWidth: '50px', maxWidth: '50px'}} className={cnMixSpace({ mL:'s'})} size="xs" align="left" view="secondary">ID</Text>
                                         <Text style={{width: '100%'}} size="xs" align="left" view="secondary">Наименование</Text>
                                         <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left" view="secondary">Объём (руб)</Text>
+                                        <Text style={{minWidth: '50px', maxWidth: '50px'}} className={cnMixSpace({ mL:'s', mR:'m'})} size="xs" align="left" view="secondary">Валюта</Text>
                                 </Layout>
                                 )}
                                 <Layout direction="column">
@@ -137,8 +138,7 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                 style={{minWidth: '150px', maxWidth: '150px'}}
                                                                 size='s'
                                                         />
-                                                                
-                                                        
+                                                        <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s" className={cnMixSpace({mL: 's'})}>{acc?.currency}</Text>
                                                 </Layout>
                                         ))}
                                         {(accounts?.length === 0 || !accounts) && !isLoading && (

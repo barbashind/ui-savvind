@@ -59,7 +59,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
         useEffect(() => {
                 const getAccountsData = async () => {
                         await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name})))
+                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
                                 
                         })
                 }
@@ -188,6 +188,8 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
+                                                caption={(data.accountFrom === data.accountTo && !!data.accountFrom)? 'Счета совпадают' : (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo) ? 'Валюта отличается' : undefined }
+                                                status={((data.accountFrom === data.accountTo && !!data.accountFrom) || (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo)) ? 'alert' : undefined}
                                         />
                                         <TextField 
                                                 value={data.justification}
@@ -199,7 +201,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 size="s"
-                                                style={{width: '100%', minWidth: '150px',}}
+                                                style={{width: '100%', minWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
                                         />
                                         <Combobox
@@ -230,7 +232,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                  }}
                                                 size={'s'}
-                                                style={{minWidth: '150px', maxWidth: '150px'}}
+                                                style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
                                          />
                                           {/* <Select
@@ -271,6 +273,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         label={'Сохранить'}
                                                         view="primary"
                                                         size="s"
+                                                        disabled={((data.accountFrom === data.accountTo && !!data.accountFrom) || (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo))}
                                                         className={cnMixSpace({ mL:'m' })}
                                                         onClick={(e)=>{
                                                                 if (data.id) {

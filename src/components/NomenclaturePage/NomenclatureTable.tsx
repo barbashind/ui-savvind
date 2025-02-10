@@ -139,7 +139,7 @@ useEffect(() => {
 const activeMessageNomenclature = async (record: TNomenclatureRow, itemId: number | undefined) => {
     const body = {
         ...record,
-        isMessageActive: true
+        isMessageActive: !record.isMessageActive
     }
     await updateNomenclature(itemId, body).then(()=>{
         setUpdateFlag(true);
