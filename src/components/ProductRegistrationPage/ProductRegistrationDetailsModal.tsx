@@ -541,7 +541,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         />
                                                                                                 ) : (
                                                                                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mR:'m' })} align="center">
-                                                                                                                {itemBatch?.costPriceAll}
+                                                                                                                {itemBatch?.costPriceAll ? Number(itemBatch?.costPriceAll)?.toFixed(2) : ''}
                                                                                                         </Text>
                                                                                                 )}
                                                                                                 

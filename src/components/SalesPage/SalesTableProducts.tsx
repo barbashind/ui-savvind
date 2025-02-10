@@ -286,7 +286,7 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
         return (
             <Layout flex={1} direction="column" style={{ height: '100%' }}>
             <Layout flex={1} direction="column" style={{
-                    minHeight: 'calc(90vh - 155px)',
+                    minHeight: 'calc(90vh - 203px)',
                     overflow: 'auto',
                     display: 'flex',
                     width: '100%',

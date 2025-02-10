@@ -33,7 +33,10 @@ const SalesToolbar = ({setIsEditModalOpen, setFilterValues, setSearchText,  sear
 
 
         return (
-                <Layout direction="row" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({m: 'm', p:'m'})} >
+                <Layout direction="column">
+
+                
+                <Layout direction="row" style={{ justifyContent: 'space-between'}} className={cnMixSpace({mH: 'm', pH:'m', mT: 'm', pT:'m'})} >
                         <Layout direction="row">
                                 <Text size='2xl' weight="semibold" view="brand" >
                                         Продажи
@@ -82,19 +85,22 @@ const SalesToolbar = ({setIsEditModalOpen, setFilterValues, setSearchText,  sear
                                                 setUpdateFlag(true);
                                         }}
                                 />
-                                <Button size='s' view='secondary' label={'Сформировать чек'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
-                                <Button 
-                                        size='s' 
-                                        view='secondary' 
-                                        label={'Возврат товара'} 
-                                        iconLeft={IconRevert} 
-                                        onClick={()=>{setIsReturnModalOpen(true)}} 
-                                        className={cnMixSpace({mL: 's'})}
-                                        style={{color: '#eb5757', borderColor: '#eb5757'}}
-                                />
-                                <Button size='s' view='secondary' iconLeft={IconSortDownCenter} title="Фильтр" onClick={()=>{setIsFilterModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
                         </Layout>
                         
+                </Layout>
+                <Layout direction="row" style={{ justifyContent: 'end', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({m: 'm', pB:'m', pH:'m'})} >
+                        <Button size='s' view='secondary' label={'Сформировать чек'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                        <Button 
+                                size='s' 
+                                view='secondary' 
+                                label={'Возврат товара'} 
+                                iconLeft={IconRevert} 
+                                onClick={()=>{setIsReturnModalOpen(true)}} 
+                                className={cnMixSpace({mL: 's'})}
+                                style={{color: '#eb5757', borderColor: '#eb5757'}}
+                        />
+                        <Button size='s' view='secondary' iconLeft={IconSortDownCenter} title="Фильтр" onClick={()=>{setIsFilterModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                </Layout>
                 </Layout>
         )
 }

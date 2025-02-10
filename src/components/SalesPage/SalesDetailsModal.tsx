@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { Layout } from "@consta/uikit/Layout"
 import { Button } from '@consta/uikit/Button';
@@ -74,6 +74,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
         const [captionList, setCaptionList] = useState<TCaption[]>([]);
 
         const [role, setRole] = useState<string | undefined>(undefined);
+        const serialRef = useRef<HTMLInputElement>(null);
     
     // Преобразование при получении данных
     const transformFromResponse = (response: TSale[]): TSale[] => {
@@ -147,6 +148,12 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                 setIsLoading(false);
                         });
                 }
+                if (serialRef.current) {
+                        const inputSerial = serialRef.current?.getElementsByTagName('input');
+                        if (inputSerial) {
+                                inputSerial[0].focus();
+                        }
+                    }
                 getProducts();
                 
             }, [checkId, setData, isOpen]);
@@ -455,7 +462,7 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Сер. номер</Text>
                                         <Text size="s" style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })} align="center"></Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Количество</Text>
-                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })}>Цена продажи</Text>
+                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} >Цена продажи</Text>
                                         <div style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })}/>
                                 </Layout>
                                 <Layout direction="column">
@@ -534,6 +541,7 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                                                 caption={ captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck))))?.caption : undefined}
                                                                                                 status={captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? "alert" : undefined}
                                                                                                 onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "serialNumber") && (capt.index !== sales.indexOf(itemCheck)) ))}}
+                                                                                                ref={serialRef}
                                                                                         />  
 
                                                                                         <Layout  style={{minWidth:'38px', maxWidth:'38px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
@@ -615,7 +623,7 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
 
                                                                                 <Layout direction="row" style={{width: '100%'}} className={cnMixSpace({p:'s'})}>
                                                                                         <Text style={{ width: '100%', alignContent: 'center' }} size="xs">{itemCheck.name && itemCheck.itemId ? itemCheck?.name : ''}</Text>
-                                                                                        <Text style={{minWidth:'100px', maxWidth:'100px' , alignContent: 'center'}} className={cnMixSpace({ mL:'m' })}>{itemCheck?.serialNumber ?? null}</Text>
+                                                                                        <Text style={{minWidth:'100px', maxWidth:'100px' , alignContent: 'center'}} className={cnMixSpace({ mL:'m' })} truncate size="xs">{itemCheck?.serialNumber ?? null}</Text>
                                                                                         <Layout  style={{minWidth:'38px', maxWidth:'38px', justifyContent: 'center', alignContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
                                                                                                         {!!itemCheck.serialNumber && itemCheck.itemId ? (<IconAllDone view="success" style={{alignSelf: 'center'}}/>) : !!itemCheck.serialNumber && !itemCheck.itemId ?  (<IconClose view="alert" style={{alignSelf: 'center'}}/>) : <></>}
                                                                                         </Layout>
