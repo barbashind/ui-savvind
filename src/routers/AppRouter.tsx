@@ -18,7 +18,7 @@ import { concatUrl } from "../utils/urlUtils.ts";
 const AppRouter = () => {
         return (
                 <Routes>
-                        <Route element={<MainPage />}>
+                        <Route element={<MainPage  />} path={routeTarget.main}>
                                 <Route element={<Nomenclature />} path={concatUrl([routeTarget.main, routeTarget.nomenclature])} />
                                 <Route element={<Sales />} path={concatUrl([routeTarget.main, routeTarget.sales])} />
                                 <Route element={<ProductRegistration />} path={concatUrl([routeTarget.main, routeTarget.product_registration])} />
@@ -30,12 +30,12 @@ const AppRouter = () => {
                         <Route
                                 path=""
                                 element={
-                                        <Navigate to={{ pathname: concatUrl([routeTarget.main, routeTarget.sales])}} relative="path" />
+                                        <Navigate to={{ pathname: routeTarget.main }} relative="path" />
                                 }
                         />
                         <Route
                                 path="*"
-                                element={<Navigate to={{ pathname: concatUrl([routeTarget.main, routeTarget.sales]) }} relative="path" />}
+                                element={<Navigate to={{ pathname: routeTarget.main }} relative="path" />}
                         />
                 </Routes>
         );

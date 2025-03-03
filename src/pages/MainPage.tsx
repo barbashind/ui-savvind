@@ -23,6 +23,13 @@ import { BarcodeOutlined } from "@ant-design/icons";
 import { DefaultTabs } from "../utils/types.ts";
 import { concatUrl } from "../utils/urlUtils.ts";
 import { routeTarget } from "../routers/routes.ts";
+import { Card } from "@consta/uikit/Card/index";
+import NoneclatureImage from "../assets/NoneclatureImage.tsx";
+import SettingsImage from "../assets/SettingsImage.tsx";
+import PurchaseImage from "../assets/PurchaseImage.tsx";
+import RegistrationImage from "../assets/RegistrationImage.tsx";
+import SalesImage from "../assets/SalesImage.tsx";
+import AccountingImage from "../assets/AccountingImage.tsx";
 
 
 // сервисы
@@ -152,10 +159,46 @@ const MainPage = () => {
                                                                 />
                                                         </Layout>   
                                                 )}
-                                        </Layout>        
-                                <Layout style={{ width: isOpenMenu ? 'calc(100% - 222px)' : 'calc(100% - 72px)'}}>
-                                        <Outlet />          
-                                </Layout>
+                                        </Layout>
+                                {activePage ? (
+                                        <Layout style={{ width: isOpenMenu ? 'calc(100% - 222px)' : 'calc(100% - 72px)'}}>
+                                                <Outlet />          
+                                        </Layout>
+                                ) : (
+                                        <Layout style={{ width: isOpenMenu ? 'calc(100% - 222px)' : 'calc(100% - 72px)'}}>
+                                                <Layout direction="column">
+                                                        <Layout direction="row" >
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <SettingsImage/>
+                                                                        <Text view="link" weight="semibold">Настройки</Text>
+                                                                </Card>
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <NoneclatureImage/>
+                                                                        <Text view="link" weight="semibold">Номенклатура</Text>
+                                                                </Card>
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <PurchaseImage/>
+                                                                        <Text view="link" weight="semibold">Закупка</Text>
+                                                                </Card>
+                                                        </Layout>
+                                                        <Layout direction="row">
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <RegistrationImage/>
+                                                                        <Text view="link" weight="semibold">Оприходование товаров</Text>
+                                                                </Card>
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <SalesImage/>
+                                                                        <Text view="link" weight="semibold">Продажи</Text>
+                                                                </Card>
+                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                        <AccountingImage/>
+                                                                        <Text view="link" weight="semibold">Бухгалтерия</Text>
+                                                                </Card>
+                                                        </Layout>
+                                                </Layout>        
+                                        </Layout>
+                                )}
+                                
 
                                 
                                    

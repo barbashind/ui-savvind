@@ -154,6 +154,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
             key: 'batchNumber',
             align: 'left',
             width: '100%',
+            minWidth: 200,
             render: (value: string, record: TPurchaseRow) => {
                 return record.spacer ? (
                     <></>
@@ -177,6 +178,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                     }}
                 />
             ),
+            minWidth: 200,
             dataIndex: 'sum',
             key: 'sum',
             align: 'left',
@@ -204,6 +206,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                     }}
                 />
             ),
+            minWidth: 200,
             dataIndex: 'createdAt',
             key: 'createdAt',
             align: 'left',
@@ -227,6 +230,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                     withoutSort
                 />
             ),
+            minWidth: 200,
             dataIndex: 'comment',
             key: 'comment',
             align: 'left',
@@ -254,6 +258,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
             key: 'batchStatus',
             align: 'left',
             width: '200px',
+            minWidth: 200,
             render: (value: string, record: TPurchaseRow) => {
                 return record.spacer ? (
                     <></>
@@ -284,6 +289,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 key: 'idBatch',
                 align: 'center',
                 width: '150px',
+                minWidth: 150,
                 render: (_value: boolean, record: TPurchaseRow) => {
                     return record.spacer ? (
                         <></>

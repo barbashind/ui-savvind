@@ -33,7 +33,7 @@ export interface TProduct {
         updatedAt?: Date | null;
         name: string | null;
         productComment?: string | null;
-        weight: number | null | string;
+        weight: number | null;
     }
 
 export interface TDeliver {

@@ -4,7 +4,7 @@ export interface TNomenclature {
     itemId?: number;
     name: string | null;
     lastCostPrice: number | null;
-    weight: number | null | string;
+    weight: number | null;
     remains: number | null;
     isMessageActive: boolean;
     productType?: string;

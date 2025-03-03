@@ -91,10 +91,11 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
 
         useEffect(() => {
                 if (data.batchStatus === 'CREATED' || !data.batchStatus)
+                
                 setItemsBatch(prev => prev?.map(item => ({
                         ...item,
-                        costDeliver: Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight ) || 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100,
-                        costPriceAll:  Math.round((Number(Math.round(((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (Number(productList?.find(elem => elem?.itemId === item?.itemId)?.weight) || 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100) + Number(item?.costPrice ?? 0)) * 100) / 100}
+                        costDeliver: Math.round((((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0)  * (productList?.find(elem => (elem?.itemId === item?.itemId))?.weight ?? 0)) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * (rate || 1) * 100 )  / 100,
+                        costPriceAll:  Math.round((Number((((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (productList?.find(elem => elem?.itemId === item?.itemId)?.weight ?? 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100) + (item?.costPrice ?? 0) * (rate || 1)) * 100) / 100}
                         ))) 
                 }, [data?.batchStatus, data?.deliver, itemsBatch.length, deliversList, productList, rate]);
 
@@ -568,7 +569,9 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })}>
                                                                                                         {(itemBatch?.costPriceAll ? (itemBatch?.costPriceAll?.toString()) : '-') + ' руб'}
                                                                                                 </Text>
-                                                                                        <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>{itemBatch.costPrice && itemBatch.quant && itemBatch.costDeliver ? ((Number(itemBatch.costPrice)  + Number(itemBatch.costDeliver)) * itemBatch.quant).toFixed(2) + ' руб' : '0 руб'}</Text>
+                                                                                                <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>
+                                                                                                {itemBatch.costPrice && itemBatch.quant && itemBatch.costDeliver ? (((Number(itemBatch.costPrice) * (rate ?? 1) ) + Number(itemBatch.costDeliver)) * itemBatch.quant).toFixed(2) + ' руб' : '0 руб'}
+                                                                                                </Text>
                                                                                         {itemBatch.itemId && (
                                                                                                 <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
                                                                                                         {itemBatch.hasSerialNumber ? (<IconAllDone view="success" style={{alignSelf: 'center'}}/>) : (<IconClose view="alert" style={{alignSelf: 'center'}}/>)}
@@ -784,7 +787,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })}>Общая сумма:</Text> 
-                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * (Number(item.costPrice ?? 0) + Number(item.costDeliver ?? 0) ), 0)?.toFixed(2) + ' руб'}</Text>  
+                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * Number(item.costPriceAll ?? 0) , 0)?.toFixed(2) + ' руб'}</Text>  
                                         </Layout>
                                         <Layout direction="row" style={{justifyContent: 'right'}}>
                                                 <Button 

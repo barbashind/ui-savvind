@@ -116,3 +116,23 @@ export const getProductTypes = async (
             console.log('failed');
         });
 };
+
+export const uploadProductsFile = async (file: File) => {
+    const formData = new FormData();
+    const token = localStorage.getItem('token');
+    formData.append('file', file);
+    try {
+        const response = await fetch('/api/upload-nomenclature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+        return response; // Ответ от сервера
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        throw new Error('Failed to upload file');
+    }
+};

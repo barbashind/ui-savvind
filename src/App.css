@@ -42,3 +42,8 @@
   width: max-content;
   height: 30px !important;
 }
+
+.CardIcon:hover{
+  opacity: 70%;
+  text-decoration: underline #0078d2;
+}

@@ -169,6 +169,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
             key: 'name',
             align: 'left',
             width: '100%',
+            minWidth: 150,
             render: (value: string, record: TNomenclatureRow) => {
                 return record.spacer ? (
                     <></>
@@ -192,6 +193,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'brand',
                 align: 'left',
                 width: '240px',
+                minWidth: 240,
                 render: (value: string, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -215,6 +217,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'productType',
                 align: 'left',
                 width: '240px',
+                minWidth: 240,
                 render: (value: string, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -238,6 +241,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                                 }}
                     />
                 ),
+                minWidth: 150,
                 dataIndex: 'lastCostPrice',
                 key: 'lastCostPrice',
                 align: 'left',
@@ -269,6 +273,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'remains',
                 align: 'left',
                 width: '120px',
+                minWidth: 120,
                 render: (value: string, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -293,6 +298,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'remains',
                 align: 'left',
                 width: '200px',
+                minWidth: 200,
                 render: (value: string, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -317,6 +323,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'isMessageActive',
                 align: 'center',
                 width: '150px',
+                minWidth: 150,
                 render: (value: boolean, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -348,6 +355,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'isMessageActive',
                 align: 'center',
                 width: '150px',
+                minWidth: 150,
                 render: (_value: boolean, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
