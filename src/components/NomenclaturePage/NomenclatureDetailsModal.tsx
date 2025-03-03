@@ -468,7 +468,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                                 if (value) {
                                                                         setData(prev => ({
                                                                         ...prev,
-                                                                        weight:  value,
+                                                                        weight:  Number(value),
                                                                         }))
                                                                 } else {
                                                                         setData(prev => ({
