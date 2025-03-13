@@ -11,6 +11,7 @@ export interface TAccounting {
         category?: string;
         createdAt: Date | null;
         updatedAt: Date | null;
+        currency?: string;
     }
 
 export type TAccountingRow = TAccounting & {

@@ -36,6 +36,7 @@ const Purchase = () => {
                 } = {
                         filterValues: defaultFilter,
                         currentPage: 0,
+                        columnSort: [{column: 'batchNumber', sortOrder: 'desc'}]
                 };
         const [count, setCount] = useState<number | null>(0)
         const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);

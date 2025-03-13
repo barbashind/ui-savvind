@@ -271,7 +271,10 @@ const columns: ColumnType<TAccountingRow>[] = [
             ) : (
                 <Layout direction="row" style={{ minWidth: '110px', maxWidth: '110px'  }}>
                     <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                        {value + ' руб'}
+                        {value + ' ' }
+                    </Text>
+                    <Text size="s" weight="regular" view="secondary" className={cnMixSpace({mL:'2xs'})}>
+                        { (record.currency ?? '')}
                     </Text>
                 </Layout> 
             );

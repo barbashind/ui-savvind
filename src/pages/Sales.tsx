@@ -37,6 +37,7 @@ const Sales = () => {
                         } = {
                                 filterValues: defaultFilter,
                                 currentPage: 0,
+                                columnSort: [{column: 'checkId', sortOrder: 'desc'}]
                         };
         const [count, setCount] = useState<number | null>(0)
         const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);

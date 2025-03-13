@@ -18,6 +18,8 @@ import { TAccount, TCategory } from "../../types/settings-types.ts";
 import { Combobox } from "@consta/uikit/Combobox/index";
 import { TextField } from "@consta/uikit/TextFieldCanary/index";
 import NumberMaskTextField from "../../utils/NumberMaskTextField.tsx";
+import { getUserInfo } from "../../services/AuthorizationService.ts";
+import { DatePicker } from "@consta/uikit/DatePicker/index";
 
 
 
@@ -55,11 +57,29 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
         const [accounts, setAccounts] = useState<TAccount[]>([]);
         const [categories, setCategories] = useState<TCategory[]>([]);
 
+        const [role, setRole] = useState<string | undefined>(undefined);
+                
+        useEffect(() => {
+                
+                const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setRole(resp.role);
+                        })
+                };
+                
+                void getUserInfoData();
+        }, []);
+
         // Инициализация данных выпадающих списков
         useEffect(() => {
                 const getAccountsData = async () => {
                         await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
+                                if (role === 'KUR') {
+                                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})).filter((item)=>(item.name === 'Деньги в офисе')))
+                                } else {
+                                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
+                                }
+                                
                                 
                         })
                 }
@@ -71,7 +91,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                 }
                 void getAccountsData();
                 void getCategoriesData();
-        }, [])
+        }, [role])
         // Инициализация данных записи
         useEffect(() => {
                 if (id) {
@@ -86,7 +106,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                         try {
                             if (id) {
                                 await getAccounting(id, (resp) => {
-                                    setData(resp);
+                                    setData({...resp, createdAt: resp.createdAt ? new Date(resp.createdAt) : null});
                                     setIsLoading(false);
                                 });
                             }
@@ -152,6 +172,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                         <Text size="s" style={{width: '100%', minWidth: '150px'}} >Обоснование</Text>
                                         <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} className={cnMixSpace({mH:'m'})}>Категория</Text>
                                         <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} className={cnMixSpace({mR:'m'})}>Объем</Text>
+                                        <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} className={cnMixSpace({mR:'m'})}>Дата создания</Text>
                                         {/* <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}}>Форма</Text> */}
                                 </Layout>
                                 <Layout direction="row" className={cnMixSpace({mT:'xs'})}>
@@ -165,9 +186,9 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 placeholder="Выберите счет"
                                                 onChange={(value) => {
                                                         if (value) {
-                                                                setData(prev => ({...prev, accountFrom: value?.name}))
+                                                                setData(prev => ({...prev, accountFrom: value?.name, currency: value?.currency}))
                                                         } else {
-                                                                setData(prev => ({...prev, accountFrom: undefined}))
+                                                                setData(prev => ({...prev, accountFrom: undefined, currency: undefined}))
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
@@ -182,9 +203,9 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 placeholder="Выберите счет"
                                                 onChange={(value) => {
                                                         if (value) {
-                                                                setData(prev => ({...prev, accountTo: value?.name}))
+                                                                setData(prev => ({...prev, accountTo: value?.name, currency: value?.currency}))
                                                         } else {
-                                                                setData(prev => ({...prev, accountTo: undefined}))
+                                                                setData(prev => ({...prev, accountTo: undefined, currency: undefined}))
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
@@ -235,6 +256,22 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
                                          />
+                                         <DatePicker
+                                                value={data.createdAt}
+                                                onChange={(value : Date | null) => {
+                                                        if (value) {
+                                                                const utcDate = (value);
+                                                                utcDate.setUTCHours(0, 0, 0, 0); 
+                                                                utcDate.setDate(value.getDate() + 1);
+                                                                setData(prev => ({ ...prev, createdAt: utcDate }));
+                                                        } else {
+                                                                setData(prev => ({...prev, createdAt: null}))
+                                                        }
+                                                 }}
+                                                size={'s'}
+                                                style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
+                                                className={cnMixSpace({mR:'m'})}
+                                                />
                                           {/* <Select
                                                 items={[{id: 'replenishment', label: 'Пополнение'}, {id: 'deduction', label: 'Расходы'}]}
                                                 getItemLabel={(item)=> (item.label ?? '')}

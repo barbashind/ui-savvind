@@ -21,6 +21,9 @@ import { TCaption } from "../../utils/types";
 import { addCheck, addCheckSales, deleteCheck, deleteCheckSales, getCheck, getCheckSales, getProductBySerial, updateCheck } from "../../services/SalesService";
 import { getNomenclatures } from "../../services/PurchaseService";
 import { getUserInfo } from "../../services/AuthorizationService";
+import { TAccount, TUser } from "../../types/settings-types";
+import { getAccounts, getUsers } from "../../services/SettingsService";
+import { Select } from "@consta/uikit/Select";
 
 interface TSalesDetailsModalProps {
         isOpen: boolean;
@@ -40,7 +43,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 summ: null,
                 isBooking: null,
                 isUnpaid: null,
-
+                account: 'Деньги в офисе',
                 customer: undefined,
                 createdAt: null,
                 updatedAt: null,
@@ -159,6 +162,15 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
             }, [checkId, setData, isOpen]);
 
         
+        useEffect(() => {
+                if (serialRef.current) {
+                        const inputSerial = serialRef.current?.getElementsByTagName('input');
+                        if (inputSerial && sales?.length) {
+                                inputSerial[0].focus();
+                        }
+                    }
+        }, [sales?.length])
+        
 
         const getProduct = async (e: React.FocusEvent<HTMLElement, Element> , item: TSale) => {
                 e.preventDefault();
@@ -221,7 +233,8 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                 partners: partners,
                                                 isCancelled: null,
                                                 seller: data.seller,
-                                                courier: data.courier
+                                                courier: data.courier,
+                                                account: data.account,
                                         }).then(async(resp) => {
                 
                                                 
@@ -278,7 +291,8 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                                 body: body,
                                                                 isCancelled: null,
                                                                 seller: data.seller,
-                                                                courier: data.courier
+                                                                courier: data.courier,
+                                                                account: data.account,
                                                                 // partners: partners,
                                                         }).then(async(resp) => {
                                 
@@ -336,7 +350,8 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                 body: body,
                                                 isCancelled: null,
                                                 seller: data.seller,
-                                                courier: data.courier
+                                                courier: data.courier,
+                                                account: data.account,
                                                 // partners: partners
                                         }).then(async(resp) => {
                 
@@ -391,6 +406,34 @@ const deleteCheckData = async (checkId: number | undefined, sales : TSale[]) => 
         })
 }
 
+const updateCheckUnpaidData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
+        try {
+                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                const partners = getPartners(salesDef);
+                await updateCheck(checkId, {
+                        customer: data.customer ?? '-',
+                        summ: totalSum,
+                        isBooking: false,
+                        isUnpaid: true,
+                        createdAt: data.createdAt,
+                        updatedAt: data.updatedAt,
+                        isCancelled: null,
+                        partners: partners,
+                        isEnding: isEnding,
+                        seller: data.seller,
+                        courier: data.courier,
+                        account: data.account,
+        }).then(() => {
+                setUpdateFlag(true)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        })} catch (error : any) {
+                        console.error('Ошибка при создании партий или элементов:', error);
+                        setCaptionList(error?.response?.errors)
+                        setIsLoading(false);
+        }
+        
+}
+
 const updateCheckData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
         try {
                 const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
@@ -406,7 +449,8 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                         partners: partners,
                         isEnding: isEnding,
                         seller: data.seller,
-                        courier: data.courier
+                        courier: data.courier,
+                        account: data.account,
         }).then(() => {
                 setUpdateFlag(true)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -419,9 +463,49 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
 }
 
                 
+const ruToEnMap: Record<string, string> = {
+        а: 'F', б: ',', в: 'D', г: 'U', д: 'L', е: 'T', ё: '`', ж: ';', з: 'P',
+        и: 'B', й: 'Q', к: 'R', л: 'K', м: 'V', н: 'Y', о: 'J', п: 'G', р: 'H',
+        с: 'C', т: 'N', у: 'E', ф: 'A', х: '[', ц: 'W', ч: 'X', ш: 'I', щ: 'O',
+        ы: 'S', э: '\'', ь: 'M', ю: '.', я: 'Z',
+        А: 'F', Б: ',', В: 'D', Г: 'U', Д: 'L', Е: 'T', Ё: '`', Ж: ';', З: 'P',
+        И: 'B', Й: 'Q', К: 'R', Л: 'K', М: 'V', Н: 'Y', О: 'J', П: 'G', Р: 'H',
+        С: 'C', Т: 'N', У: 'E', Ф: 'A', Х: '[', Ц: 'W', Ч: 'X', Ш: 'I', Щ: 'O',
+        Ы: 'S', Э: '\'', Ь: 'M', Ю: '.', Я: 'Z',
+    };
         
+const convertRuToEn = (value : string) => {
+        return value.split('').map(char => ruToEnMap[char] || char).join('').toUpperCase();
+        };        
 
-        
+const [users, setUsers] = useState<TUser[]>([]);
+
+useEffect(() => {
+        const getUsersData = async () => {
+                await getUsers((resp) => {
+                        setUsers(resp.map((item : TUser) => ({
+                                id: item.id, 
+                                username: item.username, 
+                                role: item.role, 
+                        })))
+                });
+        }
+        void getUsersData().then(()=>{
+                setIsLoading(false);
+        });
+}, [])
+
+const [accounts, setAccounts] = useState<TAccount[]>([]);
+useEffect(() => {
+                const getAccountsData = async () => {
+                        await getAccounts((resp) => {
+                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
+                        })
+                }
+                
+                void getAccountsData();
+}, [])
+
         return (
                 <Modal
                         isOpen={isOpen}
@@ -462,7 +546,7 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Сер. номер</Text>
                                         <Text size="s" style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })} align="center"></Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Количество</Text>
-                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} >Цена продажи</Text>
+                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} onClick={()=> {console.log(captionList)}}>Цена продажи</Text>
                                         <div style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })}/>
                                 </Layout>
                                 <Layout direction="column">
@@ -510,37 +594,62 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                                                 value={itemCheck.serialNumber ?? null}
                                                                                                 onChange={(value)=>{
                                                                                                         if (value) {
+                                                                                                                const convertedValue = convertRuToEn(value);
+                                                                                                                const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
                                                                                                                 setSales(prev => 
-                                                                                                                prev.map(product => (sales.indexOf(product) === sales.indexOf(itemCheck)) ? 
-                                                                                                                        { ...product, 
-                                                                                                                                serialNumber: value, 
-                                                                                                                        } : product
-                                                                                                                )
+                                                                                                                        prev.map(product => (sales.indexOf(product) === sales.indexOf(itemCheck)) ? 
+                                                                                                                                { ...product, 
+                                                                                                                                        serialNumber: filteredValue, 
+                                                                                                                                } : product
+                                                                                                                        )
+                                                                                                                        );
+                                                                                                        } else {
+                                                                                                                setSales(prevProducts => 
+                                                                                                                        prevProducts.map(product => 
+                                                                                                                                (sales?.indexOf(product) === sales?.indexOf(itemCheck)) ? { ...product, serialNumber:  null } : product
+                                                                                                                        )
                                                                                                                 );
-                                                                                                } else {
-                                                                                                        setSales(prevProducts => 
-                                                                                                                prevProducts.map(product => 
-                                                                                                                        (sales?.indexOf(product) === sales?.indexOf(itemCheck)) ? { ...product, serialNumber:  null } : product
-                                                                                                                )
-                                                                                                        );
-                                                                                                }
+                                                                                                        }
                                                                                                 }}
                                                                                                 style={{minWidth:'100px', maxWidth:'100px'}} 
                                                                                                 className={cnMixSpace({ mL:'m' })}
                                                                                                 onBlur={(e)=>{
                                                                                                         if (itemCheck.serialNumber) {
-                                                                                                                getProduct(e, itemCheck)
+                                                                                                                getProduct(e, itemCheck);
+                                                                                                                if (sales.filter((elem)=> (elem.serialNumber === itemCheck.serialNumber))?.length > 1) {
+                                                                                                                        setSales(prevProducts => 
+                                                                                                                                prevProducts.map(product => 
+                                                                                                                                        (sales?.indexOf(product) === sales?.indexOf(itemCheck)) ? { ...product, serialNumber:  null } : product
+                                                                                                                                )
+                                                                                                                        );
+                                                                                                                        setCaptionList((prev) => [...prev, {state: "serialNumber", index : sales.indexOf(itemCheck), caption: 'Сер. ном. уже использовался'}])
+                                                                                                                }
                                                                                                         }
                                                                                                 }}
                                                                                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                                                 onKeyPress={async (event: any) => {
                                                                                                         if (event.key === 'Enter') {
                                                                                                                 if (itemCheck.serialNumber) {
-                                                                                                                        getProduct(event, itemCheck)
-                                                                                                        }}}}
+                                                                                                                        getProduct(event, itemCheck);
+                                                                                                                        if (sales?.indexOf(itemCheck) === (sales?.length - 1)) {
+                                                                                                                                setSales(prev => [...prev, 
+                                                                                                                                defaultItem
+                                                                                                                        ]);
+                                                                                                                        }
+                                                                                                                        
+                                                                                                                        if (sales.filter((elem)=> (elem.serialNumber === itemCheck.serialNumber))?.length > 1) {
+                                                                                                                                setSales(prevProducts => 
+                                                                                                                                        prevProducts.map(product => 
+                                                                                                                                                (sales?.indexOf(product) === sales?.indexOf(itemCheck)) ? { ...product, serialNumber:  null } : product
+                                                                                                                                        )
+                                                                                                                                );
+                                                                                                                                setCaptionList((prev) => [...prev, {state: "serialNumber", index : sales.indexOf(itemCheck), caption: 'Сер. ном. уже использовался'}])
+                                                                                                                        }
+                                                                                                        }
+                                                                                                }}}
                                                                                                 caption={ captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck))))?.caption : undefined}
                                                                                                 status={captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? "alert" : undefined}
-                                                                                                onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "serialNumber") && (capt.index !== sales.indexOf(itemCheck)) ))}}
+                                                                                                onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "serialNumber") || (capt.index !== sales.indexOf(itemCheck))))}}
                                                                                                 ref={serialRef}
                                                                                         />  
 
@@ -601,6 +710,15 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                                                                 )
                                                                                                         );
                                                                                                 }
+                                                                                                }}
+                                                                                                onBlur={()=> {
+                                                                                                        setSales(prev => 
+                                                                                                                prev.map(product => (product.itemId === itemCheck.itemId && !product.salePrice) ? 
+                                                                                                                        { ...product, 
+                                                                                                                                salePrice: itemCheck.salePrice, 
+                                                                                                                        } : product
+                                                                                                                )
+                                                                                                                );
                                                                                                 }}
                                                                                                 style={{minWidth:'150px', maxWidth:'150px'}} 
                                                                                                 className={cnMixSpace({ mL:'m' })}
@@ -680,16 +798,17 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                         </Layout>
                                         <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
                                                         <Text size="s" className={cnMixSpace({ mB:'xs' })} style={{ minWidth: '130px', maxWidth: '130px'}}>Продавец:</Text>
-                                                        <TextField 
+                                                        <Select 
                                                                 size="s"
-                                                                type="textarea"
-                                                                rows={1}
-                                                                value={data?.seller}
+                                                                items={users?.filter(item => (item.role === 'SLR'))}
+                                                                value={users?.find(item => (item.username === data.seller))}
+                                                                getItemKey={item => item.id ?? '' }
+                                                                getItemLabel={item => item.username ?? ''}
                                                                 onChange={(value) => {
                                                                         if (value) {
                                                                             setData(prev => ({
                                                                         ...prev,
-                                                                        seller:  value,
+                                                                        seller:  value.username,
                                                                         }))    
                                                                         } else {
                                                                                 setData(prev => ({
@@ -704,16 +823,17 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                         </Layout>
                                         <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
                                                         <Text size="s" className={cnMixSpace({ mB:'xs' })} style={{ minWidth: '130px', maxWidth: '130px'}}>Курьер:</Text>
-                                                        <TextField 
+                                                        <Select
+                                                                items={users?.filter(item => (item.role === 'KUR'))} 
                                                                 size="s"
-                                                                type="textarea"
-                                                                rows={1}
-                                                                value={data?.courier}
+                                                                getItemKey={item => item.id ?? '' }
+                                                                getItemLabel={item => item.username ?? ''}
+                                                                value={users?.find(item => (item.username === data.courier))}
                                                                 onChange={(value) => {
                                                                         if (value) {
                                                                             setData(prev => ({
                                                                         ...prev,
-                                                                        courier:  value,
+                                                                        courier:  value.username,
                                                                         }))    
                                                                         } else {
                                                                                 setData(prev => ({
@@ -725,6 +845,26 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                 }}
                                                                 className={cnMixSpace({ mL:'2xs' })}
                                                         />        
+                                        </Layout>
+                                        <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
+                                                        <Text size="s" className={cnMixSpace({ mB:'xs' })} style={{ minWidth: '130px', maxWidth: '130px'}}>Счет начисления:</Text>
+                                                        <Combobox
+                                                                items={accounts}
+                                                                getItemLabel={(item)=> (item.name ?? '')}
+                                                                getItemKey={(item) => (item.accountId ?? 0)}
+                                                                value={accounts.find(el => (el.name === data?.account))}
+                                                                size="s"
+                                                                style={{minWidth: '200px', maxWidth: '200px'}}
+                                                                placeholder="Выберите счет"
+                                                                onChange={(value) => {
+                                                                        if (value) {
+                                                                                setData(prev => ({...prev, account: value?.name}))
+                                                                        } else {
+                                                                                setData(prev => ({...prev, account: undefined}))
+                                                                        }
+                                                                }}
+                                                                className={cnMixSpace({mR:'m'})}
+                                                        />       
                                         </Layout>
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
@@ -802,6 +942,21 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                 }}
                                                         />
                                                 )}
+                                                {checkId && data.isBooking && (
+                                                        <Button 
+                                                                label={'Отсрочка оплаты (при брони)'}
+                                                                view="primary"
+                                                                size="s"
+                                                                style={{backgroundColor: '#f38b00'}}
+                                                                className={cnMixSpace({ mL:'m' })}
+                                                                onClick={()=>{
+                                                                        if (checkId) {
+                                                                                updateCheckUnpaidData(checkId, false);
+                                                                                closeWindow();
+                                                                        }
+                                                                }}
+                                                        />
+                                                )}
                                                 {checkId && data.isUnpaid && (
                                                         <Button 
                                                                 label={'Оплата внесена'}
@@ -816,6 +971,21 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
                                                                         } else {
                                                                                 // createUnpaid(e)
                                                                         }
+                                                                }}
+                                                        />
+                                                )}
+                                                 {checkId && data.isUnpaid && (
+                                                        <Button 
+                                                                label={'Отменить продажу'}
+                                                                view="primary"
+                                                                size="s"
+                                                                style={{backgroundColor: '#eb5757'}}
+                                                                className={cnMixSpace({ mL:'m' })}
+                                                                onClick={()=>{
+                                                                        if (checkId) {
+                                                                                deleteCheckData(checkId, salesDef)
+                                                                                closeWindow();
+                                                                        } 
                                                                 }}
                                                         />
                                                 )}

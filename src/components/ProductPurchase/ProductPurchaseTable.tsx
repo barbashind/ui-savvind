@@ -170,7 +170,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
         {
             title: (
                 <TableColumnHeader
-                    header="Объем закупа (руб)"
+                    header="Объем закупа ($)"
                     sortOrder={getColumnSortOrder('sum')}
                     sortOrderIndex={getColumnSortOrderIndex('sum')}
                     onSort={(sortOrder, isAdd) => {
@@ -189,7 +189,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 ) : (
                     <Layout direction="row" style={{ width: '200px' }}>
                         <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                            {'(' + (value?.toString() || '0') + ' руб)' }
+                            {'(' + (value?.toString() || '0') + ' $)' }
                         </Text>
                     </Layout>
                 );

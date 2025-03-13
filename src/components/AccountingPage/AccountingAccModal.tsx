@@ -8,13 +8,12 @@ import { Text } from "@consta/uikit/Text";
 import { cnMixSpace } from "@consta/uikit/MixSpace";
 import { Loader } from '@consta/uikit/Loader';
 
-import { SaveOutlined } from "@ant-design/icons"
 
-import { getAccounts, updateAccounts } from "../../services/SettingsService.ts";
+import { getAccounts } from "../../services/SettingsService.ts";
 import { TAccount } from "../../types/settings-types.ts";
-import NumberMaskTextField from "../../utils/NumberMaskTextField.tsx";
-import { AntIcon } from "../../utils/AntIcon.ts";
-import { cnMixFontSize } from "../../utils/MixFontSize.ts";
+import { Combobox } from "@consta/uikit/Combobox/index";
+import { TextField } from "@consta/uikit/TextField/index";
+import TextHighlith from "../global/TextHighlith.tsx";
 
 
 
@@ -33,7 +32,11 @@ const AccountingAccModal = ({isOpen, setIsOpen} : TAccountingAccModalProps) => {
         }
 
 const [accounts, setAccounts] = useState<TAccount[]>([]);
+const [accountsDef, setAccountsDef] = useState<TAccount[]>([]);
 const [isLoading, setIsLoading] = useState<boolean>(true);
+const [currencies, setCurrencies] = useState<(string | undefined)[]>([]);
+const [currency, setCurrency] = useState<string | undefined>(undefined);
+const [searchText, setSearchText] = useState<string | null>(null);
 
 // Инициализация данных
 useEffect(() => {
@@ -41,27 +44,33 @@ useEffect(() => {
         const getAccountsData = async () => {
                 await getAccounts((resp) => {
                         setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value, currency: item.currency})))
-                        
+                        setAccountsDef(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value, currency: item.currency})))
+                        setCurrencies([...new Set(resp.map((item: TAccount) => item.currency))]);
                 })
         }
+
         void getAccountsData().then(()=> {
                 setIsLoading(false);
         });
 }, [isOpen])
 
-const updateAccountsData = async (accounts : TAccount[]) => {
-        setIsLoading(true);
-        await updateAccounts(accounts).then(()=>{
-                const getAccountsData = async () => {
-                        await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value})))
-                        })
-                }
-                void getAccountsData().then(()=> {
-                        setIsLoading(false);
-                });
-        })
-}
+useEffect(() => {
+        setAccounts((prev) => prev.filter(item => item.currency === currency))
+}, [currency])
+
+useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchText) {
+                setAccounts((prev) => prev.filter(item => item.name && item.name.toLowerCase().includes(searchText.toLowerCase())))
+            } else {
+                setAccounts(accountsDef);
+            }
+        }, 1000); // 1000 миллисекунд = 1 секунда
+
+        return () => clearTimeout(timer); // Очистка таймера при изменении searchText
+    }, [accountsDef, setAccounts, searchText]);
+
+
                 
         return (
                 <Modal
@@ -76,19 +85,38 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems:'center'}}>
                                         <Text view="brand" size="l" weight="semibold">Счета</Text>
                                         <Layout direction="row">
-                                                <Button
-                                                        label={'Сохранить'}
-                                                        iconLeft={AntIcon.asIconComponent(() => (
-                                                                <SaveOutlined
-                                                                className={cnMixFontSize('m') + ' ' + cnMixSpace({mR:'xs'})}
-                                                                />
-                                                        ))}
-                                                        view="primary"
+                                                <TextField 
+                                                        placeholder="Введите для поиска"
                                                         size="s"
-                                                        onClick={()=>{
-                                                                updateAccountsData(accounts);
+                                                        style={{ minWidth: '250px'}}
+                                                        className={cnMixSpace({mR: 's'})}
+                                                        value={searchText}
+                                                        onChange={(value) => {
+                                                                if (value) {
+                                                                        setSearchText(value);
+                                                                } else {
+                                                                        setSearchText(null);
+                                                                }
                                                         }}
                                                 />
+                                                <Combobox
+                                                        items={currencies}
+                                                        size="s"
+                                                        placeholder="Выберите валюту"
+                                                        value={currency} 
+                                                        style={{ minWidth: '200px'}}
+                                                        multiple={false}
+                                                        getItemLabel={(item: string | undefined) => item ?? ''}
+                                                        getItemKey={(item: string | undefined) => item ?? ''}
+                                                        onChange={(value)=>{
+                                                                if (value) {
+                                                                        setCurrency(value)       
+                                                                } else {
+                                                                        setCurrency(undefined)
+                                                                        setAccounts(accountsDef)  
+                                                                }
+                                                        }}
+                                                /> 
                                                 <Button
                                                         label={'Закрыть'}
                                                         view="secondary"
@@ -113,31 +141,8 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                         {!isLoading && accounts?.map((acc : TAccount) => (
                                                 <Layout direction="row" className={cnMixSpace({mT: 's', p:'s'})} style={{border: '1px solid rgba(0,65,102,.2)', borderRadius: '4px'}}>
                                                         <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s">{acc?.accountId?.toString()}</Text>
-                                                        <Text style={{width: '100%'}} size="s">{acc?.name}</Text>
-                                                        <NumberMaskTextField
-                                                                value={acc.value?.toString()}
-                                                                onChange={(value : string | null) => {
-                                                                        if (value) {
-                                                                                setAccounts(prev => 
-                                                                                    prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
-                                                                                            { ...account, 
-                                                                                                    value: Number(value),
-                                                                                            } : account
-                                                                                    )
-                                                                                    );    
-                                                                            } else {
-                                                                                    setAccounts(prev => 
-                                                                                            prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
-                                                                                                    { ...account, 
-                                                                                                        value: undefined,
-                                                                                                    } : account
-                                                                                            )
-                                                                                            );   
-                                                                            }
-                                                                }}
-                                                                style={{minWidth: '150px', maxWidth: '150px'}}
-                                                                size='s'
-                                                        />
+                                                        <Text style={{width: '100%'}} size="s">{TextHighlith(acc?.name, searchText)}</Text>
+                                                        <Text style={{minWidth: '150px', maxWidth: '150px'}} size="s">{acc.value?.toString()}</Text>
                                                         <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s" className={cnMixSpace({mL: 's'})}>{acc?.currency}</Text>
                                                 </Layout>
                                         ))}

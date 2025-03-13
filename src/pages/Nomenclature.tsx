@@ -37,6 +37,7 @@ const Nomenclature = () => {
                 } = {
                         filterValues: defaultFilter,
                         currentPage: 0,
+                        columnSort: [{column: 'createdAt', sortOrder: 'desc'}]
                 };
         const [count, setCount] = useState<number | null>(0)
         const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);
@@ -52,8 +53,6 @@ const Nomenclature = () => {
         const [searchText, setSearchText] = useState<string | null> (null);        
         const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false)
         
-
-
         return (
                 <Card style={{width: '100%'}} className={cnMixSpace({p: 's'})}>
                                 <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({mL: 'm', p: 's'})}>

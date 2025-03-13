@@ -111,7 +111,20 @@ const returnProduct = async (product : TSale) => {
         }
         
                 
+        const ruToEnMap: Record<string, string> = {
+                а: 'F', б: ',', в: 'D', г: 'U', д: 'L', е: 'T', ё: '`', ж: ';', з: 'P',
+                и: 'B', й: 'Q', к: 'R', л: 'K', м: 'V', н: 'Y', о: 'J', п: 'G', р: 'H',
+                с: 'C', т: 'N', у: 'E', ф: 'A', х: '[', ц: 'W', ч: 'X', ш: 'I', щ: 'O',
+                ы: 'S', э: '\'', ь: 'M', ю: '.', я: 'Z',
+                А: 'F', Б: ',', В: 'D', Г: 'U', Д: 'L', Е: 'T', Ё: '`', Ж: ';', З: 'P',
+                И: 'B', Й: 'Q', К: 'R', Л: 'K', М: 'V', Н: 'Y', О: 'J', П: 'G', Р: 'H',
+                С: 'C', Т: 'N', У: 'E', Ф: 'A', Х: '[', Ц: 'W', Ч: 'X', Ш: 'I', Щ: 'O',
+                Ы: 'S', Э: '\'', Ь: 'M', Ю: '.', Я: 'Z',
+            };
         
+const convertRuToEn = (value : string) => {
+        return value.split('').map(char => ruToEnMap[char] || char).join('').toUpperCase();
+        };
 
         
         return (
@@ -148,11 +161,13 @@ const returnProduct = async (product : TSale) => {
                                                 <TextField
                                                         size="s"
                                                         value={serialNumber}
-                                                        onChange={(value) => {
+                                                        onChange={(value)=>{
                                                                 if (value) {
-                                                                        setSerialNumber(value);
+                                                                        const convertedValue = convertRuToEn(value);
+                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
+                                                                        setSerialNumber(filteredValue);
                                                                 } else {
-                                                                        setSerialNumber(null);
+                                                                        setSerialNumber(null)
                                                                 }
                                                         }}
                                                         placeholder="Введите сер. номер"

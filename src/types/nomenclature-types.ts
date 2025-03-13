@@ -5,7 +5,6 @@ export interface TNomenclature {
     name: string | null;
     lastCostPrice: number | null;
     weight: number | null;
-    remains: number | null;
     isMessageActive: boolean;
     productType?: string;
     brand: string | null;
@@ -24,6 +23,7 @@ export interface TNomenclature {
     productSim: string | null;
     remainsSum: number | null;
     hasSerialNumber: boolean;
+    lastCostPriceAll?: number | null;
 }
 
 export type TNomenclatureRow = TNomenclature & {
@@ -50,5 +50,5 @@ export interface TNomenclatureSortFields {
         name: SortOrder;
         lastCostPrice: SortOrder;
         createdAt: SortOrder;
-        remains: SortOrder;
+        remainsSum: SortOrder;
 }

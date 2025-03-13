@@ -560,7 +560,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                         )}
                                                                                         {(data.batchStatus !== 'CREATED' && data.batchStatus) && (
                                                                                                 <Text size="s" style={{minWidth:'110px', maxWidth:'110px'}} className={cnMixSpace({  mT: '2xs' })}>
-                                                                                                        {(itemBatch?.costPrice ? (itemBatch?.costPrice)?.toString() : '-') + ' руб'}
+                                                                                                        {(itemBatch?.costPrice ? (itemBatch?.costPrice)?.toString() : '-') + ' $'}
                                                                                                 </Text>
                                                                                         )}
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })}>

@@ -29,7 +29,7 @@ import { Loader } from "@consta/uikit/Loader"
 
 const Users = () => {
 
-const roles : string[] = [ 'ADM', 'SLR'];
+const roles : string[] = [ 'ADM', 'SLR', 'KUR'];
         
 const [users, setUsers] = useState<TUser[]>([]);
 

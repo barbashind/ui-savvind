@@ -164,58 +164,7 @@ const NomenclatureFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, filt
                                 className={cnMixSpace({ mT: 'xs'})}
                         />
                         <Text size="s" className={cnMixSpace({ mT: 's'})}>
-                                 Остаток (шт):
-                        </Text>
-                        <Layout direction="row" className={cnMixSpace({ mT: 'xs'})}>
-                                
-                                <TextField
-                                        size='s'
-                                        type="number"
-                                        placeholder="От"
-                                        incrementButtons={false}
-                                        value={filterValues?.remainsMin?.toString() ?? ''}
-                                        onChange={(value) => {  
-                                                if (value) {
-                                                        setFilterValues(prev => ({
-                                                                ...prev,
-                                                                remainsMin:  Number(value),
-                                                                }))       
-                                                } else {
-                                                        setFilterValues(prev => ({
-                                                                ...prev,
-                                                                remainsMin:  null,
-                                                                }))  
-                                                }
-                                        }}
-                                />
-                                <Text size="s" className={cnMixSpace({ mT: 's', mH:'s'})}>
-                                        -
-                                </Text>
-                                <TextField
-                                        size='s'
-                                        type="number"
-                                        placeholder="До"
-                                        incrementButtons={false}
-                                        value={filterValues?.remainsMax?.toString() ?? ''}
-                                        onChange={(value) => {  
-                                                if (value) {
-                                                        setFilterValues(prev => ({
-                                                                ...prev,
-                                                                remainsMax:  Number(value),
-                                                                }))       
-                                                } else {
-                                                        setFilterValues(prev => ({
-                                                                ...prev,
-                                                                remainsMax:  null,
-                                                                }))  
-                                                }
-                                        }}
-                                        className={cnMixSpace({  mL:'xs'})}
-                                />
-                        </Layout>
-
-                        <Text size="s" className={cnMixSpace({ mT: 's'})}>
-                                 Остаток (руб):
+                                 Остаток:
                         </Text>
                         <Layout direction="row" className={cnMixSpace({ mT: 'xs'})}>
                                 

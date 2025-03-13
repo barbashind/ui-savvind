@@ -28,6 +28,7 @@ const ProductRegistration = () => {
                         } = {
                                 filterValues: defaultFilter,
                                 currentPage: 0,
+                                columnSort: [{column: 'batchId', sortOrder: 'desc'}]
                         };
                 const [count, setCount] = useState<number | null>(0)
                 const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);

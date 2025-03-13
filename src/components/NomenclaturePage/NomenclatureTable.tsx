@@ -262,25 +262,25 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 title: (
                     <TableColumnHeader
                         header="Остаток"
-                        sortOrder={getColumnSortOrder('remains')}
-                        sortOrderIndex={getColumnSortOrderIndex('remains')}
+                        sortOrder={getColumnSortOrder('remainsSum')}
+                        sortOrderIndex={getColumnSortOrderIndex('remainsSum')}
                         onSort={(sortOrder, isAdd) => {
-                                onColumnSort('remains', sortOrder, isAdd);
+                                onColumnSort('remainsSum', sortOrder, isAdd);
                                 }}
                     />
                 ),
-                dataIndex: 'remains',
-                key: 'remains',
+                dataIndex: 'remainsSum',
+                key: 'remainsSum',
                 align: 'left',
                 width: '120px',
                 minWidth: 120,
-                render: (value: string, record: TNomenclatureRow) => {
+                render: (value: number, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
                     ) : (
                         <Layout direction="row" style={{ width: '120px' }}>
                             <Text size="s" weight="medium">
-                                {value ? value + ' шт' : '0 шт'}
+                                {value ? Math.round(value) + ' шт' : '0 шт'}
                             </Text>
                             
                         </Layout>
@@ -290,12 +290,12 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
             {
                 title: (
                     <TableColumnHeader
-                        header="Остаток в руб"
+                        header="Остаток в $"
                         withoutSort={true}
                     />
                 ),
-                dataIndex: 'remains',
-                key: 'remains',
+                dataIndex: 'remainsSum',
+                key: 'remainsSum',
                 align: 'left',
                 width: '200px',
                 minWidth: 200,
@@ -306,7 +306,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                         <Layout direction="row" style={{ width: '200px' }}>
                             
                             <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                {(Number(Number(value) * Number(record?.lastCostPrice)) || '0') + ' руб' }
+                                {(Number(Number(value) * Number(record?.lastCostPrice)) || '0') + ' $' }
                             </Text>
                         </Layout>
                     );

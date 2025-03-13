@@ -76,6 +76,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 itemId?: number;
                 name: string | null;
                 weightProduct: number | null;
+                
             }
         const [data, setData] = useState<TPurchase>(defaultData);
         const [itemsBatch, setItemsBatch] = useState<TPurchaseItem[]>([defaultItem]);
@@ -87,6 +88,8 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
         const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
         const [productList, setProductList] = useState<TNomenclatureP[]>([]);
         const [mainCost, setMainCost] = useState<number | null>(null);
+        const [rate, setRate] = useState<number | null>(null);
+        const [mainInsuranceCost, setMainInsuranceCost] = useState<number | null>(null);
 
         const checkSerialNumberExists = async (serialNumber: string | null) => {
                 if (!serialNumber) {
@@ -129,11 +132,11 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 а: 'F', б: ',', в: 'D', г: 'U', д: 'L', е: 'T', ё: '`', ж: ';', з: 'P',
                 и: 'B', й: 'Q', к: 'R', л: 'K', м: 'V', н: 'Y', о: 'J', п: 'G', р: 'H',
                 с: 'C', т: 'N', у: 'E', ф: 'A', х: '[', ц: 'W', ч: 'X', ш: 'I', щ: 'O',
-                ы: 'S', э: '\'', ю: '.', я: 'Z',
+                ы: 'S', э: '\'', ь: 'M', ю: '.', я: 'Z',
                 А: 'F', Б: ',', В: 'D', Г: 'U', Д: 'L', Е: 'T', Ё: '`', Ж: ';', З: 'P',
                 И: 'B', Й: 'Q', К: 'R', Л: 'K', М: 'V', Н: 'Y', О: 'J', П: 'G', Р: 'H',
                 С: 'C', Т: 'N', У: 'E', Ф: 'A', Х: '[', Ц: 'W', Ч: 'X', Ш: 'I', Щ: 'O',
-                Ы: 'S', Э: '\'', Ю: '.', Я: 'Z',
+                Ы: 'S', Э: '\'', Ь: 'M', Ю: '.', Я: 'Z',
             };
             
         const convertRuToEn = (value : string) => {
@@ -394,7 +397,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                         onChange={(value)=>{
                                                                                                                                 if (value) {
                                                                                                                                         const convertedValue = convertRuToEn(value);
-                                                                                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9]/g, '');
+                                                                                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
                                                                                                                                         setSerialNumber(filteredValue);
                                                                                                                                         // setSerialNumber(value);
                                                                                                                                         setSerialCaption(null)
@@ -569,34 +572,79 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                 )))}
                                 </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
-                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общая себестоимость:</Text>
+                                                        <Text size="s" onClick={()=>{console.log(rate?.toString())}} >Курс $:</Text>
+                                                        <NumberMaskTextField 
+                                                                size="s"
+                                                                placeholder="Введите курс доллара"
+                                                                value={rate?.toString()}
+                                                                onChange={(value : string | null) => {
+                                                                        if (value) {
+                                                                                setRate(Number(value))
+                                                                        } else {
+                                                                                setRate(null)
+                                                                        }
+                                                                }}
+                                                                className={cnMixSpace({ mT:'2xs', mL: 'xs'})}
+                                                                style={{width: '100px'}}
+                                                        />  
+                                        </Layout>
+                                <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
+                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общ. стоимость доставки:</Text>
                                                         <NumberMaskTextField 
                                                                 size="s"
                                                                 value={mainCost}
-                                                                placeholder='Введите и нажмите Enter для расчёта'
+                                                                placeholder='Введите общ. стоимость доставки'
                                                                 onChange={(value : string | null) => {setMainCost(Number(value))}}
+                                                                className={cnMixSpace({ mL:'2xs' })}
+                                                        />
+                                                        <InfoCircleFilled className={cnMixSpace({ mL:'s' })}/>
+                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите кол-во принято или серийники</Text>
+                                        </Layout>
+                                        <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
+                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общ. стоимость страховки:</Text>
+                                                        <NumberMaskTextField 
+                                                                size="s"
+                                                                value={mainInsuranceCost}
+                                                                placeholder='Введите и нажмите Enter для расчёта'
+                                                                onChange={(value : string | null) => {setMainInsuranceCost(Number(value))}}
                                                                 className={cnMixSpace({ mL:'2xs' })}
                                                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                 onKeyPress={async (event: any) => {
                                                                         if (event.key === 'Enter') {
                                                                                 let totalWeight = 0;
-
+                                                                                let totalPrice = 0;
                                                                                 // Считаем общий вес продукции
                                                                                 for (const item of itemsBatch) {
                                                                                     const product = productList.find(p => p.itemId === item.itemId);
                                                                                     if (product) {
                                                                                         totalWeight += Number(product.weightProduct || 0 ) * Number(item?.quantFinal || 0);
+
                                                                                     }
                                                                                 }
-                                                                                // Находим цену за единицу веса
-                                                                                const pricePerUnitWeight = Number(mainCost) / totalWeight;
+                                                                                // Находим цену доставки за единицу веса
+                                                                                const pricePerUnitWeight = (Number(mainCost)) / totalWeight;
+
+                                                                                 // Считаем общую цену продукции
+                                                                                 for (const item of itemsBatch) {
+                                                                                        const product = productList.find(p => p.itemId === item.itemId);
+                                                                                        if (product) {
+                                                                                                totalPrice += Number(item.costPrice || 0 ) * Number(item?.quantFinal || 0);
+                                                                                        }
+                                                                                    }
+                                                                                
+                                                                                // Находим цену страховки за товар
+                                                                                const priceInsuranceUnit = (Number(mainInsuranceCost)) / totalPrice;
+                                                                                
+
+                                                                                
 
                                                                                 // Обновляем costPriceAll для каждого элемента itemsBatch
                                                                                 const updatedItemsBatch = itemsBatch.map(item => {
                                                                                         const product = productList.find(p => p.itemId === item.itemId);
                                                                                         return {
                                                                                                 ...item,
-                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)),
+                                                                                                costDeliver: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate),
+                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate) + Number(item.costPrice || 0) * Number(data?.rate)  + Number(priceInsuranceUnit * Number(item.costPrice || 0 ) * Number(rate)),
                                                                                         };
                                                                                 })
                                                                                 setItemsBatch(updatedItemsBatch)
@@ -605,7 +653,54 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         }}
                                                         />
                                                         <InfoCircleFilled className={cnMixSpace({ mL:'s' })}/>
-                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите кол-во принято или серийники</Text>
+                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите общ.стоимость доставки и курс</Text>
+                                                        <Button
+                                                                label={'Расчитать'}
+                                                                size="s"
+                                                                className={cnMixSpace({ mL:'xs' })}
+                                                                onClick={ () => {
+                                                                         
+                                                                                let totalWeight = 0;
+                                                                                let totalPrice = 0;
+                                                                                // Считаем общий вес продукции
+                                                                                for (const item of itemsBatch) {
+                                                                                    const product = productList.find(p => p.itemId === item.itemId);
+                                                                                    if (product) {
+                                                                                        totalWeight += Number(product.weightProduct || 0 ) * Number(item?.quantFinal || 0);
+
+                                                                                    }
+                                                                                }
+                                                                                // Находим цену доставки за единицу веса
+                                                                                const pricePerUnitWeight = (Number(mainCost) * Number(rate)) / totalWeight;
+
+                                                                                 // Считаем общую цену продукции
+                                                                                 for (const item of itemsBatch) {
+                                                                                        const product = productList.find(p => p.itemId === item.itemId);
+                                                                                        if (product) {
+                                                                                                totalPrice += Number(item.costPrice || 0 ) * Number(rate) * Number(item?.quantFinal || 0);
+                                                                                        }
+                                                                                    }
+                                                                                
+                                                                                // Находим цену страховки за товар
+                                                                                const priceInsuranceUnit = (Number(mainInsuranceCost) * Number(rate)) / totalPrice;
+                                                                                
+
+                                                                                
+
+                                                                                // Обновляем costPriceAll для каждого элемента itemsBatch
+                                                                                const updatedItemsBatch = itemsBatch.map(item => {
+                                                                                        const product = productList.find(p => p.itemId === item.itemId);
+                                                                                        return {
+                                                                                                ...item,
+                                                                                                costDeliver: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)),
+                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate) + Number(item.costPrice || 0) * Number(data?.rate)  + Number(priceInsuranceUnit * Number(item.costPrice || 0 ) * Number(rate)),
+                                                                                        };
+                                                                                })
+                                                                                setItemsBatch(updatedItemsBatch)
+                                                                                
+                                                                        }
+                                                                        }
+                                                                        />
                                         </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
                                                         <Text size="s" className={cnMixSpace({ mB:'xs' })} >Комментарий:</Text>

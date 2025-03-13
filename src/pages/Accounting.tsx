@@ -31,6 +31,7 @@ const Accounting = ( ) => {
         } = {
                 filterValues: defaultFilter,
                 currentPage: 0,
+                columnSort: [{column: 'id', sortOrder: 'desc'}]
         };
         const [count, setCount] = useState<number | null>(0)
         const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);
@@ -62,7 +63,7 @@ const Accounting = ( ) => {
         
         return (
                 <Card style={{width: '100%', height: '100%'}} className={cnMixSpace({p: 's'})}>
-                        {role === 'ADM' && (
+                        {(role !== 'SLR') && (
                               <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({mL: 'm', p: 's'})}>
                                 <AccountingToolbar
                                          setIsEditModalOpen={setIsEditModalOpen} 
@@ -72,21 +73,27 @@ const Accounting = ( ) => {
                                          setUpdateFlag={setUpdateFlag}
                                          setIsAccModalOpen={setIsAccModalOpen}
                                 />
-                                <AccountingTable 
-                                                 updateFlag={updateFlag}
-                                                 setUpdateFlag={setUpdateFlag}
-                                                 currentPage={currentPage}
-                                                 setCurrentPage={setCurrentPage}
-                                                 getColumnSortOrder={getColumnSortOrder}
-                                                 getColumnSortOrderIndex={getColumnSortOrderIndex}
-                                                 columnSort={columnSort}
-                                                 onColumnSort={onColumnSort}
-                                                 filterValues={filterValues}
-                                                 count={count}
-                                                 setCount={setCount}
-                                                 setId={setId}
-                                                 setIsEditModalOpen={setIsEditModalOpen}
-                                />
+                                {(role === 'ADM') && (
+                                        <AccountingTable 
+                                                        updateFlag={updateFlag}
+                                                        setUpdateFlag={setUpdateFlag}
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        getColumnSortOrder={getColumnSortOrder}
+                                                        getColumnSortOrderIndex={getColumnSortOrderIndex}
+                                                        columnSort={columnSort}
+                                                        onColumnSort={onColumnSort}
+                                                        filterValues={filterValues}
+                                                        count={count}
+                                                        setCount={setCount}
+                                                        setId={setId}
+                                                        setIsEditModalOpen={setIsEditModalOpen}
+                                        />
+                                )}
+                                {(role === ('KUR'))&& (
+                                        <Text>Нет полномочий</Text>
+                                )}
+                                
                                 <AccountingDetailsModal
                                         id={id}
                                         setId={setId}
@@ -94,13 +101,15 @@ const Accounting = ( ) => {
                                         isOpen={isEditModalOpen}
                                         setUpdateFlag={setUpdateFlag}
                                 />
-                                <AccountingAccModal
-                                        isOpen={isAccModalOpen}
-                                        setIsOpen={setIsAccModalOpen}
-                                />
+                                {(role === 'ADM') && (
+                                        <AccountingAccModal
+                                                isOpen={isAccModalOpen}
+                                                setIsOpen={setIsAccModalOpen}
+                                        />
+                                )}
                         </Layout>  
                         )}
-                        {role !== 'ADM' && (
+                        {(role === ('SLR'))&& (
                                 <Text>Нет полномочий</Text>
                         )}
                         

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // компоненты Consta
 import { Layout } from "@consta/uikit/Layout"
@@ -14,7 +14,9 @@ import { IconSortDownCenter } from '@consta/icons/IconSortDownCenter';
 import { IconSearchStroked } from '@consta/icons/IconSearchStroked';
 import { TNomenclatureFilter } from "../../types/nomenclature-types";
 import { IconUpload } from '@consta/icons/IconUpload';
-import { uploadProductsFile } from "../../services/NomenclatureService";
+import { updateNomenclatureRemains, uploadProductsFile } from "../../services/NomenclatureService";
+import { IconRevert } from "@consta/icons/IconRevert";
+import { getUserInfo } from "../../services/AuthorizationService";
 
 export interface TNomeclatureToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,10 +27,27 @@ export interface TNomeclatureToolbarProps {
         setIsFilterModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchText,  searchText, setUpdateFlag, setIsFilterModalOpen} : TNomeclatureToolbarProps) => {
+const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchText,  searchText, setUpdateFlag, setIsFilterModalOpen } : TNomeclatureToolbarProps) => {
         
         const element = useRef<HTMLInputElement>(null);
-
+        const updateRemains = async() => {
+                await updateNomenclatureRemains().then(()=> {
+                        setUpdateFlag(true);
+                })
+        }
+        const [role, setRole] = useState<string | undefined>(undefined);
+                
+                             useEffect(() => {
+                                        
+                                        const getUserInfoData = async () => {
+                                                await getUserInfo().then((resp) => {
+                                                        setRole(resp.role);
+                                                })
+                                        };
+                                        
+                                        void getUserInfoData();
+                                }, []);
+        
         return (
                 <Layout direction="row" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({mB: 'm', p:'m'})} >
                         <Layout direction="row">
@@ -37,6 +56,15 @@ const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchTex
                                 </Text>
                         </Layout>
                         <Layout direction="row">
+                                <Button 
+                                        label={'Обновить остатки товаров'}
+                                        view="secondary"
+                                        onClick={()=>{
+                                                updateRemains();
+                                        }}
+                                        iconLeft={IconRevert}
+                                        size="s"
+                                />
                                 <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})}>
                                         Поиск:
                                 </Text>
@@ -68,30 +96,34 @@ const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchTex
                                                 setUpdateFlag(true);
                                         }}
                                 />
-                                <Button size='s' view='secondary' label={'Добавить'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mH: 's'})}/>
-                                <div style={{ minWidth: 'fit-content' }}>
-                                        <FileField
-                                        id="purchase"
-                                        inputRef={element}
-                                        onChange={() => {
-                                                if (element.current?.files) {
-                                                        uploadProductsFile(element.current.files[0]);
-                                                }
-                                                if (element.current) {
-                                                element.current.value = '';
-                                                }
-                                        }}
-                                        >
-                                        {(props) => (
-                                                <Button
-                                                {...props}
-                                                size="s"
-                                                iconLeft={IconUpload}
-                                                label={'Загрузить файл'}
-                                                />
-                                        )}
-                                        </FileField>
-                                </div>
+                                {role !== 'KUR' && (
+                                        <Button size='s' view='secondary' label={'Добавить'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mH: 's'})}/>
+                                )}
+                                {role !== 'KUR' && (
+                                        <div style={{ minWidth: 'fit-content' }}>
+                                                <FileField
+                                                id="purchase"
+                                                inputRef={element}
+                                                onChange={() => {
+                                                        if (element.current?.files) {
+                                                                uploadProductsFile(element.current.files[0]);
+                                                        }
+                                                        if (element.current) {
+                                                        element.current.value = '';
+                                                        }
+                                                }}
+                                                >
+                                                {(props) => (
+                                                        <Button
+                                                        {...props}
+                                                        size="s"
+                                                        iconLeft={IconUpload}
+                                                        label={'Загрузить файл'}
+                                                        />
+                                                )}
+                                                </FileField>
+                                        </div>
+                                )}
                                 <Button size='s' view='secondary' iconLeft={IconSortDownCenter} title="Фильтр" onClick={()=>{setIsFilterModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
                         </Layout>
                         

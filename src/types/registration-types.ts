@@ -41,4 +41,5 @@ export interface TPurchaseRegFilter {
 
 export interface TPurchaseRegSortFields {
     updatedAt: SortOrder;
+    batchId?: number;
 }

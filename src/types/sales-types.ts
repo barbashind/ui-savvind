@@ -14,6 +14,7 @@ export interface TCheck {
         isEnding?: boolean;
         seller?:string | null;
         courier?:string | null;
+        account?: string;
     }
 
 export interface TSale {

@@ -37,7 +37,6 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                 lastCostPrice: null,
                 weight: null,
                 isMessageActive: false,
-                remains: null,
                 productType: undefined,
                 brand: null,
                 productHeight: null,
@@ -96,7 +95,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         lastCostPrice: Number(data.lastCostPrice),
                         weight: Number(data.weight),
                         productType: data.productType,
-                        remains: data.remains,
+                        remains: data.remainsSum,
                         brand: data.brand,
                         productHeight: Number(data.productHeight),
                         productWidth: Number(data.productWidth),
@@ -110,7 +109,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         productCountry: data.productCountry,
                         productSim: data.productSim,
                         isMessageActive: data.isMessageActive,
-                        remainsSum: (data.lastCostPrice && data.remains) ? data.lastCostPrice * data.remains : null,
+                        remainsSum: (data.lastCostPrice && data.remainsSum) ? data.lastCostPrice * data.remainsSum : null,
                         hasSerialNumber: data.hasSerialNumber,
                                 }).then(() => {  setUpdateFlag(true)
                                 setIsOpen(false);
@@ -131,7 +130,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         lastCostPrice: Number(data.lastCostPrice),
                         weight: Number(data.weight),
                         productType: data.productType,
-                        remains: data.remains,
+                        remains: data.remainsSum,
                         brand: data.brand,
                         productHeight: Number(data.productHeight),
                         productWidth: Number(data.productWidth),
@@ -145,7 +144,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         productCountry: data.productCountry,
                         productSim: data.productSim,
                         isMessageActive: data.isMessageActive,
-                        remainsSum: (data.lastCostPrice && data.remains) ? data.lastCostPrice * data.remains : null,
+                        remainsSum: (data.lastCostPrice && data.remainsSum) ? data.lastCostPrice * data.remainsSum : null,
                         hasSerialNumber: data.hasSerialNumber,
                 }).then(
                        () => { 
@@ -370,7 +369,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 />
                                         </Layout>
                                         <Layout direction="column" className={cnMixSpace({ mL:'m' })}>
-                                                <Text size="s" className={cnMixSpace({ mT:'m' })}>Последняя цена закупки:</Text>
+                                                <Text size="s" className={cnMixSpace({ mT:'m' })}>Последняя цена закупки ($):</Text>
                                                 <NumberMaskTextField 
                                                         size="s" 
                                                         value={data?.lastCostPrice?.toString()}
@@ -390,7 +389,15 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                         className={cnMixSpace({ mT:'2xs' })}
                                                 />
                                         </Layout>
-                                        
+                                        <Layout direction="column" className={cnMixSpace({ mL:'m' })}>
+                                                <Text size="s" className={cnMixSpace({ mT:'m' })}>Последняя стоимость закупки (руб):</Text>
+                                                <NumberMaskTextField 
+                                                        size="s" 
+                                                        value={data?.lastCostPriceAll?.toString()}
+                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                        disabled
+                                                />
+                                        </Layout>
                                 </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'m' })}>
                                         <Layout direction="column">

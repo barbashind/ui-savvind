@@ -73,6 +73,25 @@ export const updateNomenclature = async (id: number | undefined, data: object): 
     return resp;
 };
 
+// Обновление данных по остаткам
+export const updateNomenclatureRemains = async (): Promise<object> => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/update-nomenclature/remains`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        const errorResponse = await getErrorResponse(response);
+        throw new ErrorResponse(errorResponse);
+    }
+    const resp: object = (await response.json()) as Promise<object>;
+    return resp;
+};
+
+
 // Удаление записи
 export const deleteNomenclature = async (id: number | undefined): Promise<object> => {
     const token = localStorage.getItem('token');

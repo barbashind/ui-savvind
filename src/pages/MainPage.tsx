@@ -18,6 +18,7 @@ import { IconPaste } from '@consta/icons/IconPaste';
 import { IconStorage } from '@consta/icons/IconStorage';
 import { IconSettings } from '@consta/icons/IconSettings';
 import { BarcodeOutlined } from "@ant-design/icons";
+import { IconExit } from '@consta/icons/IconExit';
 
 // собственные компоненты
 import { DefaultTabs } from "../utils/types.ts";
@@ -132,6 +133,17 @@ const MainPage = () => {
                                                                         view="bordered"
                                                                         className={cnMixSpace({mT: 's', mH: 's'})}
                                                                 />
+                                                                <Button 
+                                                                        label={'Выйти из системы'}
+                                                                        onClick={()=>{
+                                                                                localStorage.removeItem('token');
+                                                                                window.location.reload();
+                                                                        }}
+                                                                        view="primary"
+                                                                        className={cnMixSpace({mT: '2xl', mH: 's'})}
+                                                                        iconLeft={IconExit}
+                                                                        size="s"
+                                                                />
                                                         </Layout>
                                                 
                                                 ) : (
@@ -168,29 +180,71 @@ const MainPage = () => {
                                         <Layout style={{ width: isOpenMenu ? 'calc(100% - 222px)' : 'calc(100% - 72px)'}}>
                                                 <Layout direction="column">
                                                         <Layout direction="row" >
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.settings);
+                                                                                setActivePage(pages[6]);
+                                                                        }}
+                                                                >
                                                                         <SettingsImage/>
                                                                         <Text view="link" weight="semibold">Настройки</Text>
                                                                 </Card>
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.nomenclature);
+                                                                                setActivePage(pages[0]);
+                                                                        }}
+                                                                >
                                                                         <NoneclatureImage/>
                                                                         <Text view="link" weight="semibold">Номенклатура</Text>
                                                                 </Card>
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.product_purchase);
+                                                                                setActivePage(pages[1]);
+                                                                        }}
+                                                                >
                                                                         <PurchaseImage/>
                                                                         <Text view="link" weight="semibold">Закупка</Text>
                                                                 </Card>
                                                         </Layout>
                                                         <Layout direction="row">
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.product_registration);
+                                                                                setActivePage(pages[2]);
+                                                                        }}
+                                                                >
                                                                         <RegistrationImage/>
                                                                         <Text view="link" weight="semibold">Оприходование товаров</Text>
                                                                 </Card>
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.sales);
+                                                                                setActivePage(pages[4]);
+                                                                        }}
+                                                                >
                                                                         <SalesImage/>
                                                                         <Text view="link" weight="semibold">Продажи</Text>
                                                                 </Card>
-                                                                <Card style={{height: 'fit-content'}} className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}>
+                                                                <Card 
+                                                                        style={{height: 'fit-content'}} 
+                                                                        className={cnMixSpace({p:'m', m: '3xl'}) + ' CardIcon'}
+                                                                        onClick={()=> {
+                                                                                goNavigate(routeTarget.accounting);
+                                                                                setActivePage(pages[5]);
+                                                                        }}
+                                                                >
                                                                         <AccountingImage/>
                                                                         <Text view="link" weight="semibold">Бухгалтерия</Text>
                                                                 </Card>
