@@ -94,6 +94,7 @@ const writeDownProduct = async (product : TPurchaseItem) => {
         if (product.hasSerialNumber) {
                 await deletePurchaseItem(product.itemBatchId).then(() => {
                         closeWindow()
+                        setIsLoading(false)
                 }
                         ).catch(()=>{
                         setCaption('Товар не найден');
@@ -101,6 +102,7 @@ const writeDownProduct = async (product : TPurchaseItem) => {
         } else {
                 await returnPurchaseItem(product.itemBatchId).then(() => {
                         closeWindow()
+                        setIsLoading(false)
                 }
                         ).catch(()=>{
                         setCaption('Товар не найден');
@@ -177,6 +179,7 @@ const writeDownProduct = async (product : TPurchaseItem) => {
                                                         className={cnMixSpace({ mL:'m' })}
                                                         onClick={()=>{
                                                                 if (item) {
+                                                                        setIsLoading(true)
                                                                         writeDownProduct(item);
                                                                 }
                                                         }}
@@ -228,7 +231,7 @@ const writeDownProduct = async (product : TPurchaseItem) => {
                                                                                       <Loader size="m" />
                                                                               </Layout>  
                                         )}
-                                        {(items.length > 0) && items.map((elem) => (
+                                        {(items.length > 0) && !isLoading &&  items.map((elem) => (
                                                 <Layout 
                                                         direction="row" 
                                                         className={cnMixSpace({mT:'s', p: 's'})} 

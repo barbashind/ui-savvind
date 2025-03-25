@@ -21,7 +21,7 @@ export default defineConfig({
     port: 80,
     proxy: {
       '/api': {
-        target: 'http://78.107.239.94:80',
+        target: 'http://erp.yes-electronics.com',
         changeOrigin: true,
         secure: false,
       },
