@@ -306,7 +306,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                         <Layout direction="row" style={{ width: '200px' }}>
                             
                             <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                {(Number(Number(value) * Number(record?.lastCostPrice)) || '0') + ' $' }
+                                {(Number(Number(value) * Number(record?.lastCostPrice)).toFixed(2) || '0') + ' $' }
                             </Text>
                         </Layout>
                     );
