@@ -25,7 +25,8 @@ import { TPurchase } from "../../types/purchase-types";
 import { TAccount } from "../../types/settings-types";
 import { getAccounts } from "../../services/SettingsService";
 import NumberMaskTextField from "../../utils/NumberMaskTextField";
-
+import { Tooltip } from "../global/Tooltip";
+import { Direction, Position } from "@consta/uikit/__internal__/src/components/Popover/Popover";
 
 
 
@@ -322,7 +323,8 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 }
         }
 
-
+        const [tooltipPosition, setTooltipPosition] = useState<Position>(undefined);
+        const [arrowDir, setArrowDir] = useState<Direction>('upLeft');
         
         return (
                 <Modal
@@ -449,6 +451,43 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         caption={ captionList?.length > 0 && captionList?.find(item=>((item.state === "itemId") && (item.index === itemsBatch.indexOf(itemBatch)))) ? captionList?.find(item=>((item.state === "itemId") && (item.index === itemsBatch.indexOf(itemBatch))))?.caption : undefined}
                                                                                                         status={captionList?.length > 0 && captionList?.find(item=>((item.state === "itemId") && (item.index === itemsBatch.indexOf(itemBatch)))) ? "alert" : undefined}
                                                                                                         onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "itemId") && (capt.index !== itemsBatch.indexOf(itemBatch)) ))}}
+                                                                                                        onMouseMove={(event) => {
+                                                                                                                const target = event.target as HTMLElement;
+                                                                                                                const rect = target.getBoundingClientRect();
+                                                                                                                if (target.classList.contains('Select-Input')) {
+                                                                                                                        setTooltipPosition({
+                                                                                                                        x: rect.right - (target.clientWidth * 0.5),
+                                                                                                                        y: rect.top,
+                                                                                                                    });
+                                                                                                                    
+                                                                                                                    setArrowDir('upCenter')
+                                                                                                                }
+                                                                                                                    
+                                                                                                            }}
+                                                                                                        onMouseLeave={() => {
+                                                                                                        setTooltipPosition(undefined);
+                                                                                                        }}
+                                                                                                        renderItem = {(item) => 
+                                                                                                                (
+                                                                                                                <Layout  
+                                                                                                                        className='comboboxItemArea'
+                                                                                                                        onClick={() => {
+                                                                                                                                setItemsBatch(prev => 
+                                                                                                                                        prev.map(product => (itemsBatch.indexOf(product) === itemsBatch.indexOf(itemBatch)) ? 
+                                                                                                                                                { ...product, 
+                                                                                                                                                itemId: item.item.id, 
+                                                                                                                                                name: item.item.label,
+                                                                                                                                                costPrice: productList.find(el => (el.itemId === item.item.id))?.costPrice ?? null,
+                                                                                                                                                hasSerialNumber: productList.find(el => (el.itemId === item.item.id))?.hasSerialNumber ?? false,
+                                                                                                                                                caption: null
+                                                                                                                                                } : product
+                                                                                                                                        )
+                                                                                                                                        );
+                                                                                                                        }}
+                                                                                                                        >
+                                                                                                                        <Text size='s' className={cnMixSpace({mV:'xs', mL:'xs'}) + ' comboboxItem'}>{item.item.label}</Text>
+                                                                                                                </Layout>
+                                                                                                        )}
                                                                                                 /> 
                                                                                         )}
                                                                                         {(data.batchStatus !== 'CREATED' && data.batchStatus) && (
@@ -459,6 +498,20 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                 </div>
                                                                                                 
                                                                                         )}
+                                                                                        <Tooltip
+                                                                                                direction={arrowDir ?? 'upCenter'}
+                                                                                                spareDirection={arrowDir ?? 'upCenter'}
+                                                                                                position={tooltipPosition}
+                                                                                                className="tooltip"
+                                                                                                classNameArrow="tooltipArrow"
+                                                                                        >
+                                                                                                <Text
+                                                                                                        size="xs"
+                                                                                                        style={{zoom: 'var(--zoom)', maxWidth: '238px'}}
+                                                                                                >
+                                                                                                        {itemBatch?.name}
+                                                                                                </Text>
+                                                                                        </Tooltip> 
                                                                                         </div>
                                                                                         {(data.batchStatus === 'CREATED' || !data.batchStatus) && (
                                                                                                 <Combobox

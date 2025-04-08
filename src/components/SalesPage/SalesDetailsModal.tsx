@@ -176,6 +176,8 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 e.preventDefault();
                         await getProductBySerial(item.serialNumber, (resp) => {
                                 if (resp && !resp.isSaled) {
+                                        const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
+                                        audio.play(); 
                                         setSales(prev => 
                                                 prev.map(product => (sales.indexOf(product) === sales.indexOf(item)) ? 
                                                         { ...product, 

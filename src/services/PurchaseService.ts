@@ -246,3 +246,43 @@ export const returnPurchaseItem = async (id: number | null): Promise<object> => 
     return response;
 };
     
+
+// Смена склада с серийником
+export const changeWarehouseBySerial = async (warehouse: string | undefined, serialNumbers: string[] | null): Promise<object> => {
+    const token = localStorage.getItem('token');
+    const body = {warehouse, serialNumbers}
+    const response = await fetch('/api/change-warehouse-by-serial-num', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    },
+);
+    if (!response.ok) {
+        const errorResponse = await getErrorResponse(response);
+        throw new ErrorResponse(errorResponse);
+    }
+    return response;
+};
+
+// Смена склада без серийника
+export const changeWarehouseByName = async (warehouse: string | undefined, itemBatchId: number | null | undefined, quant: number | null): Promise<object> => {
+    const token = localStorage.getItem('token');
+    const body = {warehouse, itemBatchId, quant}
+    const response = await fetch('/api/change-warehouse-by-name', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    },
+);
+    if (!response.ok) {
+        const errorResponse = await getErrorResponse(response);
+        throw new ErrorResponse(errorResponse);
+    }
+    return response;
+};

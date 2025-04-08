@@ -1,17 +1,17 @@
-import axios from "axios";
-import data from "../utils/config.tsx";
+import axios from 'axios';
+import data from '../utils/config.tsx';
 
 export const serverWrapper = {
-    get: request("GET"),
-    post: request("POST"),
-    put: request("PUT"),
-    delete: request("DELETE"),
+    get: request('GET'),
+    post: request('POST'),
+    put: request('PUT'),
+    delete: request('DELETE'),
 };
 
 const instance = axios.create({
-    baseURL: "/",
+    baseURL: '/',
     headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
     },
 });
 
@@ -34,7 +34,6 @@ function request(method) {
     };
 }
 
-
 /**
  *
  * @param {*} url
@@ -42,6 +41,6 @@ function request(method) {
  */
 export function getFullUrl(url) {
     let fullUrl;
-    fullUrl = 'http://' + data.host + data.port + '/api' + url
+    fullUrl = 'https://' + data.host + data.port + '/api' + url;
     return fullUrl;
 }

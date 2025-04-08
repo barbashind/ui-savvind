@@ -1,49 +1,70 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.ListItemGrid-Slot_position_left, .ListItemGrid-Slot_position_right {
-  width: -moz-max-content;
-  width: max-content;
-  height: 30px !important;
+.ListItemGrid-Slot_position_left,
+.ListItemGrid-Slot_position_right {
+    width: -moz-max-content;
+    width: max-content;
+    height: 30px !important;
 }
 
-.CardIcon:hover{
-  opacity: 70%;
-  text-decoration: underline #0078d2;
+.CardIcon:hover {
+    opacity: 70%;
+    text-decoration: underline #0078d2;
+}
+
+.tooltip {
+    z-index: 200;
+    padding: 8px !important;
+}
+
+.tooltipArrow {
+    color: white;
+}
+
+.comboboxItem {
+    cursor: pointer;
+    color: #002033;
+}
+
+.comboboxItemArea:hover {
+    background-color: rgba(0, 65, 102, 0.2);
+    text-decoration-color: #002033;
+    cursor: pointer;
 }

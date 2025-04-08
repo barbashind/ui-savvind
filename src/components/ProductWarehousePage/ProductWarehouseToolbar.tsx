@@ -30,8 +30,10 @@ export interface TProductWarehouseToolbarProps {
         filterValuesP: TPurchaseItemFilter;
         setUpdateFlag: React.Dispatch<React.SetStateAction<boolean>>;
         setIsReturnModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+        setIsChangingModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+        setCurrentPage:  React.Dispatch<React.SetStateAction<number>>;
 }
-const ProductWarehouseToolbar = ({setIsFilterModalOpen, mode, setMode, modes, setFilterValuesP, filterValuesP, setUpdateFlag, setIsReturnModalOpen} : TProductWarehouseToolbarProps) => {
+const ProductWarehouseToolbar = ({setIsFilterModalOpen, mode, setMode, modes, setFilterValuesP, filterValuesP, setUpdateFlag, setIsReturnModalOpen, setIsChangingModalOpen,  setCurrentPage} : TProductWarehouseToolbarProps) => {
 const [warehouses, setWarehouses] = useState<TWarehouse[]>([]);
 
 useEffect(() => {
@@ -91,6 +93,7 @@ useEffect(() => {
                                                         onKeyPress={(event) => {
                                                                 if (event.key === 'Enter') {
                                                                         setUpdateFlag(true);
+                                                                        setCurrentPage(0);
                                                                 }
                                                             }}
                                                         withClearButton
@@ -105,6 +108,7 @@ useEffect(() => {
                                                         onChange={(value)=> {
                                                                 if (value) {
                                                                         setFilterValuesP(prev => ({ ...prev, warehouse: value.name ?? null }));
+                                                                        setCurrentPage(0);
                                                                 } else {
                                                                         setFilterValuesP(prev => ({ ...prev, warehouse: null }));
                                                                 }
@@ -139,6 +143,13 @@ useEffect(() => {
                                         className={cnMixSpace({mL: 's'})}
                                 />
                                 )}
+                                <Button 
+                                        size='s' 
+                                        view='secondary' 
+                                        label="Поменять склад" 
+                                        onClick={()=>{setIsChangingModalOpen(true)}} 
+                                        className={cnMixSpace({mL: 's'})}
+                                />
                                 <Button 
                                         size='s' 
                                         view='secondary' 

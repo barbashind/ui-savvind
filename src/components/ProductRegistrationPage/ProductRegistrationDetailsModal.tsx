@@ -412,10 +412,12 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                                 const isUnique = await checkSerialNumberExists(serialNumber);
 
                                                                                                                                 if (!isUnique) {
+                                                                                                                                        setSerialNumber(null)
                                                                                                                                 return; // Если серийный номер не уникален, прекращаем выполнение
                                                                                                                                 } else {
                                                                                                                                 
-                                                                                                                                       
+                                                                                                                                const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
+                                                                                                                                audio.play(); 
                                                                                                                                 setItemsBatch(prev => ([...prev, {
                                                                                                                                         itemBatchId: null,
                                                                                                                                         batchId: itemBatch.batchId,

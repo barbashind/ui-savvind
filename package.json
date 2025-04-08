@@ -7,6 +7,8 @@
     "dev": "vite --port 3000",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "prettier": "prettier --write .",
+    "pre-commit": "npm run prettier && npm run lint",
     "preview": "vite preview --port 3000"
   },
   "dependencies": {
@@ -17,6 +19,7 @@
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "js-file-download": "^0.4.12",
+    "eslint-plugin-prettier": "^5.2.3",
     "keycloak-js": "^23.0.1",
     "luxon": "^3.2.1",
     "rc-table": "^7.48.1",

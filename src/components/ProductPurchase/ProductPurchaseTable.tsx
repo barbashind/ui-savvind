@@ -23,6 +23,7 @@ import { GetColumnSortOrder, GetColumnSortOrderIndex, OnColumnSort, Sort } from 
 import { ErrorResponse, IPagination, TSortParam } from "../../services/utils.ts";
 import { usePaginationStore } from "../../hooks/usePaginationStore.ts";
 import { Pagination } from "../global/Pagination.tsx";
+import { Modal } from "@consta/uikit/Modal/index";
 
 
 
@@ -53,7 +54,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 });        
         const [rows, setRows] = useState<TPurchaseRow[]>([]);
         const [isLoading, setIsLoading] = useState<boolean>(false);
-    
+        const [isDeletingModal, setIsDeletingModal] = useState<boolean>(false);
        
         useEffect(() => {
                 setStoredPageSize(pagination.pageSize);
@@ -301,9 +302,42 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                                 view="clear" 
                                 onClick={(e) => {
                                         e.stopPropagation();
-                                        deleteBatchData(record.batchId);
+                                        setIsDeletingModal(true)
+                                        // deleteBatchData(record.batchId);
                                 }}
                                 />
+                            <Modal
+                                isOpen={isDeletingModal}
+                                hasOverlay={false}
+                            >
+                                <Layout direction="column" className={cnMixSpace({p:'xl'})}>
+                                    <Text size="m" >{`Партия № ${record.batchNumber}`}</Text>
+                                    <Text size="s" view="secondary" className={cnMixSpace({mT:'2xl'})}>Вы уверены, что хотите удалить закупку?</Text>
+                                    <Layout direction="row" style={{justifyContent: 'right'}} className={cnMixSpace({mT:'2xl'})}>
+                                        <Button
+                                            view="primary"
+                                            label={'Да, удалить'}
+                                            onClick={(e)=>{
+                                                e.stopPropagation();
+                                                deleteBatchData(record.batchId);
+                                                setIsDeletingModal(false);
+                                            }}
+                                            size="s"
+                                        />
+                                        <Button
+                                            view="secondary"
+                                            label={'Отмена'}
+                                            onClick={(e)=>{
+                                                e.stopPropagation();
+                                                setIsDeletingModal(false);
+                                            }}
+                                            size="s"
+                                            className={cnMixSpace({mL:'m'})}
+                                        />
+                                    </Layout>
+                                </Layout>
+                                
+                            </Modal>
                         </div>
                     );
                 },
@@ -395,6 +429,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                             setUpdateFlag(true);
                         }}
                     />
+                    
         </Layout>
         )
 }

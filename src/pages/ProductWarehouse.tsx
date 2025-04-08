@@ -10,6 +10,7 @@ import { TPurchaseFilter, TPurchaseItemFilter, TPurchaseItemSortFields, TPurchas
 import { Sort, useTableSorter } from "../hooks/useTableSorter.ts";
 import ProductWarehouseItemsTable from "../components/ProductWarehousePage/ProductWarehouseItemsTable.tsx";
 import WriteDownModal from "../components/ProductWarehousePage/WriteDownModal.tsx";
+import ChangingWarehouseModal from "../components/ProductWarehousePage/ChangingWarehouseModal.tsx";
 
 export type TMode = {
         code: string;
@@ -67,6 +68,7 @@ const ProductWarehouse = () => {
                 const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
                 const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false)
                 const [isReturnModalOpen, setIsReturnModalOpen] = useState<boolean>(false)
+                const [isChangingModalOpen, setIsChangingModalOpen] = useState<boolean>(false)
                 const [id, setId] = useState<number | undefined>(undefined)
                 const [updateFlag, setUpdateFlag] = useState<boolean>(true);
 
@@ -88,6 +90,8 @@ const ProductWarehouse = () => {
                                                 mode={mode}
                                                 setMode={setMode}
                                                 modes={modes}
+                                                setCurrentPage={setCurrentPage}
+                                                setIsChangingModalOpen={setIsChangingModalOpen}
                                         />
                                         {mode.code === 'BATCHES' && (
                                                 <ProductWarehouseTable
@@ -124,7 +128,11 @@ const ProductWarehouse = () => {
                                                 setIsOpen={setIsReturnModalOpen}
                                                 setUpdateFlag={setUpdateFlag}
                                         />
-                                        
+                                        <ChangingWarehouseModal
+                                                isOpen={isChangingModalOpen}
+                                                setIsOpen={setIsChangingModalOpen}
+                                                setUpdateFlag={setUpdateFlag}
+                                        />
                                         <ProductWarehouseDetailsModal
                                                 isOpen={isEditModalOpen}
                                                 setIsOpen={setIsEditModalOpen}
