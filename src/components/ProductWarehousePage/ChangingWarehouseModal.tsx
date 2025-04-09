@@ -21,6 +21,8 @@ import { Tag } from "@consta/uikit/Tag";
 import { TWarehouse } from "../../types/settings-types";
 import { getWarehouses } from "../../services/SettingsService";
 
+import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
+
 interface TChangingWarehouseModalProps {
         isOpen: boolean;
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -244,7 +246,7 @@ const changeWarehouseByItem = async () => {
                                                         return; // Если серийный номер не уникален, прекращаем выполнение
                                                         } else if (serialNumber) {
                                                         
-                                                                const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
+                                                                const audio = new Audio(checkProductAudio);
                                                                 audio.play(); 
                                                                 setSerialNums((prev) => prev ? [...prev, serialNumber] : [serialNumber])
                                                                 setSerialNumber(null);

@@ -27,6 +27,9 @@ import { Select } from "@consta/uikit/Select";
 import { Tooltip } from "../global/Tooltip";
 import { Direction, Position } from "@consta/uikit/Popover";
 
+import errorAudio from '../../assets/Audio/errorSignal.mp3';
+import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
+
 interface TSalesDetailsModalProps {
         isOpen: boolean;
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -176,7 +179,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                         await getProductBySerial(item.serialNumber, (resp) => {
                                 if (resp && !resp.isSaled && sales.filter((elem)=> (elem.serialNumber === item.serialNumber))?.length === 1) {
 
-                                        const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
+                                        const audio = new Audio(checkProductAudio);
                                         audio.play(); 
                                         setSales(prev => 
                                                 prev.map(product => (sales.indexOf(product) === sales.indexOf(item)) ? 
@@ -196,7 +199,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                         }
                                         
                                 } else {
-                                        const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
+                                        const audio = new Audio(errorAudio);
                                         audio.play();  
                                         if (sales.filter((elem)=> (elem.serialNumber === item.serialNumber))?.length > 1) {
                                                 setSales(prevProducts => 
@@ -205,8 +208,6 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                         )
                                                 );
                                                 setCaptionList((prev) => [...prev, {state: "serialNumber", index : sales.indexOf(item), caption: 'Сер. ном. уже использовался'}])
-                                                const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
-                                                audio.play();  
                                         }
                                 }
                         });

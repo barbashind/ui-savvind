@@ -28,6 +28,9 @@ import { getNomenclatures } from "../../services/PurchaseService.ts";
 import { TNomenclature } from "../../types/nomenclature-types";
 import { InfoCircleFilled } from "@ant-design/icons";
 
+import errorAudio from '../../assets/Audio/errorSignal.mp3';
+import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
+
 
 
 
@@ -413,12 +416,12 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
 
                                                                                                                                 if (!isUnique) {
                                                                                                                                         setSerialNumber(null)
-                                                                                                                                        const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
+                                                                                                                                        const audio = new Audio(errorAudio);
                                                                                                                                         audio.play();
                                                                                                                                 return; // Если серийный номер не уникален, прекращаем выполнение
                                                                                                                                 } else {
                                                                                                                                 
-                                                                                                                                const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
+                                                                                                                                const audio = new Audio(checkProductAudio);
                                                                                                                                 audio.play(); 
                                                                                                                                 setItemsBatch(prev => ([...prev, {
                                                                                                                                         itemBatchId: null,
