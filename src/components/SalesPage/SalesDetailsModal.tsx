@@ -242,7 +242,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 e.preventDefault();
                                 const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
                                 const partners = getPartners(sales);
-                                const body = sales;
+                                const body = sales?.filter((item => (!!item.itemId)));
                                 try {
                                         await addCheck({
                                                 customer: data.customer ?? '-',
@@ -263,7 +263,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                 // Создаем новый массив с обновленным checkId
                                                 const transformedRecords: TSale[] = [];
     
-                                                sales.forEach(record => {
+                                                sales?.filter((item => (!!item.itemId)))?.forEach(record => {
                                                 const quantity = record.quant || 1; // Если quant пустой, то по умолчанию 1
                                                 for (let i = 0; i < quantity; i++) {
                                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -300,7 +300,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                 setIsLoading(true);
                                 e.preventDefault();
                                                 const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
-                                                const body = sales;
+                                                const body = sales?.filter((item => (!!item.itemId)));
                                                 // const partners = getPartners(sales);
                                                 try {
                                                         await addCheck({
@@ -322,7 +322,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                                 // Создаем новый массив с обновленным checkId
                                                                 const transformedRecords: TSale[] = [];
                     
-                                                                sales.forEach(record => {
+                                                                sales?.filter((item => (item.itemId)))?.forEach(record => {
                                                                 const quantity = record.quant || 1; // Если quant пустой, то по умолчанию 1
                                                                 for (let i = 0; i < quantity; i++) {
                                                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -359,7 +359,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 setIsLoading(true);
                 e.preventDefault();
                                 const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
-                                const body = sales;
+                                const body = sales?.filter((item => (!!item.itemId)));
                                 // const partners = getPartners(sales);
                                 try {
                                         await addCheck({
@@ -381,7 +381,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                 // Создаем новый массив с обновленным checkId
                                                 const transformedRecords: TSale[] = [];
     
-                                                sales.forEach(record => {
+                                                sales?.filter((item => (item.itemId)))?.forEach(record => {
                                                 const quantity = record.quant || 1; // Если quant пустой, то по умолчанию 1
                                                 for (let i = 0; i < quantity; i++) {
                                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
