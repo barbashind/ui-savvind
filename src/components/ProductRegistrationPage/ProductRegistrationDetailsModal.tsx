@@ -413,6 +413,8 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
 
                                                                                                                                 if (!isUnique) {
                                                                                                                                         setSerialNumber(null)
+                                                                                                                                        const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
+                                                                                                                                        audio.play();
                                                                                                                                 return; // Если серийный номер не уникален, прекращаем выполнение
                                                                                                                                 } else {
                                                                                                                                 

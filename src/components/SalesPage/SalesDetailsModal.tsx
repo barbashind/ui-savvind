@@ -24,6 +24,8 @@ import { getUserInfo } from "../../services/AuthorizationService";
 import { TAccount, TUser } from "../../types/settings-types";
 import { getAccounts, getUsers } from "../../services/SettingsService";
 import { Select } from "@consta/uikit/Select";
+import { Tooltip } from "../global/Tooltip";
+import { Direction, Position } from "@consta/uikit/Popover";
 
 interface TSalesDetailsModalProps {
         isOpen: boolean;
@@ -108,9 +110,6 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 }
                 const getUserInfoData = async () => {
                         await getUserInfo().then((resp) => {
-                                setData(prev => ({
-                                        ...prev, seller: resp.username
-                                }));
                                 setRole(resp.role);
                         })
                 };
@@ -175,7 +174,8 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
         const getProduct = async (e: React.FocusEvent<HTMLElement, Element> , item: TSale) => {
                 e.preventDefault();
                         await getProductBySerial(item.serialNumber, (resp) => {
-                                if (resp && !resp.isSaled) {
+                                if (resp && !resp.isSaled && sales.filter((elem)=> (elem.serialNumber === item.serialNumber))?.length === 1) {
+
                                         const audio = new Audio('/src/assets/Audio/checkProduct.mp3');
                                         audio.play(); 
                                         setSales(prev => 
@@ -189,6 +189,25 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                                                         } : product
                                                 )
                                                 );
+                                        if (sales?.indexOf(item) === (sales?.length - 1)) {
+                                                setSales(prev => [...prev, 
+                                                defaultItem
+                                        ]);
+                                        }
+                                        
+                                } else {
+                                        const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
+                                        audio.play();  
+                                        if (sales.filter((elem)=> (elem.serialNumber === item.serialNumber))?.length > 1) {
+                                                setSales(prevProducts => 
+                                                        prevProducts.map(product => 
+                                                                (sales?.indexOf(product) === sales?.indexOf(item)) ? { ...product, serialNumber:  null } : product
+                                                        )
+                                                );
+                                                setCaptionList((prev) => [...prev, {state: "serialNumber", index : sales.indexOf(item), caption: 'Сер. ном. уже использовался'}])
+                                                const audio = new Audio('/src/assets/Audio/errorSignal.mp3');
+                                                audio.play();  
+                                        }
                                 }
                         });
                                
@@ -508,6 +527,10 @@ useEffect(() => {
                 void getAccountsData();
 }, [])
 
+        const [tooltipPosition, setTooltipPosition] = useState<Position>(undefined);
+        const [tooltipText, setTooltipText] = useState<string | undefined>(undefined);
+        const [arrowDir, setArrowDir] = useState<Direction>('upLeft');
+
         return (
                 <Modal
                         isOpen={isOpen}
@@ -587,7 +610,38 @@ useEffect(() => {
                                                                                                                 }
                                                                                                         }}
                                                                                                         disabled = {!!itemCheck.serialNumber}
+                                                                                                        onMouseMove={(event) => {
+                                                                                                                const target = event.target as HTMLElement;
+                                                                                                                const rect = target.getBoundingClientRect();
+                                                                                                                if (target.classList.contains('Select-Input')) {
+                                                                                                                        setTooltipPosition({
+                                                                                                                        x: rect.right - (target.clientWidth * 0.5),
+                                                                                                                        y: rect.top,
+                                                                                                                    });
+                                                                                                                    setTooltipText(itemCheck?.name ?? undefined)
+                                                                                                                    setArrowDir('upCenter')
+                                                                                                                }
+                                                                                                            }}
+                                                                                                        onMouseLeave={() => {
+                                                                                                        setTooltipPosition(undefined);
+                                                                                                        setTooltipText(undefined)
+                                                                                                        }}
+
                                                                                                 /> 
+                                                                                                <Tooltip
+                                                                                                        direction={arrowDir ?? 'upCenter'}
+                                                                                                        spareDirection={arrowDir ?? 'upCenter'}
+                                                                                                        position={tooltipPosition}
+                                                                                                        className="tooltip"
+                                                                                                        classNameArrow="tooltipArrow"
+                                                                                                >
+                                                                                                        <Text
+                                                                                                                size="xs"
+                                                                                                                style={{zoom: 'var(--zoom)', maxWidth: '238px'}}
+                                                                                                        >
+                                                                                                                {tooltipText}
+                                                                                                        </Text>
+                                                                                                </Tooltip> 
                                                                                         </div>      
 
                                                                                         <TextField 
@@ -618,14 +672,6 @@ useEffect(() => {
                                                                                                 onBlur={(e)=>{
                                                                                                         if (itemCheck.serialNumber) {
                                                                                                                 getProduct(e, itemCheck);
-                                                                                                                if (sales.filter((elem)=> (elem.serialNumber === itemCheck.serialNumber))?.length > 1) {
-                                                                                                                        setSales(prevProducts => 
-                                                                                                                                prevProducts.map(product => 
-                                                                                                                                        (sales?.indexOf(product) === sales?.indexOf(itemCheck)) ? { ...product, serialNumber:  null } : product
-                                                                                                                                )
-                                                                                                                        );
-                                                                                                                        setCaptionList((prev) => [...prev, {state: "serialNumber", index : sales.indexOf(itemCheck), caption: 'Сер. ном. уже использовался'}])
-                                                                                                                }
                                                                                                         }
                                                                                                 }}
                                                                                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -633,11 +679,7 @@ useEffect(() => {
                                                                                                         if (event.key === 'Enter') {
                                                                                                                 if (itemCheck.serialNumber) {
                                                                                                                         getProduct(event, itemCheck);
-                                                                                                                        if (sales?.indexOf(itemCheck) === (sales?.length - 1)) {
-                                                                                                                                setSales(prev => [...prev, 
-                                                                                                                                defaultItem
-                                                                                                                        ]);
-                                                                                                                        }
+                                                                                                                        
                                                                                                                         
                                                                                                                         if (sales.filter((elem)=> (elem.serialNumber === itemCheck.serialNumber))?.length > 1) {
                                                                                                                                 setSales(prevProducts => 
@@ -896,6 +938,8 @@ useEffect(() => {
                                                                                 createBooking(e);
                                                                         }
                                                                 }}
+                                                                disabled={!data.seller}
+                                                                title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
                                                 {!checkId && (
@@ -912,6 +956,8 @@ useEffect(() => {
                                                                                 createUnpaid(e)
                                                                         }
                                                                 }}
+                                                                disabled={!data.seller}
+                                                                title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
                                                 {checkId && data.isBooking && (
@@ -927,6 +973,8 @@ useEffect(() => {
                                                                                 closeWindow();
                                                                         }
                                                                 }}
+                                                                disabled={!data.seller}
+                                                                title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
                                                 {checkId && data.isBooking && (
@@ -1001,6 +1049,8 @@ useEffect(() => {
                                                                 onClick={(e)=>{
                                                                                 createCheck(e);
                                                                 }}
+                                                                disabled={!data.seller}
+                                                                title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
 

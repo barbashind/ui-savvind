@@ -324,6 +324,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
         }
 
         const [tooltipPosition, setTooltipPosition] = useState<Position>(undefined);
+        const [tooltipText, setTooltipText] = useState<string | undefined>(undefined);
         const [arrowDir, setArrowDir] = useState<Direction>('upLeft');
         
         return (
@@ -459,13 +460,14 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                                         x: rect.right - (target.clientWidth * 0.5),
                                                                                                                         y: rect.top,
                                                                                                                     });
-                                                                                                                    
+                                                                                                                    setTooltipText(itemBatch?.name ?? undefined)
                                                                                                                     setArrowDir('upCenter')
                                                                                                                 }
                                                                                                                     
                                                                                                             }}
                                                                                                         onMouseLeave={() => {
                                                                                                         setTooltipPosition(undefined);
+                                                                                                        setTooltipText(undefined)
                                                                                                         }}
                                                                                                         renderItem = {(item) => 
                                                                                                                 (
@@ -509,7 +511,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         size="xs"
                                                                                                         style={{zoom: 'var(--zoom)', maxWidth: '238px'}}
                                                                                                 >
-                                                                                                        {itemBatch?.name}
+                                                                                                        {tooltipText}
                                                                                                 </Text>
                                                                                         </Tooltip> 
                                                                                         </div>
