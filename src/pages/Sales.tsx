@@ -107,9 +107,6 @@ const Sales = () => {
                                 <PurchaseModal
                                         isOpen={isPurchaseModalOpen}
                                         setIsOpen={setIsPurchaseModalOpen}
-                                        checkId={id}
-                                        setCheckId={setId}
-                                        setUpdateFlag={setUpdateFlag}
                                 />
                                  <SalesDetailsModal
                                         isOpen={isEditModalOpen}
