@@ -163,7 +163,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 ) : (
                     <div>
                         <Text size="s" weight="medium">
-                            {value || '-'}
+                            {value ?  value : 'Разовая закупка'}
                         </Text>
                     </div>
                 );
@@ -191,7 +191,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 ) : (
                     <Layout direction="row" style={{ width: '200px' }}>
                         <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                            {'(' + (value?.toString() || '0') + ' $)' }
+                            {record.batchNumber !== 0 ? '(' + (value?.toString() || '0') + ' $)' : '(' + (value?.toString() || '0') + ' ₽)' }
                         </Text>
                     </Layout>
                 );
@@ -242,6 +242,30 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                     <></>
                 ) : (
                     <Layout direction="row" style={{ width: '200px' }}>
+                        <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                            {value}
+                        </Text>
+                    </Layout>
+                );
+            },
+        },
+        {
+            title: (
+                <TableColumnHeader
+                    header="Автор"
+                    withoutSort
+                />
+            ),
+            minWidth: 150,
+            dataIndex: 'author',
+            key: 'author',
+            align: 'left',
+            width: '150px',
+            render: (value: string, record: TPurchaseRow) => {
+                return record.spacer ? (
+                    <></>
+                ) : (
+                    <Layout direction="row" style={{ width: '150px' }}>
                         <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
                             {value}
                         </Text>

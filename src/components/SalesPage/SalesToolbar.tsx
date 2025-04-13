@@ -16,6 +16,7 @@ import { IconRevert } from "@consta/icons/IconRevert";
 
 
 import { TCheckFilter } from "../../types/sales-types";
+import { IconStorage } from "@consta/icons/IconStorage";
 
 export interface TSalesToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,9 +28,21 @@ export interface TSalesToolbarProps {
         isProducts: boolean;
         setIsProducts: React.Dispatch<React.SetStateAction<boolean>>;
         setIsReturnModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+        setIsPurchaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SalesToolbar = ({setIsEditModalOpen, setFilterValues, setSearchText,  searchText, setUpdateFlag, setIsFilterModalOpen, setIsReturnModalOpen, isProducts, setIsProducts} : TSalesToolbarProps) => {
+const SalesToolbar = ({
+                setIsEditModalOpen, 
+                setFilterValues,
+                setSearchText,  
+                searchText, 
+                setUpdateFlag, 
+                setIsFilterModalOpen, 
+                setIsReturnModalOpen,
+                setIsPurchaseModalOpen,
+                isProducts,
+                setIsProducts
+        } : TSalesToolbarProps) => {
 
 
         return (
@@ -89,7 +102,22 @@ const SalesToolbar = ({setIsEditModalOpen, setFilterValues, setSearchText,  sear
                         
                 </Layout>
                 <Layout direction="row" style={{ justifyContent: 'end', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({m: 'm', pB:'m', pH:'m'})} >
-                        <Button size='s' view='secondary' label={'Сформировать чек'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                        <Button 
+                                size='s' 
+                                view='secondary' 
+                                label={'Разовая закупка'} 
+                                iconLeft={IconStorage} 
+                                onClick={()=>{setIsPurchaseModalOpen(true)}} 
+                                className={cnMixSpace({mL: 's'})}
+                        />
+                        <Button 
+                                size='s' 
+                                view='secondary' 
+                                label={'Сформировать чек'} 
+                                iconLeft={IconAdd} 
+                                onClick={()=>{setIsEditModalOpen(true)}} 
+                                className={cnMixSpace({mL: 's'})}
+                        />
                         <Button 
                                 size='s' 
                                 view='secondary' 

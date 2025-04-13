@@ -8,6 +8,7 @@ export interface TRouteTarget {
         accounting: string;
         login: string;
         settings: string;
+        analytics: string;
     }
 
 export const routeTarget: TRouteTarget = {
@@ -21,4 +22,5 @@ export const routeTarget: TRouteTarget = {
         accounting: 'accounting',
         login: 'login',
         settings: 'settings',
+        analytics: 'analytics',
     };

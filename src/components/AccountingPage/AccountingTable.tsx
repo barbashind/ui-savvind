@@ -328,6 +328,30 @@ const columns: ColumnType<TAccountingRow>[] = [
             );
         },
     },
+    {
+        title: (
+            <TableColumnHeader
+                header="Создал"
+                withoutSort={true}
+                align="left"
+            />
+        ),
+        dataIndex: 'author',
+        key: 'author',
+        align: 'left',
+        width: '110px',
+        render: (value: string, record: TAccountingRow) => {
+            return record.spacer ? (
+                <></>
+            ) : (
+                <Layout direction="row" style={{ minWidth: '110px', maxWidth: '110px'  }}>
+                    <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                        {value}
+                    </Text>
+                </Layout> 
+            );
+        },
+    },
     // {
     //     title: (
     //         <TableColumnHeader
@@ -425,6 +449,7 @@ const columns: ColumnType<TAccountingRow>[] = [
                             e.stopPropagation();
                             deleteAccountingData(record.id);
                         }}
+                        disabled={record.category === 'Продажа товара' || record.category === 'Продажа товара контрагента' }
                     />
                 </Layout> 
             );

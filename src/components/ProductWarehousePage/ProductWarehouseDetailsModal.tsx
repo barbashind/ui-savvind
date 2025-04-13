@@ -177,7 +177,7 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                 </Layout>
 
                                 {/* Шапка */}
-                                <Text size="m" weight="semibold" className={cnMixSpace({ mT:'xl' })}>{`Список товаров партии (${itemsBatch?.length?.toString() ?? 0}):`}</Text>
+                                <Text size="m" weight="semibold" className={cnMixSpace({ mT:'xl' })}>{`Список товаров партии (${itemsBatch?.filter(item => (!item.serialNumber)).length?.toString() ?? 0}):`}</Text>
                                 <Layout direction="row" className={cnMixSpace({ mT:'m' })} >
                                         <div style={{minWidth:'15px', maxWidth:'15px'}} className={cnMixSpace({ mR:'m' })}/>
                                         <Text size="s" style={{ width: '100%'}} className={cnMixSpace({  pL:'s' })}>Наименование</Text>
@@ -249,7 +249,7 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                                                                 returnBatch(e, batchId);
                                                                         }
                                                                 }}
-                                                                disabled={!!itemsBatch?.find(elem => elem.quantFinal !== elem.remainder)}
+                                                                disabled={!!itemsBatch?.find(elem => elem.quantFinal !== elem.remainder) || (data.batchNumber === 0)}
                                                         />
                                                 }   
 

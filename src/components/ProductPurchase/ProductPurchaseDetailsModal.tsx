@@ -92,13 +92,12 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
 
         useEffect(() => {
                 if (data.batchStatus === 'CREATED' || !data.batchStatus)
-                
                 setItemsBatch(prev => prev?.map(item => ({
                         ...item,
                         costDeliver: Math.round((((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0)  * (productList?.find(elem => (elem?.itemId === item?.itemId))?.weight ?? 0)) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * (rate || 1) * 100 )  / 100,
                         costPriceAll:  Math.round((Number((((deliversList?.find(el=> el?.deliverId === data?.deliver)?.priceDeliver ?? 0 ) * (productList?.find(elem => elem?.itemId === item?.itemId)?.weight ?? 0) + ((item?.costPrice  ?? 0)) * ((deliversList?.find(el=> el?.deliverId === data?.deliver)?.insurance ?? 0) / 100)) * 100 * (rate || 1)) / 100) + (item?.costPrice ?? 0) * (rate || 1)) * 100) / 100}
                         ))) 
-                }, [data?.batchStatus, data?.deliver, itemsBatch.length, deliversList, productList, rate]);
+        }, [data?.batchStatus, data?.deliver, itemsBatch.length, deliversList, productList, rate]);
 
         // Инициализация данных
         useEffect(() => {
@@ -115,21 +114,22 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                         await getPurchase(batchId, (resp) => {
                                 setData(resp);
                                 setRate(resp?.rate ?? null);
-                                setIsLoading(false);
                             });
                 }
 
                 const getItems = async (batchId : number) => {
                         await getPurchaseItems(batchId, (resp) => {
                                 setItemsBatch(resp);
-                                setIsLoading(false);
                             });
                         }
                 
                 const getProducts = async () => {
                         await  getNomenclatures((resp) => {
                                 setProductList(resp.map((item : TNomenclature) => ({name: item.name, hasSerialNumber: item.hasSerialNumber, itemId: item.itemId, costPrice: item.lastCostPrice, weight: item.weight, productPrice: item.productPrice})));
-                                setIsLoading(false);
+                                if (!batchId) {
+                                        setIsLoading(false);
+                                }
+                                
                             });
                         }
                 const getDeliversData = async () => {
@@ -150,12 +150,14 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 }
 
                 if (batchId) {
-                        getItems(batchId);  
+                        setIsLoading(true);
                         getData(batchId).then(
                                 () => {
-                                setIsLoading(false);
+                                getItems(batchId)     
                         }
-                   );
+                   ).then(()=> {
+                                       setIsLoading(false); 
+                                });
                 }
                 if (!batchId) {
                         getAutoBatchNumer();
@@ -618,14 +620,14 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         {(itemBatch?.costPrice ? (itemBatch?.costPrice)?.toString() : '-') + ' $'}
                                                                                                 </Text>
                                                                                         )}
-                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })}>
-                                                                                                        {(itemBatch?.costDeliver ? itemBatch?.costDeliver?.toString() : '-') + ' руб'}
+                                                                                                <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })} onClick={() => console.log(itemBatch)}>
+                                                                                                        {(itemBatch.costDeliver?.toString() ?? 0) + ' руб'}
                                                                                                 </Text>
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mL: 'm' })}>
-                                                                                                        {(itemBatch?.costPriceAll ? (itemBatch?.costPriceAll?.toString()) : '-') + ' руб'}
+                                                                                                        {(itemBatch.costPriceAll ?? 0) + ' руб'}
                                                                                                 </Text>
                                                                                                 <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>
-                                                                                                {itemBatch.costPrice && itemBatch.quant && itemBatch.costDeliver ? (((Number(itemBatch.costPrice) * (rate ?? 1) ) + Number(itemBatch.costDeliver)) * itemBatch.quant).toFixed(2) + ' руб' : '0 руб'}
+                                                                                                {((itemBatch.costPriceAll ?? 0) * (itemBatch.quant ?? 0)).toFixed(2) + ' руб' }
                                                                                                 </Text>
                                                                                         {itemBatch.itemId && (
                                                                                                 <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>

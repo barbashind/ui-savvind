@@ -58,12 +58,14 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
         const [categories, setCategories] = useState<TCategory[]>([]);
 
         const [role, setRole] = useState<string | undefined>(undefined);
+        const [user, setUser] = useState<string | undefined>(undefined);
                 
         useEffect(() => {
                 
                 const getUserInfoData = async () => {
                         await getUserInfo().then((resp) => {
                                 setRole(resp.role);
+                                setUser(resp.username);
                         })
                 };
                 
@@ -120,7 +122,8 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
 
         const createAccounting = async (e: React.MouseEvent<Element, MouseEvent>) => {
                         e.preventDefault();
-                        await addAccounting(data).then(
+                        const updatedData = {...data, author: user}
+                        await addAccounting(updatedData).then(
                                () => { 
                                 setUpdateFlag(true);
                                 closeWindow();

@@ -13,6 +13,7 @@ import Accounting from "../pages/Accounting.tsx";
 import Purchase from "../pages/Purchase.tsx";
 import Settings from "../pages/Settings.tsx";
 import { concatUrl } from "../utils/urlUtils.ts";
+import Analytics from "../pages/Analytics.tsx";
 
 
 const AppRouter = () => {
@@ -26,6 +27,7 @@ const AppRouter = () => {
                                 <Route element={<ProductWarehouse />} path={concatUrl([routeTarget.main, routeTarget.product_warehouse])} />
                                 <Route element={<Accounting />} path={concatUrl([routeTarget.main, routeTarget.accounting])} />
                                 <Route element={<Settings />} path={concatUrl([routeTarget.main, routeTarget.settings])} />
+                                <Route element={<Analytics />} path={concatUrl([routeTarget.main, routeTarget.analytics])} />
                         </Route>
                         <Route
                                 path=""

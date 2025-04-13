@@ -146,7 +146,7 @@ const { getStoredPageSize, setStoredPageSize } = usePaginationStore('Records');
                 ) : (
                     <div>
                         <Text size="s" weight="medium" style={{ minWidth: '150px' }}>
-                            {value || '-'}
+                            {value ?  value : 'Разовая закупка'}
                         </Text>
                     </div>
                 );

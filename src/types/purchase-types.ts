@@ -15,6 +15,7 @@ export interface TPurchase {
     totalQuant?: number | null;
     totalQuantFinal?: number | null;
     rate?: number | null;
+    author?: string;
 }
 
 export type TPurchaseData = TPurchase & {

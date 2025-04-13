@@ -1,3 +1,4 @@
+import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData } from '#/types/analytic-types';
 import { HttpService } from '../system/HttpService';
 import { TPurchaseItem } from '../types/product-purchase-types';
 import { TCheck, TCheckFilter, TSale } from '../types/sales-types';
@@ -212,3 +213,57 @@ export const updateCheck = async (checkId : number | undefined, data : TCheck): 
     return response;
     
 };
+
+
+    export const getAnalytics = async (data : TAnalyticFilter): Promise<TAnalyticData[]> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/analytic-by-users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        const resp: TAnalyticData[] = (await response.json()) as TAnalyticData[];
+        return resp;
+    };
+
+    export const getAnalyticsGraph = async (data : TAnalyticFilter): Promise<TAnalyticGraphData[]> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/analytic-graph', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        const resp: TAnalyticGraphData[] = (await response.json()) as TAnalyticGraphData[];
+        return resp;
+    };
+
+    export const getAnalyticsAssets = async (): Promise<TAssetsData> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/analytic-assets', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        const resp: TAssetsData = (await response.json()) as TAssetsData;
+        return resp;
+    };

@@ -14,9 +14,11 @@ import { TCheckFilter, TCheckSortFields } from "../types/sales-types.ts";
 import SalesTableProducts from "../components/SalesPage/SalesTableProducts.tsx";
 import { Sort, useTableSorter } from "../hooks/useTableSorter.ts";
 import ReturnModal from "../components/SalesPage/ReturnModal.tsx";
+import PurchaseModal from "../components/SalesPage/PurchaseModal.tsx";
 
 const Sales = () => {
         const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
+        const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState<boolean>(false)
         const [isReturnModalOpen, setIsReturnModalOpen] = useState<boolean>(false)
         const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false)
         const [id, setId] = useState<number | undefined>(undefined)
@@ -63,6 +65,7 @@ const Sales = () => {
                                         isProducts={isProducts}
                                         setFilterValues={setFilterValues}
                                         setIsReturnModalOpen={setIsReturnModalOpen}
+                                        setIsPurchaseModalOpen={setIsPurchaseModalOpen}
                                 />
                                 {!isProducts && (
                                         <SalesTable 
@@ -101,7 +104,14 @@ const Sales = () => {
                                 
 
                                 
-                                <SalesDetailsModal
+                                <PurchaseModal
+                                        isOpen={isPurchaseModalOpen}
+                                        setIsOpen={setIsPurchaseModalOpen}
+                                        checkId={id}
+                                        setCheckId={setId}
+                                        setUpdateFlag={setUpdateFlag}
+                                />
+                                 <SalesDetailsModal
                                         isOpen={isEditModalOpen}
                                         setIsOpen={setIsEditModalOpen}
                                         checkId={id}

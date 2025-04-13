@@ -19,6 +19,7 @@ import { IconStorage } from '@consta/icons/IconStorage';
 import { IconSettings } from '@consta/icons/IconSettings';
 import { BarcodeOutlined } from "@ant-design/icons";
 import { IconExit } from '@consta/icons/IconExit';
+import { IconColoredEconomics } from '@consta/icons/IconColoredEconomics';
 
 // собственные компоненты
 import { DefaultTabs } from "../utils/types.ts";
@@ -68,12 +69,18 @@ const pages : DefaultTabs[] = [
                 },
                 {
                         id: 5,
+                        label: 'Аналитика',
+                        navTo:  routeTarget.analytics,
+                        leftIcon: IconColoredEconomics,
+                },
+                {
+                        id: 6,
                         label: 'Бухгултерия',
                         navTo:  routeTarget.accounting,
                         leftIcon: IconCalculator,
                 },
                 {
-                        id: 6,
+                        id: 7,
                         label: 'Настройки',
                         navTo: routeTarget.settings,
                         leftIcon: IconSettings,
@@ -248,6 +255,7 @@ const MainPage = () => {
                                                                         <AccountingImage/>
                                                                         <Text view="link" weight="semibold">Бухгалтерия</Text>
                                                                 </Card>
+                                                                
                                                         </Layout>
                                                 </Layout>        
                                         </Layout>
