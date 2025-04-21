@@ -14,6 +14,7 @@ import { IconArrowUndone } from '@consta/icons/IconArrowUndone';
 import { getPurchase, getPurchaseItems, updatePurchase, updatePurchaseItems } from "../../services/PurchaseService";
 import { TPurchase } from "../../types/purchase-types";
 import { TPurchaseItem } from "../../types/product-purchase-types";
+import { getUserInfo } from "../../services/AuthorizationService";
 
 
 interface TProductWarehouseDetailsModalProps {
@@ -133,7 +134,18 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                         }
                 }
 
-
+        const [role, setRole] = useState<string | undefined>(undefined);
+                                
+        useEffect(() => {
+                
+                const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setRole(resp.role);
+                        })
+                };
+                
+                void getUserInfoData();
+        }, []);
 
         
         return (
@@ -236,7 +248,7 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                                         }}
                                                 />
                                                     
-                                                { (data.batchStatus === 'COMPLETED') && 
+                                                { (data.batchStatus === 'COMPLETED' && role === 'ADM') && 
                                                         <Button 
                                                                 label={'Вернуть на приемку'}
                                                                 iconLeft={IconArrowUndone}

@@ -30,6 +30,7 @@ import { InfoCircleFilled } from "@ant-design/icons";
 
 import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
+import { getUserInfo } from "../../services/AuthorizationService.ts";
 
 
 
@@ -284,6 +285,19 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                         return false;
                 }
         }
+
+         const [role, setRole] = useState<string | undefined>(undefined);
+                        
+        useEffect(() => {
+                
+                const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setRole(resp.role);
+                        })
+                };
+                
+                void getUserInfoData();
+        }, []);
 
 
 
@@ -767,7 +781,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                 }}
                                                         />
                                                 }   
-                                                { (data.batchStatus === 'COMPLETED') && 
+                                                { (data.batchStatus === 'COMPLETED' && role === 'ADM') && 
                                                         <Button 
                                                                 label={'Вернуть на приемку'}
                                                                 iconLeft={IconArrowUndone}
