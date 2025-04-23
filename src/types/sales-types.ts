@@ -47,6 +47,9 @@ export interface TCheckFilter {
         dateMin: Date | null;
         dateMax: Date | null;
         customer: string | null;
+        isUnpaid: boolean;
+        isBooking: boolean;
+        isPaid:  boolean;
     }
 
 export interface TProduct {

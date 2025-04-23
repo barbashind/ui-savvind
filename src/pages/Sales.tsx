@@ -28,7 +28,10 @@ const Sales = () => {
                 dateMin: null,
                 dateMax: null,
                 customer: null,
-                searchText: null
+                searchText: null,
+                isUnpaid: true,
+                isBooking: true,
+                isPaid: true
         }
 
         const PageSettings: {
@@ -64,6 +67,7 @@ const Sales = () => {
                                         setIsProducts={setIsProducts}
                                         isProducts={isProducts}
                                         setFilterValues={setFilterValues}
+                                        filterValues={filterValues}
                                         setIsReturnModalOpen={setIsReturnModalOpen}
                                         setIsPurchaseModalOpen={setIsPurchaseModalOpen}
                                 />

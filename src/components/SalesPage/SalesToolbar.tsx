@@ -7,6 +7,7 @@ import { Text } from "@consta/uikit/Text";
 import { TextField } from '@consta/uikit/TextField';
 import { cnMixSpace } from "@consta/uikit/MixSpace";
 import { Switch } from '@consta/uikit/Switch';
+import { Checkbox } from '@consta/uikit/Checkbox';
 
 // иконки
 import { IconAdd } from '@consta/icons/IconAdd';
@@ -22,6 +23,7 @@ export interface TSalesToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
         setSearchText: React.Dispatch<React.SetStateAction<string | null>>;
         setFilterValues: React.Dispatch<React.SetStateAction<TCheckFilter>>;
+        filterValues: TCheckFilter;
         searchText: string | null;
         setUpdateFlag: React.Dispatch<React.SetStateAction<boolean>>;
         setIsFilterModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,6 +36,7 @@ export interface TSalesToolbarProps {
 const SalesToolbar = ({
                 setIsEditModalOpen, 
                 setFilterValues,
+                filterValues,
                 setSearchText,  
                 searchText, 
                 setUpdateFlag, 
@@ -102,13 +105,52 @@ const SalesToolbar = ({
                         
                 </Layout>
                 <Layout direction="row" style={{ justifyContent: 'end', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({m: 'm', pB:'m', pH:'m'})} >
+                        <Checkbox
+                                checked={filterValues.isPaid}
+                                onChange={()=>{
+                                        setFilterValues(prev => ({
+                                                ...prev,
+                                                isPaid: !prev.isPaid
+                                        }));
+                                        setUpdateFlag(true);
+                                }}
+                                label="Оплачено"
+                                className={cnMixSpace({mL: 'm', p:'2xs'})}
+                                size="s"
+                        />
+                        <Checkbox
+                                checked={filterValues.isBooking}
+                                onChange={()=>{
+                                        setFilterValues(prev => ({
+                                                ...prev,
+                                                isBooking: !prev.isBooking
+                                        }));
+                                        setUpdateFlag(true);
+                                }}
+                                label="Бронь"
+                                className={cnMixSpace({mL: 'm', p:'2xs'})}
+                                size="s"
+                        />
+                        <Checkbox
+                                checked={filterValues.isUnpaid}
+                                onChange={()=>{
+                                        setFilterValues(prev => ({
+                                                ...prev,
+                                                isUnpaid: !prev.isUnpaid
+                                        }));
+                                        setUpdateFlag(true);
+                                }}
+                                label="Не оплачено"
+                                className={cnMixSpace({mL: 'm', p:'2xs'})}
+                                size="s"
+                        />
                         <Button 
                                 size='s' 
                                 view='secondary' 
                                 label={'Разовая закупка'} 
                                 iconLeft={IconStorage} 
                                 onClick={()=>{setIsPurchaseModalOpen(true)}} 
-                                className={cnMixSpace({mL: 's'})}
+                                className={cnMixSpace({mL: 'm'})}
                         />
                         <Button 
                                 size='s' 
