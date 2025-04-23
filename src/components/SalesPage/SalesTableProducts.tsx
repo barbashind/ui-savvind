@@ -67,7 +67,10 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
                     searchText: filterValues.searchText,
                     dateMin: filterValues.dateMin,
                     dateMax: filterValues.dateMax,
-                    customer: filterValues.customer
+                    customer: filterValues.customer,
+                    isUnpaid: true,
+                    isBooking: true,
+                    isPaid: true
                 }
             
                 const getData = async () => {

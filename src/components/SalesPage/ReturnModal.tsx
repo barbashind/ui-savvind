@@ -72,6 +72,9 @@ const getSalesData = async () => {
                         customer: customer,
                         dateMin: date,
                         dateMax: dateMax,
+                        isUnpaid: true,
+                        isBooking: true,
+                        isPaid: true
                 }
                         await getSalesFilter(filterParam).then( (resp) => {
                                 if (resp) {

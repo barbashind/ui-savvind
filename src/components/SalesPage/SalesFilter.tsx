@@ -29,7 +29,10 @@ const SalesFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, filterValue
                 dateMin: null,
                 dateMax: null,
                 customer: null,
-                searchText: null
+                searchText: null,
+                isUnpaid: true,
+                isBooking: true,
+                isPaid: true
         }
 
         return (
