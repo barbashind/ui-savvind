@@ -584,7 +584,7 @@ useEffect(() => {
                                                                                 <Layout direction="row" style={{width: '100%'}} className={cnMixSpace({p:'s'})}>
                                                                                         <div style={{ width: '100%' }}>
                                                                                                 <Combobox
-                                                                                                        items={productList?.map(element => ({id: element.itemId ?? 0, label: element.name ?? ''}))}
+                                                                                                        items={productList?.filter(el => (!el.hasSerialNumber))?.map(element => ({id: element.itemId ?? 0, label: element.name ?? ''}))}
                                                                                                         size="s"
                                                                                                         placeholder="Введите для поиска и выберите товар"
                                                                                                         value={itemCheck.name && itemCheck.itemId ? {id: itemCheck.itemId, label: itemCheck.name} : undefined} 
@@ -696,6 +696,7 @@ useEffect(() => {
                                                                                                 status={captionList?.length > 0 && captionList?.find(item=>((item.state === "serialNumber") && (item.index === sales.indexOf(itemCheck)))) ? "alert" : undefined}
                                                                                                 onFocus={()=>{setCaptionList(prev => prev?.filter(capt => (capt.state !== "serialNumber") || (capt.index !== sales.indexOf(itemCheck))))}}
                                                                                                 ref={serialRef}
+                                                                                                disabled={!!itemCheck.itemId}
                                                                                         />  
 
                                                                                         <Layout  style={{minWidth:'38px', maxWidth:'38px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
@@ -731,6 +732,7 @@ useEffect(() => {
                                                                                                 onFocus={()=>{
                                                                                                         setCaptionList(prev => prev?.filter(capt => ((capt.state !== "quant") || (capt.index !== sales.indexOf(itemCheck))) ))
                                                                                                 }}
+                                                                                                disabled={!!itemCheck.serialNumber}
                                                                                         />
                                                                                         
 
