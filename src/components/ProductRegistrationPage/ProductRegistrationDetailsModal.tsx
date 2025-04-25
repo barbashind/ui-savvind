@@ -465,6 +465,45 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                                 }
                                                                                                                                 }
                                                                                                                                 }
+                                                                                                                                onPaste={async (event) => {
+                                                                                                                                        event.preventDefault(); // Предотвращаем стандартное поведение вставки
+                                                                                                                                    
+                                                                                                                                        const clipboardData = event.clipboardData.getData('text'); // Получаем данные из буфера обмена
+                                                                                                                                        const serialNumbers = clipboardData.split('\n'); // Разделяем по строкам
+                                                                                                                                    
+                                                                                                                                        for (const number of serialNumbers) {
+                                                                                                                                          const convertedValue = convertRuToEn(number);
+                                                                                                                                          const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
+                                                                                                                                          const trimmedNumber = filteredValue; // Удаляем лишние пробелы
+                                                                                                                                          if (trimmedNumber) { // Проверяем, что строка не пустая
+                                                                                                                                            const isUnique = await checkSerialNumberExists(trimmedNumber);
+                                                                                                                                            if (!isUnique) {
+                                                                                                                                              const audio = new Audio(errorAudio);
+                                                                                                                                              audio.play();
+                                                                                                                                              continue; // Если номер не уникален, переходим к следующему
+                                                                                                                                            }
+                                                                                                                                    
+                                                                                                                                            // Добавляем новый элемент в itemsBatch
+                                                                                                                                            setItemsBatch(prev => ([...prev, {
+                                                                                                                                              itemBatchId: null,
+                                                                                                                                              batchId: itemBatch.batchId,
+                                                                                                                                              itemId: itemBatch.itemId,
+                                                                                                                                              costPrice: itemBatch.costPrice,
+                                                                                                                                              costPriceAll: itemBatch.costPriceAll,
+                                                                                                                                              costDeliver: itemBatch.costDeliver,
+                                                                                                                                              batchNumber: itemBatch.batchNumber,
+                                                                                                                                              name: itemBatch.name,
+                                                                                                                                              hasSerialNumber: itemBatch.hasSerialNumber,
+                                                                                                                                              quant: itemBatch.quant,
+                                                                                                                                              serialNumber: trimmedNumber,
+                                                                                                                                              warehouse: itemBatch.warehouse,
+                                                                                                                                              partner: itemBatch.partner,
+                                                                                                                                              createdAt: null,
+                                                                                                                                              updatedAt: null,
+                                                                                                                                            }]));
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }}
                                                                                                                             caption={(focusedIndex === itemsBatch.indexOf(itemBatch)) ? (serialCaption ?? undefined) : undefined}
                                                                                                                             status={(serialCaption && (focusedIndex === itemsBatch.indexOf(itemBatch))) ? 'alert' : undefined}
                                                                                                                             onFocus={() => {setFocusedIndex(itemsBatch.indexOf(itemBatch))}}
