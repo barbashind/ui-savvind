@@ -192,7 +192,15 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 setIsLoading(true);
                 e.preventDefault();
                 const totalSum = itemsBatch?.reduce((acc, item) => acc + (item.quant ?? 0) * (item.costPrice ?? 0), 0) ?? 0;
-                const body = itemsBatch;
+                const chunkArray = (array : TPurchaseItem[]) => {
+                        const result = [];
+                        for (let i = 0; i < array.length; i += 100) {
+                            result.push(array.slice(i, i + 100));
+                        }
+                        return result;
+                    };
+                const bodyChunks = chunkArray(itemsBatch);
+                for (const chunk of bodyChunks) {
                 try {
                         await updatePurchase( id ,{
                                 comment: data.comment,
@@ -202,10 +210,10 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                 batchStatus: 'COMPLETED',
                                 createdAt: data.createdAt,
                                 updatedAt: data.updatedAt,
-                                body: body,
+                                body: chunk,
 
                         }).then(async(resp) => {
-                                const body = itemsBatch.map(product => ({
+                                const body = chunk.map(product => ({
                                         ...product,
                                         batchNumber: data.batchNumber,
                                         remainder: product.quantFinal,
@@ -226,6 +234,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                         setUpdateFlag(true);
                         setIsLoading(false);
                 }
+        }
         }
 
         const returnBatch = async (e: React.MouseEvent<Element, MouseEvent> , id : number) => {
