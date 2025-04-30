@@ -1,4 +1,4 @@
-import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData } from '#/types/analytic-types';
+import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdData, TProdDataFilter } from '../types/analytic-types';
 import { HttpService } from '../system/HttpService';
 import { TPurchaseItem } from '../types/product-purchase-types';
 import { TCheck, TCheckFilter, TSale } from '../types/sales-types';
@@ -266,4 +266,22 @@ export const updateCheck = async (checkId : number | undefined, data : TCheck): 
         }
         const resp: TAssetsData = (await response.json()) as TAssetsData;
         return resp;
+    };
+
+export const getAnalyticProd = (param: {
+        page: number;
+        size: number;
+        sortParam?: TSortParam<TProdData>[];
+        filterParam?: TProdDataFilter;
+    }): Promise<TPageableResponse<TProdData>> => {
+        const response = HttpService.post<TPageableResponse<TProdData>>(
+            `/api/analytic-prod/filter?page=${param.page}&size=${param.size}&sort=${
+                param.sortParam
+                    ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
+                    .join('&sort=') ?? ''
+            }` /* body */,
+    
+            param.filterParam ?? { searchCriteria: {} }
+        );
+        return response;
     };

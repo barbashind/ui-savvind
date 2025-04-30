@@ -195,6 +195,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={!!data.id}
                                         />
                                         <Combobox
                                                 items={accounts}
@@ -212,6 +213,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={!!data.id}
                                                 caption={(data.accountFrom === data.accountTo && !!data.accountFrom)? 'Счета совпадают' : (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo) ? 'Валюта отличается' : undefined }
                                                 status={((data.accountFrom === data.accountTo && !!data.accountFrom) || (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo)) ? 'alert' : undefined}
                                         />
@@ -227,6 +229,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size="s"
                                                 style={{width: '100%', minWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                         />
                                         <Combobox
                                                 items={categories}
@@ -244,6 +247,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                         />
                                        
                                         <NumberMaskTextField
@@ -258,6 +262,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size={'s'}
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                          />
                                          <DatePicker
                                                 value={data.createdAt}
@@ -274,6 +279,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size={'s'}
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                                 />
                                           {/* <Select
                                                 items={[{id: 'replenishment', label: 'Пополнение'}, {id: 'deduction', label: 'Расходы'}]}

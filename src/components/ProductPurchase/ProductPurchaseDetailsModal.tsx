@@ -27,6 +27,7 @@ import { getAccounts } from "../../services/SettingsService";
 import NumberMaskTextField from "../../utils/NumberMaskTextField";
 import { Tooltip } from "../global/Tooltip";
 import { Direction, Position } from "@consta/uikit/__internal__/src/components/Popover/Popover";
+import { formatNumber } from "../../utils/formatNumber";
 
 
 
@@ -627,7 +628,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                                                                                         {(itemBatch.costPriceAll ?? 0) + ' руб'}
                                                                                                 </Text>
                                                                                                 <Text size="s"  style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>
-                                                                                                {((itemBatch.costPriceAll ?? 0) * (itemBatch.quant ?? 0)).toFixed(2) + ' руб' }
+                                                                                                {formatNumber(((itemBatch.costPriceAll ?? 0) * (itemBatch.quant ?? 0)).toFixed(2)) + ' руб' }
                                                                                                 </Text>
                                                                                         {itemBatch.itemId && (
                                                                                                 <Layout  style={{minWidth:'100px', maxWidth:'100px', justifyContent: 'center'}} className={cnMixSpace({ mL:'m' })}>
@@ -844,7 +845,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })}>Общая сумма:</Text> 
-                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * Number(item.costPriceAll ?? 0) , 0)?.toFixed(2) + ' руб'}</Text>  
+                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{formatNumber(itemsBatch.reduce((acc, item) => acc + (item.quant ?? 0) * Number(item.costPriceAll ?? 0) , 0)?.toFixed(2)) + ' руб'}</Text>  
                                         </Layout>
                                         <Layout direction="row" style={{justifyContent: 'right'}}>
                                                 <Button 

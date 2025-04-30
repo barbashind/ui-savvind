@@ -24,6 +24,7 @@ import { ErrorResponse, IPagination, TSortParam } from '../../services/utils.ts'
 import { usePaginationStore } from '../../hooks/usePaginationStore.ts';
 import { Pagination } from '../global/Pagination.tsx';
 import { deleteNomenclature, getNomenclatures, updateNomenclature } from '../../services/NomenclatureService.ts';
+import { formatNumber } from '../../utils/formatNumber.ts';
 
 
 interface TNomenclatureTableProps {
@@ -306,7 +307,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                         <Layout direction="row" style={{ width: '200px' }}>
                             
                             <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                {(Number(Number(value) * Number(record?.lastCostPrice)).toFixed(2) || '0') + ' $' }
+                                {formatNumber((Number(Number(value) * Number(record?.lastCostPrice)).toFixed(2)) || '0') + ' $' }
                             </Text>
                         </Layout>
                     );

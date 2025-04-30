@@ -9,12 +9,17 @@ import { Line } from '@consta/charts/Line';
 import { List } from '@consta/uikit/ListCanary';
 import { Avatar } from '@consta/uikit/Avatar';
 
-import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData } from "../../types/analytic-types.ts";
+import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdDataFilter, TProdDataSortFields } from "../../types/analytic-types.ts";
 
 // иконки
 import { getAnalytics, getAnalyticsAssets, getAnalyticsGraph } from "../../services/SalesService.ts";
 import { Loader } from "@consta/uikit/Loader/index";
 import { getUserInfo, UserInfo } from "../../services/AuthorizationService.ts";
+import AnalyticsProductsTable from "./AnalyticsProductsTable.tsx";
+import { Sort, useTableSorter } from "../../hooks/useTableSorter.ts";
+import { Checkbox } from "@consta/uikit/Checkbox/index";
+import { Switch } from "@consta/uikit/Switch/index";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 
 
@@ -32,7 +37,11 @@ const [data, setData]=useState<TAnalyticData[]>([])
 const [assetsData, setAssetsData]=useState<TAssetsData | undefined>(undefined)
 const [dataGraph, setDataGraph]=useState<TAnalyticGraphData[]>([])
 const [isLoading, setIsLoading]=useState<boolean>(false)
+const [updateFlagTable, setUpdateFlagTable]=useState<boolean>(false)
 const [user, setUser] = useState<UserInfo | undefined>(undefined);
+
+const [isTable, setIsTable] = useState<boolean>(false);
+const [isWithPartner, setIsWithPartner] = useState<boolean>(false);
         
 useEffect(() => {
         const getUserInfoData = async () => {
@@ -66,15 +75,40 @@ useEffect(() => {
                 void getAssetsData();
                 void getAnalyticData();
                 void getAnalyticDataGraph();
-                setUpdateFlag(false)
+                setUpdateFlag(false);
+                setUpdateFlagTable(true);
         }
+
         
 }, [filterValues, setUpdateFlag, updateFlag])
 
 
+        const PageSettings: {
+                filterValues: TProdDataFilter | null;
+                currentPage: number;
+                columnSort?: Sort<TProdDataSortFields>;
+                countFilterValues?: number | null;
+        } = {
+                filterValues: filterValues,
+                currentPage: 0,
+                columnSort: [],
+        };
+        const [count, setCount] = useState<number | null>(0)
+        const [currentPage, setCurrentPage] = useState(PageSettings.currentPage);
+        const { getColumnSortOrder, getColumnSortOrderIndex, columnSort, onColumnSort } =
+                useTableSorter<TProdDataSortFields>(PageSettings.columnSort);
+        
+
+
         return (
                 <Layout direction="column" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({mB: 'm', p:'m'})} >
-                        {!isLoading && data && data?.length > 0 && (
+                        <Layout direction="row" style={{ alignItems: 'center'}}>
+                                <Switch checked={isTable} label="Отчет по товарам" onChange={()=>{setIsTable(!isTable)}} className={cnMixSpace({mV: 'm'})}/>
+                                {isTable && (<>
+                                        <Checkbox checked={isWithPartner} label="Детализация (партнеры)" onChange={()=>{setIsWithPartner(!isWithPartner)}} className={cnMixSpace({mV: 'm', mL: 'm'})}/>
+                                </>)}
+                        </Layout>
+                        {!isLoading && data && data?.length > 0 && !isTable &&  (
                                 <Layout direction="row" className={cnMixSpace({ mB: 'm'})} style={{minHeight: '420px'}}>
                                         <Layout direction="column" style={{ border: '1px solid #56b9f2', borderRadius: '4px'}} className={cnMixSpace({pH: 'm'})}>
                                                 <Text size="s" className={cnMixSpace({ mT: 's'})} style={{width: '150px'}} >
@@ -132,7 +166,7 @@ useEffect(() => {
                                                                                                         className={cnMixSpace({ mR: 'xs'})}
                                                                                                 />
                                                                                                 <Text size="s">
-                                                                                                        {(item?.user ?? '') + ' - ' + (Number(item.margProfit ?? 0 ) * 0.03).toFixed(2)  + ' руб' }
+                                                                                                        {(item?.user ?? '') + ' - ' + formatNumber((Number(item.margProfit ?? 0 ) * 0.03).toFixed(2))  + ' руб' }
                                                                                                 </Text>
                                                                                         </Layout>
                                                                                 )}
@@ -152,7 +186,7 @@ useEffect(() => {
                                                                                         {'В доставке и на оприходовании: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({ mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(assetsData?.supplies?.toFixed(2) ?? 0 )).toFixed(2)  + ' руб' }
+                                                                                        {formatNumber((Number(assetsData?.supplies?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб' }
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -160,7 +194,7 @@ useEffect(() => {
                                                                                         {'На складе: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({  mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(assetsData?.warehouse?.toFixed(2) ?? 0 )).toFixed(2)  + ' руб' }
+                                                                                        {formatNumber((Number(assetsData?.warehouse?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб' }
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -168,7 +202,7 @@ useEffect(() => {
                                                                                         {'Деньги в офисе: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({  mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(assetsData?.officeAsset ?? 0 )).toFixed(2)  + ' руб' }
+                                                                                        {formatNumber((Number(assetsData?.officeAsset ?? 0 )).toFixed(2))  + ' руб' }
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -176,7 +210,7 @@ useEffect(() => {
                                                                                         {'Дебиторская задолженность: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({ mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(assetsData?.debit?.toFixed(2) ?? 0 )).toFixed(2)  + ' руб'}
+                                                                                        {formatNumber((Number(assetsData?.debit?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб'}
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -184,7 +218,7 @@ useEffect(() => {
                                                                                         {'Деньги в офисе с вычетом задолженности: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({ mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(Number(assetsData?.officeAsset) + Number(assetsData?.debit))).toFixed(2)  + ' руб' }
+                                                                                        {formatNumber((Number(Number(assetsData?.officeAsset) + Number(assetsData?.debit))).toFixed(2))  + ' руб' }
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -192,7 +226,7 @@ useEffect(() => {
                                                                                         {'Выручка с продаж: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({  mL: 'm'})} align="left" weight="semibold">
-                                                                                        {(Number(assetsData?.revenue?.toFixed(2) ?? 0 )).toFixed(2)  + ' руб'  }
+                                                                                        {formatNumber((Number(assetsData?.revenue?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб'  }
                                                                                 </Text>
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
@@ -200,7 +234,7 @@ useEffect(() => {
                                                                                         {'Маржа с продаж: ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({ mL: 'm'})} align="left"  weight="semibold">
-                                                                                        {(Number(assetsData?.margProfit?.toFixed(2) ?? 0 )).toFixed(2)  + ' руб' }
+                                                                                        {formatNumber((Number(assetsData?.margProfit?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб' }
                                                                                 </Text>
                                                                         </Layout>
                                                                 </Layout>
@@ -212,7 +246,7 @@ useEffect(() => {
                                 </Layout>
                         )}
 
-                {!isLoading && dataGraph && dataGraph?.length > 0 && (
+                {!isLoading && dataGraph && dataGraph?.length > 0 && !isTable && (
                                 <Layout direction="column" className={cnMixSpace({ mB: 'm'})}>
                                         <Layout direction="row" className={cnMixSpace({ p:'m'})} style={{width: '100%', border: '1px solid #56b9f2', minHeight: '350px'}}>
                                                 <Text size="s" className={cnMixSpace({ mR: 'm'})} style={{width: '150px'}}>
@@ -241,6 +275,23 @@ useEffect(() => {
                                         
                                 </Layout>
                         )}
+
+                        {(user?.role === 'ADM') && isTable && (
+                                        <AnalyticsProductsTable 
+                                                        updateFlag={updateFlagTable}
+                                                        setUpdateFlag={setUpdateFlagTable}
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        getColumnSortOrder={getColumnSortOrder}
+                                                        getColumnSortOrderIndex={getColumnSortOrderIndex}
+                                                        columnSort={columnSort}
+                                                        onColumnSort={onColumnSort}
+                                                        filterValues={filterValues}
+                                                        count={count}
+                                                        setCount={setCount}
+                                                        isWithPartner={isWithPartner}
+                                        />
+                                )}
 
                         {isLoading && (
                                 <Layout style={{width: '100%', height: '50px', justifyContent: 'center', alignItems: 'center'}}>

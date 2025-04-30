@@ -19,6 +19,7 @@ import { getCheckes } from "../../services/SalesService.ts";
 import { TableColumnHeader } from "../global/TableColumnHeader.tsx";
 import { GetColumnSortOrder, GetColumnSortOrderIndex, OnColumnSort, Sort } from "../../hooks/useTableSorter.ts";
 import { Pagination } from "../global/Pagination.tsx";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 
 interface TSalesTableProps {
@@ -273,7 +274,7 @@ const SalesTable = ({updateFlag, setUpdateFlag, setId, currentPage, setCurrentPa
                     ) : (
                         <div>
                             <Text size="s" weight="medium" style={{minWidth: '150px'}}>
-                                {(value || '0') + ' руб' }
+                                {formatNumber(value || '0') + ' руб' }
                             </Text>
                         </div>
                     );

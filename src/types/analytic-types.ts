@@ -1,3 +1,4 @@
+import { SortOrder } from "../components/global/TableColumnHeader";
 
 export interface TAnalyticFilter {
         users?: (string | undefined)[] | null;
@@ -27,4 +28,33 @@ export interface TAnalyticGraphData {
         revenue: number | undefined;
         margProfit: number | undefined;
         date: Date;
+}
+
+export interface TProdData {
+        name: string | undefined;
+        quantAll: number | undefined;
+        quantMy: number | undefined;
+        quantPartner: number | undefined;
+        revenueAll: number | undefined;
+        revenueMy: number | undefined;
+        revenuePartner: number | undefined;
+        margAll: number | undefined;
+        margMy: number | undefined;
+        margPartner: number | undefined;
+}
+
+export type TProdDataRow = TProdData & {
+        rowNumber: number;
+        spacer: boolean;
+};
+
+export interface TProdDataFilter {
+        startDate?: Date | null;
+        endDate?: Date | null;
+}
+
+export interface TProdDataSortFields {
+        quantAll: SortOrder;
+        revenueAll: SortOrder;
+        margAll: SortOrder;
 }

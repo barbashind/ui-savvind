@@ -29,6 +29,7 @@ import { Direction, Position } from "@consta/uikit/Popover";
 
 import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
+import { formatNumber } from "../../utils/formatNumber";
 
 interface TSalesDetailsModalProps {
         isOpen: boolean;
@@ -794,9 +795,9 @@ useEffect(() => {
                                                                                         </Layout>
                                                                                         <Text style={{minWidth:'100px', maxWidth:'100px', alignContent: 'center'}} className={cnMixSpace({ mL:'m' })}>{itemCheck?.quant ?? null}</Text>
                                                                                         <Layout direction="column"  style={{minWidth:'204px', maxWidth:'204px'}}>
-                                                                                                <Text style={{minWidth:'204px', maxWidth:'204px'}} size='s'>{'Цена: ' +(itemCheck?.salePrice ?? null) + ' руб'}</Text>
-                                                                                                {role !== 'KUR' && (<Text style={{minWidth:'204px', maxWidth:'204px'}} view="secondary" size='xs' className={cnMixSpace({ mT:'xs' })}>{'Закуп. цена: ' + (itemCheck?.costPrice ?? '0') + ' руб'}</Text>)}
-                                                                                                {role !== 'KUR' && (<Text style={{minWidth:'204px', maxWidth:'204px'}} view="secondary" size='xs' className={cnMixSpace({ mT:'xs' })}>{'Прибыль с поз.: ' + Number((Number(itemCheck.salePrice) - Number(itemCheck.costPrice)) * Number(itemCheck.quant ?? 1)).toString()  + ' руб'}</Text>)}
+                                                                                                <Text style={{minWidth:'204px', maxWidth:'204px'}} size='s'>{'Цена: ' + formatNumber(itemCheck?.salePrice ?? 0) + ' руб'}</Text>
+                                                                                                {role !== 'KUR' && (<Text style={{minWidth:'204px', maxWidth:'204px'}} view="secondary" size='xs' className={cnMixSpace({ mT:'xs' })}>{'Закуп. цена: ' + formatNumber(itemCheck?.costPrice ?? '0') + ' руб'}</Text>)}
+                                                                                                {role !== 'KUR' && (<Text style={{minWidth:'204px', maxWidth:'204px'}} view="secondary" size='xs' className={cnMixSpace({ mT:'xs' })}>{'Прибыль с поз.: ' + formatNumber(Number((Number(itemCheck.salePrice) - Number(itemCheck.costPrice)) * Number(itemCheck.quant ?? 1)).toFixed(2))  + ' руб'}</Text>)}
                                                                                         </Layout>
                                                                                 </Layout>
                                                                         </Layout>  

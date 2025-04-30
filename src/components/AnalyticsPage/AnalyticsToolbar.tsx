@@ -16,6 +16,7 @@ import { IconSearchStroked } from '@consta/icons/IconSearchStroked';
 import { Combobox } from "@consta/uikit/Combobox/index";
 import { DatePicker } from "@consta/uikit/DatePicker/index";
 import { getUserInfo, UserInfo } from "../../services/AuthorizationService.ts";
+import { Checkbox } from "@consta/uikit/Checkbox/index";
 
 
 
@@ -31,6 +32,8 @@ const AnalyticToolbar = ({filterValues,  setFilterValues, setUpdateFlag} : TAnal
 
 const [users, setUsers] = useState<(string | undefined)[]>([]);
 const [user, setUser] = useState<UserInfo | undefined>(undefined);
+const [today, setToday] = useState<Date | null>(null);
+const [dayWeekBack, setDayWeekBack] = useState<Date | null>(null);
         
 useEffect(() => {
         
@@ -41,6 +44,14 @@ useEffect(() => {
         };
         
         void getUserInfoData();
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); 
+        setToday(currentDate); 
+
+        const weekBackDate = new Date(currentDate.getTime());
+        weekBackDate.setDate(weekBackDate.getDate() - 7); 
+        setDayWeekBack(weekBackDate); 
+
 }, []);
 
 useEffect(() => {
@@ -145,6 +156,61 @@ useEffect(() => {
                                         }}
                                         className={cnMixSpace({ mL: 'xs'})}
                                         maxDate={new Date()}
+                                />
+                                <Checkbox 
+                                        className={cnMixSpace({ mL: 'm'})} 
+                                        label="За сегодня" 
+                                        checked={
+                                                (filterValues.startDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.startDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.startDate?.getDate() === today?.getDate()) &&
+                                                (filterValues.endDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.endDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.endDate?.getDate() === today?.getDate())
+                                        }
+                                        onChange={()=> {
+                                                if (!((filterValues.startDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.startDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.startDate?.getDate() === today?.getDate()) &&
+                                                (filterValues.endDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.endDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.endDate?.getDate() === today?.getDate()))) {
+                                                        setFilterValues(prev => ({...prev,
+                                                                startDate: today,
+                                                                endDate: new Date(),
+                                                        }))  
+                                                }
+                                        }}
+                                        onClick={()=> {
+                                                console.log( today);
+                                                console.log( filterValues.startDate);
+                                        }}
+                                />
+                                <Checkbox 
+                                        className={cnMixSpace({ mL: 'm'})} 
+                                        label="За неделю" 
+                                        checked={
+                                                (filterValues.startDate?.getFullYear() === dayWeekBack?.getFullYear()) &&
+                                                (filterValues.startDate?.getMonth() === dayWeekBack?.getMonth()) &&
+                                                (filterValues.startDate?.getDate() === dayWeekBack?.getDate()) &&
+                                                (filterValues.endDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.endDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.endDate?.getDate() === today?.getDate())
+                                        }
+                                        onChange={()=> {
+                                                if (!((filterValues.startDate?.getFullYear() === dayWeekBack?.getFullYear()) &&
+                                                (filterValues.startDate?.getMonth() === dayWeekBack?.getMonth()) &&
+                                                (filterValues.startDate?.getDate() === dayWeekBack?.getDate()) &&
+                                                (filterValues.endDate?.getFullYear() === today?.getFullYear()) &&
+                                                (filterValues.endDate?.getMonth() === today?.getMonth()) &&
+                                                (filterValues.endDate?.getDate() === today?.getDate()))) {
+                                                        setFilterValues(prev => ({...prev,
+                                                                startDate: dayWeekBack,
+                                                                endDate: today,
+                                                        }))  
+                                                }
+                                        }}
+                                        
                                 />
                         </Layout>
                         

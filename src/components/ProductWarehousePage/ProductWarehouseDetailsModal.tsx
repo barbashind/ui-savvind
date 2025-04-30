@@ -224,7 +224,7 @@ const ProductWarehouseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  
                                                                                                 )}
 
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs', mR: 'm'  })} >
-                                                                                                        {itemBatch?.quantFinal?.toString() + ' шт'}
+                                                                                                        {!itemBatch.hasSerialNumber ? itemBatch?.quantFinal?.toString() + ' шт' : itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId && elem.partner === itemBatch.partner ) && elem.serialNumber))?.length.toString() + ' шт'}
                                                                                                 </Text>
                                                                                                 <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} align='center' className={cnMixSpace({  mT: '2xs' })}>
                                                                                                         {(!itemBatch.hasSerialNumber ? itemBatch?.remainder?.toString() : itemsBatch?.filter(elem => ((elem.itemId === itemBatch.itemId && elem.partner === itemBatch.partner ) && elem.serialNumber && !elem.isSaled))?.length.toString()) + ' шт'}

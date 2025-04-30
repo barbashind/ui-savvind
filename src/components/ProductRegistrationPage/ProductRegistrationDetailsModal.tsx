@@ -31,6 +31,7 @@ import { InfoCircleFilled } from "@ant-design/icons";
 import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
 import { getUserInfo } from "../../services/AuthorizationService.ts";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 
 
@@ -613,7 +614,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         />
                                                                                                 ) : (
                                                                                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({  mT: '2xs', mR:'m' })} align="center">
-                                                                                                                {itemBatch?.costPriceAll ? Number(itemBatch?.costPriceAll)?.toFixed(2) : ''}
+                                                                                                                {itemBatch?.costPriceAll ? formatNumber(Number(itemBatch?.costPriceAll)?.toFixed(2)) : ''}
                                                                                                         </Text>
                                                                                                 )}
                                                                                                 
