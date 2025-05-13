@@ -30,6 +30,16 @@ export interface TAnalyticGraphData {
         date: Date;
 }
 
+export interface TProdDeliver {
+        name: string | undefined;
+        quant: number | undefined;
+}
+
+export interface TAnalyticDeliversData {
+        deliver: string | undefined;
+        products: TProdDeliver[];
+}
+
 export interface TProdData {
         name: string | undefined;
         quantAll: number | undefined;

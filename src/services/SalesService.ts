@@ -1,4 +1,4 @@
-import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdData, TProdDataFilter } from '../types/analytic-types';
+import { TAnalyticData, TAnalyticDeliversData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdData, TProdDataFilter } from '../types/analytic-types';
 import { HttpService } from '../system/HttpService';
 import { TPurchaseItem } from '../types/product-purchase-types';
 import { TCheck, TCheckFilter, TSale } from '../types/sales-types';
@@ -251,14 +251,15 @@ export const updateCheck = async (checkId : number | undefined, data : TCheck): 
         return resp;
     };
 
-    export const getAnalyticsAssets = async (): Promise<TAssetsData> => {
+    export const getAnalyticsAssets = async (data : TAnalyticFilter): Promise<TAssetsData> => {
         const token = localStorage.getItem('token');
         const response = await fetch('/api/analytic-assets', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
+            body: JSON.stringify(data),
         });
         if (!response.ok) {
             const errorResponse = await getErrorResponse(response);
@@ -267,6 +268,19 @@ export const updateCheck = async (checkId : number | undefined, data : TCheck): 
         const resp: TAssetsData = (await response.json()) as TAssetsData;
         return resp;
     };
+
+export const getAnalyticsDeliver = async (
+    getCallback: (arg0: TAnalyticDeliversData[]) => void
+) => {
+    await HttpService.get<TAnalyticDeliversData[]>('/api/analytic-delivers')
+        .then((response) => {
+            getCallback(response);
+        })
+        .catch(() => {
+            console.log('failed');
+        });
+};
+
 
 export const getAnalyticProd = (param: {
         page: number;

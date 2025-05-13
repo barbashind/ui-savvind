@@ -1,5 +1,5 @@
 import { HttpService } from '../system/HttpService';
-import { TNomenclature, TNomenclatureFilter } from '../types/nomenclature-types';
+import { DataStat, TNomenclature, TNomenclatureFilter } from '../types/nomenclature-types';
 
 import { IdLabel, TPageableResponse } from '../utils/types';
 import { ErrorResponse, getErrorResponse, TSortParam } from './utils';
@@ -154,4 +154,17 @@ export const uploadProductsFile = async (file: File) => {
         console.error('Error uploading file:', error);
         throw new Error('Failed to upload file');
     }
+};
+
+export const getNomenclatureStat = async (
+    id: number,
+    getCallback: (arg0: DataStat) => void
+) => {
+    await HttpService.get<DataStat>('/api/nomenclature-stat/' + id.toString())
+        .then((response) => {
+            getCallback(response);
+        })
+        .catch(() => {
+            console.log('failed');
+        });
 };

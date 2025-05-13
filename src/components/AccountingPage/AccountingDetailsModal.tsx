@@ -319,7 +319,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         label={'Сохранить'}
                                                         view="primary"
                                                         size="s"
-                                                        disabled={((data.accountFrom === data.accountTo && !!data.accountFrom) || (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo) || (!data.value))}
+                                                        disabled={((data.accountFrom === data.accountTo && !!data.accountFrom) || (accounts.find(el => (el.name === data?.accountFrom))?.currency !== accounts.find(el => (el.name === data?.accountTo))?.currency && !!data.accountFrom && !!data.accountTo) || (!data.value)) || (!data.accountTo && !data.accountFrom)}
                                                         className={cnMixSpace({ mL:'m' })}
                                                         onClick={(e)=>{
                                                                 if (data.id) {

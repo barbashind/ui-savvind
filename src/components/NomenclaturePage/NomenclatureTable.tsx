@@ -16,15 +16,22 @@ import { Loader } from '@consta/uikit/Loader/index';
 import { IconTrash } from '@consta/icons/IconTrash';
 
 // собственные компоненты
-import { TNomenclature, TNomenclatureFilter, TNomenclatureRow, TNomenclatureSortFields } from "../../types/nomenclature-types";
+import { DataStat, TNomenclature, TNomenclatureFilter, TNomenclatureRow, TNomenclatureSortFields } from "../../types/nomenclature-types";
 import { TableColumnHeader } from '../global/TableColumnHeader.tsx';
 import { TPageableResponse } from "../../utils/types.ts";
 import { GetColumnSortOrder, GetColumnSortOrderIndex, OnColumnSort, Sort } from '../../hooks/useTableSorter.ts';
 import { ErrorResponse, IPagination, TSortParam } from '../../services/utils.ts';
 import { usePaginationStore } from '../../hooks/usePaginationStore.ts';
 import { Pagination } from '../global/Pagination.tsx';
-import { deleteNomenclature, getNomenclatures, updateNomenclature } from '../../services/NomenclatureService.ts';
+import { deleteNomenclature, getNomenclatures, getNomenclatureStat, updateNomenclature } from '../../services/NomenclatureService.ts';
 import { formatNumber } from '../../utils/formatNumber.ts';
+import { IconLineAndBarChart } from '@consta/icons/IconLineAndBarChart/index';
+import { Modal } from '@consta/uikit/Modal/index';
+import { IconClose } from '@consta/icons/IconClose/index';
+import { TextField } from '@consta/uikit/TextField/index';
+import { IconArrowDown } from '@consta/icons/IconArrowDown/index';
+import { Tag } from '@consta/uikit/Tag/index';
+import { IconArrowUp } from '@consta/icons/IconArrowUp/index';
 
 
 interface TNomenclatureTableProps {
@@ -55,13 +62,32 @@ const { getStoredPageSize, setStoredPageSize } = usePaginationStore('Records');
     const [rows, setRows] = useState<TNomenclatureRow[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const [isStatModalOpen, setIsStatModalOpen] = useState<boolean>(false)
+    const [isStatLoading, setIsStatLoading] = useState<boolean>(false)
+    const [idProd, setIdProd] = useState<number | undefined>(undefined)
+    const [nameProd, setNameProd] = useState<string | null>(null)
+    const [hasSerialNumberProd, setHasSerialNumberProd] = useState<boolean>(false)
+    const [dataStat, setDataStat] = useState<DataStat | undefined>(undefined)
+    const [datesWithSerNum, setDatesWithSerNum] = useState<string[] | null>(null)
+    
+useEffect(() => {
+    const getDataStat = async () => {
+        await getNomenclatureStat(idProd ?? 0, (resp)=> {
+            setDataStat(resp);
+            setIsStatLoading(false);
+        });
+    }
+    void getDataStat();
+}, [idProd]);
+
    
-    useEffect(() => {
-            setStoredPageSize(pagination.pageSize);
-        }, [pagination.pageSize, setStoredPageSize]);
-        useEffect(() => {
-            setUpdateFlag(true);
-        }, [columnSort, setUpdateFlag]);
+useEffect(() => {
+        setStoredPageSize(pagination.pageSize);
+}, [pagination.pageSize, setStoredPageSize]);
+
+useEffect(() => {
+    setUpdateFlag(true);
+}, [columnSort, setUpdateFlag]);
 
 useEffect(() => {
     if (updateFlag) {
@@ -364,6 +390,39 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                         <div>
                             <Button 
                                 size="s" 
+                                iconLeft={IconLineAndBarChart} 
+                                view="clear" 
+                                onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsStatModalOpen(true);
+                                        setIdProd(record.itemId);
+                                        setNameProd(record.name);
+                                        setHasSerialNumberProd(record.hasSerialNumber);
+                                }}
+                                />
+                        </div>
+                    );
+                },
+            },
+            {
+                title: (
+                    <TableColumnHeader
+                        header=""
+                        withoutSort
+                    />
+                ),
+                dataIndex: 'isMessageActive',
+                key: 'isMessageActive',
+                align: 'center',
+                width: '150px',
+                minWidth: 150,
+                render: (_value: boolean, record: TNomenclatureRow) => {
+                    return record.spacer ? (
+                        <></>
+                    ) : (
+                        <div>
+                            <Button 
+                                size="s" 
                                 iconLeft={IconTrash} 
                                 view="clear" 
                                 onClick={(e) => {
@@ -462,6 +521,106 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                         setUpdateFlag(true);
                     }}
                 />
+
+                <Modal
+                    isOpen={isStatModalOpen}
+                    hasOverlay
+                    onClickOutside={() => {
+                            setIsStatModalOpen(false);
+                            setIdProd(undefined);
+                            setNameProd(null);
+                            setDataStat(undefined);
+                            setDatesWithSerNum(null);
+                    }}
+                    onEsc={() => {
+                            setIsStatModalOpen(false);
+                            setIdProd(undefined);
+                            setNameProd(null);
+                            setDataStat(undefined);
+                            setDatesWithSerNum(null);
+                    }}
+                    style={{width: '50%'}}
+            >
+                    {!isStatLoading && (
+                        <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({ p:'xl' })}>
+                            <Layout direction="row" style={{justifyContent: 'space-between'}}>
+                                    <Text size="xl" view="brand" className={cnMixSpace({ mL:'m', mT: '2xs' })}>
+                                            {'Статистика товара ' + nameProd}
+                                    </Text>
+                                    <Button
+                                            view="clear"
+                                            size="s"
+                                            iconLeft={IconClose}
+                                            onClick={() => {
+                                                setIsStatModalOpen(false);
+                                                setIdProd(undefined);
+                                                setNameProd(null);
+                                                setDataStat(undefined);
+                                            }}
+                                    />
+                            </Layout>
+
+                            <Layout direction='column'>
+                                            <Layout direction='row' style={{ alignItems: 'center' }} className={cnMixSpace({mT:'l'})}>
+                                                <Text size='s' view='secondary' style={{minWidth: '120px', maxWidth: '120px'}}>Всего продано:</Text>
+                                                <TextField 
+                                                    disabled
+                                                    value={dataStat?.salledAll? dataStat?.salledAll?.toString() + ' шт' : '0 шт'}
+                                                    style={{minWidth: '150px', maxWidth: '150px'}}
+                                                    size='s'
+                                                />
+                                            </Layout>
+                                            <Layout direction='row' style={{ width: '100%', alignItems: 'center', borderTop: '1px solid rgba(0, 65, 102, .2)', borderBottom: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mT: 's', p:'s'})}>
+                                                <Text size='s' style={{ maxWidth: '150px', minWidth: '150px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>Дата</Text>
+                                                <Text size='s' style={{ width: '100%'}}>Кол-во продано:</Text>
+                                                <div style={{ maxWidth: '121px', minWidth: '121px'}}/>
+                                            </Layout>
+                                            {dataStat?.sales && dataStat?.sales?.length > 0 && dataStat?.sales?.map((sale) => (
+                                                <Layout direction='column' style={{ width: '100%', border: '1px solid rgb(86, 185, 242)', borderRadius: '4px'}} className={cnMixSpace({p:'s', mT: 's'})}>
+                                                    <Layout direction='row'  style={{ width: '100%', alignItems: 'center'}}>
+                                                        <Text size='s' style={{ maxWidth: '150px', minWidth: '150px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>{sale?.date}</Text>
+                                                        <Text size='s' style={{ width: '100%'}}>{sale?.saled?.toString() + ' шт'}</Text>
+                                                        {hasSerialNumberProd && (
+                                                            <Button 
+                                                                label={'Серийники'}
+                                                                iconRight={datesWithSerNum?.find((el)=> (el === sale.date)) ? IconArrowUp : IconArrowDown }
+                                                                size='s'
+                                                                view='secondary'
+                                                                onClick={()=> {
+                                                                    if (datesWithSerNum?.find((el)=> (el === sale.date))) {
+                                                                        setDatesWithSerNum(datesWithSerNum?.filter((el)=> (el !== sale.date)))
+                                                                    } else {
+                                                                        setDatesWithSerNum(datesWithSerNum ? [...datesWithSerNum, sale?.date ?? ''] : [sale?.date ?? ''])
+                                                                    }
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Layout>
+                                                    {datesWithSerNum?.find((el)=> (el === sale.date)) && (
+                                                        <Layout direction="row" style={{ flexWrap: 'wrap' }}>
+                                                            {sale?.serialNumbers?.map(serialNumber =>(
+                                                                    <Tag
+                                                                            label={serialNumber?? ''} 
+                                                                            mode='info'
+                                                                            className={cnMixSpace({ mL:'s', mT:'xs'})}
+                                                                    />
+                                                            ))}
+                                                        </Layout>
+                                                    )}
+                                                    
+                                                </Layout>
+                                            ))}
+                            </Layout>
+                            
+                    </Layout>
+                )}
+                {isStatLoading && (
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Loader />
+                    </div>
+                )}
+
+            </Modal>
         </Layout>
         )
 }

@@ -529,9 +529,19 @@ useEffect(() => {
                 void getAccountsData();
 }, [])
 
-        const [tooltipPosition, setTooltipPosition] = useState<Position>(undefined);
-        const [tooltipText, setTooltipText] = useState<string | undefined>(undefined);
-        const [arrowDir, setArrowDir] = useState<Direction>('upLeft');
+const [tooltipPosition, setTooltipPosition] = useState<Position>(undefined);
+const [tooltipText, setTooltipText] = useState<string | undefined>(undefined);
+const [arrowDir, setArrowDir] = useState<Direction>('upLeft');
+
+const formatDate = (date: Date): string => {
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        };
+        const formattedDate = new Intl.DateTimeFormat('en-CA', options).format(date);
+        return formattedDate;
+    };
 
         return (
                 <Modal
@@ -1057,8 +1067,9 @@ useEffect(() => {
                                                                 title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
-
-                                                {checkId && !data.isBooking && !data.isUnpaid && (role ==='ADM') && (
+                                                {checkId && !data.isBooking && !data.isUnpaid &&
+                                                 (role ==='ADM' || (role === 'SLR' && formatDate(new Date()) === data.createdAt?.toString()))
+                                                  && (
                                                         <Button 
                                                                 label={'Удалить продажу'}
                                                                 view="primary"

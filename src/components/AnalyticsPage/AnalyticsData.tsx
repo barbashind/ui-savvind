@@ -9,10 +9,10 @@ import { Line } from '@consta/charts/Line';
 import { List } from '@consta/uikit/ListCanary';
 import { Avatar } from '@consta/uikit/Avatar';
 
-import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdDataFilter, TProdDataSortFields } from "../../types/analytic-types.ts";
+import { TAnalyticData, TAnalyticDeliversData, TAnalyticFilter, TAnalyticGraphData, TAssetsData, TProdDataFilter, TProdDataSortFields } from "../../types/analytic-types.ts";
 
 // иконки
-import { getAnalytics, getAnalyticsAssets, getAnalyticsGraph } from "../../services/SalesService.ts";
+import { getAnalytics, getAnalyticsAssets, getAnalyticsDeliver, getAnalyticsGraph } from "../../services/SalesService.ts";
 import { Loader } from "@consta/uikit/Loader/index";
 import { getUserInfo, UserInfo } from "../../services/AuthorizationService.ts";
 import AnalyticsProductsTable from "./AnalyticsProductsTable.tsx";
@@ -20,6 +20,7 @@ import { Sort, useTableSorter } from "../../hooks/useTableSorter.ts";
 import { Checkbox } from "@consta/uikit/Checkbox/index";
 import { Switch } from "@consta/uikit/Switch/index";
 import { formatNumber } from "../../utils/formatNumber.ts";
+import { Tag } from "@consta/uikit/Tag/index";
 
 
 
@@ -39,6 +40,8 @@ const [dataGraph, setDataGraph]=useState<TAnalyticGraphData[]>([])
 const [isLoading, setIsLoading]=useState<boolean>(false)
 const [updateFlagTable, setUpdateFlagTable]=useState<boolean>(false)
 const [user, setUser] = useState<UserInfo | undefined>(undefined);
+
+const [dataDelivers, setDataDelivers]=useState<TAnalyticDeliversData[]>([])
 
 const [isTable, setIsTable] = useState<boolean>(false);
 const [isWithPartner, setIsWithPartner] = useState<boolean>(false);
@@ -68,13 +71,19 @@ useEffect(() => {
                         })
                 }
                 const getAssetsData = async () => {
-                        await getAnalyticsAssets().then((resp)=>{
+                        await getAnalyticsAssets(filterValues).then((resp)=>{
                                 setAssetsData(resp);
+                        })
+                }
+                const getDeliversData = async () => {
+                        await getAnalyticsDeliver((resp)=>{
+                                setDataDelivers(resp);
                         })
                 }
                 void getAssetsData();
                 void getAnalyticData();
                 void getAnalyticDataGraph();
+                void getDeliversData();
                 setUpdateFlag(false);
                 setUpdateFlagTable(true);
         }
@@ -223,7 +232,7 @@ useEffect(() => {
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
                                                                                 <Text size="s"  align="left">
-                                                                                        {'Выручка с продаж: ' }
+                                                                                        {'Выручка с продаж(за период): ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({  mL: 'm'})} align="left" weight="semibold">
                                                                                         {formatNumber((Number(assetsData?.revenue?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб'  }
@@ -231,7 +240,7 @@ useEffect(() => {
                                                                         </Layout>
                                                                         <Layout direction="row" className={cnMixSpace({ mT: 'm', p: 's'})} style={{alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}}>
                                                                                 <Text size="s"  align="left">
-                                                                                        {'Маржа с продаж: ' }
+                                                                                        {'Маржа с продаж(за период): ' }
                                                                                 </Text>
                                                                                 <Text size="m" className={cnMixSpace({ mL: 'm'})} align="left"  weight="semibold">
                                                                                         {formatNumber((Number(assetsData?.margProfit?.toFixed(2) ?? 0 )).toFixed(2))  + ' руб' }
@@ -273,6 +282,43 @@ useEffect(() => {
                                                 />
                                         </Layout>
                                         
+                                </Layout>
+                        )}
+
+{!isLoading && dataGraph && dataGraph?.length > 0 && !isTable && (
+                                <Layout direction="column" className={cnMixSpace({ mB: 'm', p:'m'})} style={{width: '100%', border: '1px solid #56b9f2', minHeight: '350px'}}>
+                                        <Layout direction="row" >
+                                                <Text size="m" view='link' className={cnMixSpace({ mR: 'm'})} style={{width: '150px'}}>
+                                                        Товары в пути
+                                                </Text>
+                                        </Layout>
+                                        <Layout direction="row" className={cnMixSpace({ mT: 'm'})}>
+                                                <Text size="s" view="secondary" className={cnMixSpace({ mR: 'm',  pL: 'l'})} style={{width: '300px'}} align="left"  >
+                                                        Доставщик
+                                                </Text>
+                                                <Text size="s" view="secondary" align="left" className={cnMixSpace({ mR: 'm', mL: '5xl' })} style={{width: '100%'}}>
+                                                        Товары
+                                                </Text>
+                                        </Layout>
+                                        <Layout direction="column">
+                                                {dataDelivers && dataDelivers?.length > 0 && dataDelivers?.map(deliver => (
+                                                        <Layout direction="row" className={cnMixSpace({ mT: 's'})} style={{width: 'fit-content', alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}} >
+                                                                <Text style={{width: '300px'}} size="xs" align="left" className={cnMixSpace({ pL: 'l'})}>{deliver.deliver}</Text>
+                                                                <Layout direction="column" style={{width: 'fit-content'}} className={cnMixSpace({ p: 'xs'})}>
+                                                                        {deliver?.products && deliver?.products?.length > 0 && deliver?.products?.map(
+                                                                                item => (
+                                                                                        <Layout direction="row" className={cnMixSpace({ p: '2xs', mV: '2xs'})} style={{width: 'fit-content', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0, 66, 105, .28)', borderRadius: '4px'}} > 
+                                                                                                <Text size="xs" style={{minWidth: '200px', maxWidth:'200px'}} align="left">{item.name}</Text>
+                                                                                                <Tag size="s" className={cnMixSpace({ mL: 'm'})} label={item.quant + ' шт'} mode="info"/>
+                                                                                        </Layout> 
+                                                                                )
+                                                                        )}
+                                                                        
+                                                                </Layout>
+                                                        </Layout>
+                                                ))}
+                                                
+                                        </Layout>
                                 </Layout>
                         )}
 

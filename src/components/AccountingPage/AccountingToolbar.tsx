@@ -20,9 +20,10 @@ export interface TAccountingToolbarProps {
         searchText: string | null;
         setUpdateFlag: React.Dispatch<React.SetStateAction<boolean>>;
         setIsAccModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+        role: string;
 }
 
-const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues, searchText, setUpdateFlag, setIsAccModalOpen} : TAccountingToolbarProps) => {
+const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues, searchText, setUpdateFlag, setIsAccModalOpen, role} : TAccountingToolbarProps) => {
 
 
         return (
@@ -53,6 +54,7 @@ const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues,
                                             }}
                                         withClearButton
                                         className={cnMixSpace({mL: 's'})}
+                                        disabled={role === 'SLR'}
                                 />
                                 <Button 
                                         size='s' 

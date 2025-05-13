@@ -63,7 +63,6 @@ const Accounting = ( ) => {
         
         return (
                 <Card style={{width: '100%', height: '100%'}} className={cnMixSpace({p: 's'})}>
-                        {(role !== 'SLR') && (
                               <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({mL: 'm', p: 's'})}>
                                 <AccountingToolbar
                                          setIsEditModalOpen={setIsEditModalOpen} 
@@ -72,8 +71,9 @@ const Accounting = ( ) => {
                                          searchText={searchText}
                                          setUpdateFlag={setUpdateFlag}
                                          setIsAccModalOpen={setIsAccModalOpen}
+                                         role={role ?? ''}
                                 />
-                                {(role === 'ADM') && (
+                                {(role === 'ADM' || role === 'SLR') && (
                                         <AccountingTable 
                                                         updateFlag={updateFlag}
                                                         setUpdateFlag={setUpdateFlag}
@@ -101,17 +101,14 @@ const Accounting = ( ) => {
                                         isOpen={isEditModalOpen}
                                         setUpdateFlag={setUpdateFlag}
                                 />
-                                {(role === 'ADM') && (
+                                {(role === 'ADM' || role === 'SLR' ) && (
                                         <AccountingAccModal
                                                 isOpen={isAccModalOpen}
                                                 setIsOpen={setIsAccModalOpen}
                                         />
                                 )}
                         </Layout>  
-                        )}
-                        {(role === ('SLR'))&& (
-                                <Text>Нет полномочий</Text>
-                        )}
+                        
                         
                 </Card>
 

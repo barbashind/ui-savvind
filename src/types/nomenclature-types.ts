@@ -52,3 +52,14 @@ export interface TNomenclatureSortFields {
         createdAt: SortOrder;
         remainsSum: SortOrder;
 }
+
+export interface Sale  {
+    serialNumbers: string[];
+    date: string | null;
+    saled: number | null;
+};
+
+export interface DataStat {
+sales: Sale[];
+salledAll: number | null;
+};
