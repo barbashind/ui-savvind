@@ -66,7 +66,15 @@ const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues,
                                                 setUpdateFlag(true);
                                         }}
                                 />
-                                <Button size='s' view='secondary' label={'Сформировать транзакцию'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                                <Button 
+                                        size='s' 
+                                        view='secondary' 
+                                        label={'Сформировать транзакцию'} 
+                                        iconLeft={IconAdd} 
+                                        onClick={()=>{setIsEditModalOpen(true)}} 
+                                        className={cnMixSpace({mL: 's'})}
+                                        disabled={role === 'SLR'}
+                                />
                                 <Button size='s' view='secondary' label={'Проверить счета'} iconLeft={IconBook} onClick={()=>{setIsAccModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
 
                         </Layout>
