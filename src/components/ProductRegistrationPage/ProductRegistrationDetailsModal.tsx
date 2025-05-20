@@ -16,7 +16,7 @@ import { IconArrowUndone } from '@consta/icons/IconArrowUndone';
 
 import { TCaption } from "../../utils/types";
 import { Tag } from "@consta/uikit/Tag";
-import { getPurchase, getPurchaseItems, updatePurchase, updatePurchaseItems } from "../../services/PurchaseService";
+import { getDelivers, getPurchase, getPurchaseItems, updatePurchase, updatePurchaseItems } from "../../services/PurchaseService";
 import { TPurchase } from "../../types/purchase-types";
 import { TPurchaseItem } from "../../types/product-purchase-types";
 import { Combobox } from "@consta/uikit/Combobox";
@@ -26,7 +26,6 @@ import { getProductBySerial } from "../../services/SalesService";
 import NumberMaskTextField from "../../utils/NumberMaskTextField";
 import { getNomenclatures } from "../../services/PurchaseService.ts";
 import { TNomenclature } from "../../types/nomenclature-types";
-import { InfoCircleFilled } from "@ant-design/icons";
 
 import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
@@ -76,12 +75,15 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 setItemsBatch([defaultItem]);
                 setIsOpen(false);
                 setBatchId(undefined);
+                setCommonCost(null);
+                setInsCost(null);
+                setDeliverIns(null);
+                setExtraCost(null);
         }
         interface TNomenclatureP {
                 itemId?: number;
                 name: string | null;
                 weightProduct: number | null;
-                
             }
         const [data, setData] = useState<TPurchase>(defaultData);
         const [itemsBatch, setItemsBatch] = useState<TPurchaseItem[]>([defaultItem]);
@@ -92,9 +94,12 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
         const [serialCaption, setSerialCaption] = useState<string | null>(null);
         const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
         const [productList, setProductList] = useState<TNomenclatureP[]>([]);
-        const [mainCost, setMainCost] = useState<number | null>(null);
         const [rate, setRate] = useState<number | null>(null);
-        const [mainInsuranceCost, setMainInsuranceCost] = useState<number | null>(null);
+
+        const [deliverIns, setDeliverIns] = useState<number | null>(null);
+        const [commonCost, setCommonCost] = useState<number | null>(null);
+        const [insCost, setInsCost] = useState<number | null>(null);
+        const [extraCost, setExtraCost] = useState<number | null>(null);
 
         const checkSerialNumberExists = async (serialNumber: string | null) => {
                 if (!serialNumber) {
@@ -151,9 +156,13 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
     
         useEffect(() => {
                 const getData = async (batchId : number) => {
-                                        await getPurchase(batchId, (resp) => {
+                                        await getPurchase(batchId, async (resp) => {
                                                 setData(resp);
                                                 setIsLoading(false);
+                                                await getDelivers((res) => {
+                                                        setDeliverIns(res?.find(el => (el.deliverId === resp.deliver))?.insurance ?? 0);
+                                                        console.log(res?.find(el => (el.deliverId === resp.deliver))?.insurance)
+                                                })
                                             });
                                 }
                                 const getItems = async (batchId : number) => {
@@ -162,6 +171,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                 setIsLoading(false);
                                             });
                                         }
+                                
                                 const getWarehousesData = async () => {
                                                 await getWarehouses((resp) => {
                                                         setWarehouses(resp.map((item : TWarehouse) => ({
@@ -584,7 +594,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                         onFocus={()=> {setCaptionList(prev => (prev.filter(item => (item.state !== 'warehouse'))))}}
                                                                                                         className={cnMixSpace({mR:'m'})}
                                                                                                 />
-                                                                                                {!mainCost ? (
+                                                                                                {!commonCost ? (
                                                                                                         <NumberMaskTextField 
                                                                                                                 placeholder="Себестоимость"
                                                                                                                 incrementButtons={false}
@@ -641,136 +651,173 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                 </Layout>
                                                 )))}
                                 </Layout>
-                                <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
-                                                        <Text size="s" onClick={()=>{console.log(rate?.toString())}} >Курс $:</Text>
-                                                        <NumberMaskTextField 
-                                                                size="s"
-                                                                placeholder="Введите курс доллара"
-                                                                value={rate?.toString()}
-                                                                onChange={(value : string | null) => {
-                                                                        if (value) {
-                                                                                setRate(Number(value))
-                                                                        } else {
-                                                                                setRate(null)
-                                                                        }
-                                                                }}
-                                                                className={cnMixSpace({ mT:'2xs', mL: 'xs'})}
-                                                                style={{width: '100px'}}
-                                                        />  
-                                        </Layout>
-                                <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
-                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общ. стоимость доставки:</Text>
-                                                        <NumberMaskTextField 
-                                                                size="s"
-                                                                value={mainCost}
-                                                                placeholder='Введите общ. стоимость доставки'
-                                                                onChange={(value : string | null) => {setMainCost(Number(value))}}
-                                                                className={cnMixSpace({ mL:'2xs' })}
-                                                        />
-                                                        <InfoCircleFilled className={cnMixSpace({ mL:'s' })}/>
-                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите кол-во принято или серийники</Text>
-                                        </Layout>
-                                        <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'center', alignContent: 'center'}}>
-                                                        <Text size="s" className={cnMixSpace({ mT:'xs' })} >Общ. стоимость страховки:</Text>
-                                                        <NumberMaskTextField 
-                                                                size="s"
-                                                                value={mainInsuranceCost}
-                                                                placeholder='Введите и нажмите Enter для расчёта'
-                                                                onChange={(value : string | null) => {setMainInsuranceCost(Number(value))}}
-                                                                className={cnMixSpace({ mL:'2xs' })}
-                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                onKeyPress={async (event: any) => {
-                                                                        if (event.key === 'Enter') {
-                                                                                let totalWeight = 0;
-                                                                                let totalPrice = 0;
-                                                                                // Считаем общий вес продукции
-                                                                                for (const item of itemsBatch) {
-                                                                                    const product = productList.find(p => p.itemId === item.itemId);
-                                                                                    if (product) {
-                                                                                        totalWeight += Number(product.weightProduct || 0 ) * Number(item?.quantFinal || 0);
+                                        
+                                        <Layout direction='column'>
+                                                <Layout direction="row" className={cnMixSpace({ mV:'m' })}>
+                                                        <Text size="l" view="link">Рассчет стоимости доставки:</Text>
+                                                        
+                                                </Layout>
+                                                <Layout direction="row">
+                                                        <Text size="s" style={{minWidth: '200px', maxWidth: '200px'}} >Товар</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Масса</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость доставки</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость страховки</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Общ.сумма</Text>
+                                                </Layout>
 
-                                                                                    }
-                                                                                }
-                                                                                // Находим цену доставки за единицу веса
-                                                                                const pricePerUnitWeight = (Number(mainCost)) / totalWeight;
-
-                                                                                 // Считаем общую цену продукции
-                                                                                 for (const item of itemsBatch) {
-                                                                                        const product = productList.find(p => p.itemId === item.itemId);
-                                                                                        if (product) {
-                                                                                                totalPrice += Number(item.costPrice || 0 ) * Number(item?.quantFinal || 0);
-                                                                                        }
-                                                                                    }
-                                                                                
-                                                                                // Находим цену страховки за товар
-                                                                                const priceInsuranceUnit = (Number(mainInsuranceCost)) / totalPrice;
-                                                                                
-
-                                                                                
-
-                                                                                // Обновляем costPriceAll для каждого элемента itemsBatch
-                                                                                const updatedItemsBatch = itemsBatch.map(item => {
-                                                                                        const product = productList.find(p => p.itemId === item.itemId);
-                                                                                        return {
-                                                                                                ...item,
-                                                                                                costDeliver: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate),
-                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate) + Number(item.costPrice || 0) * Number(data?.rate)  + Number(priceInsuranceUnit * Number(item.costPrice || 0 ) * Number(rate)),
-                                                                                        };
-                                                                                })
-                                                                                setItemsBatch(updatedItemsBatch)
-                                                                                
-                                                                        }
-                                                                        }}
-                                                        />
-                                                        <InfoCircleFilled className={cnMixSpace({ mL:'s' })}/>
-                                                        <Text size="xs"  view='secondary' className={cnMixSpace({ mL:'xs' })} >Сначала укажите общ.стоимость доставки и курс</Text>
-                                                        <Button
-                                                                label={'Расчитать'}
-                                                                size="s"
-                                                                className={cnMixSpace({ mL:'xs' })}
-                                                                onClick={ () => {
-                                                                         
-                                                                                let totalWeight = 0;
-                                                                                let totalPrice = 0;
-                                                                                // Считаем общий вес продукции
-                                                                                for (const item of itemsBatch) {
-                                                                                    const product = productList.find(p => p.itemId === item.itemId);
-                                                                                    if (product) {
-                                                                                        totalWeight += Number(product.weightProduct || 0 ) * Number(item?.quantFinal || 0);
-
-                                                                                    }
-                                                                                }
-                                                                                // Находим цену доставки за единицу веса
-                                                                                const pricePerUnitWeight = (Number(mainCost) * Number(rate)) / totalWeight;
-
-                                                                                 // Считаем общую цену продукции
-                                                                                 for (const item of itemsBatch) {
-                                                                                        const product = productList.find(p => p.itemId === item.itemId);
-                                                                                        if (product) {
-                                                                                                totalPrice += Number(item.costPrice || 0 ) * Number(rate) * Number(item?.quantFinal || 0);
-                                                                                        }
-                                                                                    }
-                                                                                
-                                                                                // Находим цену страховки за товар
-                                                                                const priceInsuranceUnit = (Number(mainInsuranceCost) * Number(rate)) / totalPrice;
-                                                                                
-
-                                                                                
-
-                                                                                // Обновляем costPriceAll для каждого элемента itemsBatch
-                                                                                const updatedItemsBatch = itemsBatch.map(item => {
-                                                                                        const product = productList.find(p => p.itemId === item.itemId);
-                                                                                        return {
-                                                                                                ...item,
-                                                                                                costDeliver: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)),
-                                                                                                costPriceAll: Number(pricePerUnitWeight * Number(product?.weightProduct || 0)) * Number(rate) + Number(item.costPrice || 0) * Number(data?.rate)  + Number(priceInsuranceUnit * Number(item.costPrice || 0 ) * Number(rate)),
-                                                                                        };
-                                                                                })
-                                                                                setItemsBatch(updatedItemsBatch)
-                                                                                
-                                                                        }
-                                                                        }
+                                                {itemsBatch?.filter((elem) => (elem.serialNumber === null || elem.serialNumber === undefined ))?.map((elem) => (
+                                                                <Layout direction="row" style={{width: '100%'}} className={cnMixSpace({ mT:'s' })}>
+                                                                        <Text size="s" style={{minWidth: '200px', maxWidth: '200px'}} truncate>
+                                                                                {elem.name}
+                                                                        </Text>
+                                                                        <NumberMaskTextField 
+                                                                                size="s" 
+                                                                                value={productList?.find(item => (item.itemId === elem.itemId))?.weightProduct?.toString()}
+                                                                                onChange={(value : string | null) => { 
+                                                                                        if (value) {
+                                                                                                setProductList(prev => (prev?.map((el) => (el.itemId === elem.itemId ? {
+                                                                                                        ...el, weightProduct: Number(value)
+                                                                                                } : el ))))
+                                                                                        } else {
+                                                                                                setProductList(prev => (prev?.map((el) => (el.itemId === elem.itemId ? {
+                                                                                                        ...el, weightProduct: null
+                                                                                                } : el ))))
+                                                                                        }       
+                                                                                }}
+                                                                                scale={3}
+                                                                                className={cnMixSpace({ mL:'s' })}
+                                                                                status={!productList?.find(item => (item.itemId === elem.itemId))?.weightProduct ? 'alert' : undefined}
+                                                                                style={{minWidth: '100px', maxWidth: '100px'}}
                                                                         />
+                                                                        <TextField 
+                                                                                size="s"
+                                                                                value={elem?.costDeliver ? formatNumber(Number(elem.costDeliver).toFixed(2)) : '0'} 
+                                                                                disabled
+                                                                                className={cnMixSpace({ mL:'s' })}
+                                                                                style={{minWidth: '100px', maxWidth: '100px'}}
+                                                                        />
+                                                                        <TextField 
+                                                                                size="s" 
+                                                                                value={(Number(elem?.costPriceAll) - Number(elem?.costDeliver) - Number(elem?.costPrice)).toFixed(2)}
+                                                                                disabled
+                                                                                className={cnMixSpace({ mL:'s' })}
+                                                                                style={{minWidth: '100px', maxWidth: '100px'}}
+                                                                        />
+                                                                        <TextField 
+                                                                                size="s" 
+                                                                                value={elem.costPriceAll ? formatNumber(Number(elem.costPriceAll).toFixed(2)) : '0'}
+                                                                                disabled
+                                                                                className={cnMixSpace({ mL:'s' })}
+                                                                                style={{minWidth: '100px', maxWidth: '100px'}}
+                                                                        />
+                                                                </Layout>
+                                                ))}
+                                                <Layout direction="row" className={cnMixSpace({ mT:'m' })}>
+                                                        <Layout direction="column" className={cnMixSpace({ mL:'m' })}>
+                                                                <Text size='xs' className={cnMixSpace({ mT:'s' })}>
+                                                                        Общ. стоимость доставки
+                                                                </Text>
+                                                                <NumberMaskTextField 
+                                                                        size="s"
+                                                                        value={commonCost}
+                                                                        style={{minWidth: '160px', maxWidth: '160px'}}
+                                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                                        onChange={(value : string | null) => { 
+                                                                                        if (value) {
+                                                                                                setCommonCost(Number(value))
+                                                                                        } else {
+                                                                                                setCommonCost(null)
+                                                                                        }       
+                                                                                }}
+                                                                />
+                                                        </Layout>
+                                                        <Layout direction="column" className={cnMixSpace({ mL:'m' })}>
+                                                                <Text size='xs' className={cnMixSpace({ mT:'s' })}>
+                                                                        Общ. стоимость страховки
+                                                                </Text>
+                                                                <NumberMaskTextField 
+                                                                        size="s"
+                                                                        value={insCost}
+                                                                         onChange={(value : string | null) => { 
+                                                                                        if (value) {
+                                                                                                setInsCost(Number(value))
+                                                                                        } else {
+                                                                                                setInsCost(null)
+                                                                                        }       
+                                                                                }}
+                                                                        style={{minWidth: '160px', maxWidth: '160px'}}
+                                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                                />
+                                                        </Layout>
+                                                        <Layout direction="column"  className={cnMixSpace({ mL:'m' })}>
+                                                             <Text size='xs' className={cnMixSpace({ mT:'s' })} onClick={()=> {console.log(deliverIns)}}>
+                                                                Доп. расходы 
+                                                                </Text>
+                                                                <NumberMaskTextField 
+                                                                        size="s"
+                                                                        value={extraCost}
+                                                                        style={{minWidth: '160px', maxWidth: '160px'}}
+                                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                                        onChange={(value : string | null) => { 
+                                                                                        if (value) {
+                                                                                                setExtraCost(Number(value))
+                                                                                        } else {
+                                                                                                setExtraCost(null)
+                                                                                        }       
+                                                                                }}
+                                                                />   
+                                                        </Layout>
+                                                        <Layout direction="column"  className={cnMixSpace({ mL:'m' })}>
+                                                                <Text size='xs' className={cnMixSpace({ mT:'s' })} onClick={()=> {console.log(productList.filter(el => (itemsBatch.find(item => item.itemId === el.itemId))))}}>
+                                                                        Курс $
+                                                                </Text>
+                                                                <NumberMaskTextField 
+                                                                        size="s"
+                                                                        placeholder="Введите курс $"
+                                                                        value={rate?.toString()}
+                                                                        onChange={(value : string | null) => {
+                                                                                if (value) {
+                                                                                        setRate(Number(value))
+                                                                                } else {
+                                                                                        setRate(null)
+                                                                                }
+                                                                        }}
+                                                                        style={{minWidth: '160px', maxWidth: '160px'}}
+                                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                                />   
+                                                        </Layout>
+                                                </Layout>
+                                                <Button
+                                                        label={'Расчитать'}
+                                                        size="s"
+                                                        style={{minWidth: '100px', maxWidth: '100px'}}
+                                                        className={cnMixSpace({ mT:'m' })}
+                                                        disabled={!!productList?.filter(el => (itemsBatch.find(item => item.itemId === el.itemId)))?.find(item => (!item.weightProduct)) || !commonCost}
+                                                        onClick={() => {
+                                                                if (!insCost) {
+                                                                        const insurCost = Number(itemsBatch.filter(i => !i.serialNumber).reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(deliverIns) * 0.01 * Number(el.quantFinal));}, 0)); // общ. стоимость страховки
+                                                                        const commDel = Number(commonCost) - Number(insurCost) + Number(extraCost); // Общ. стоимость доставки без страховки
+                                                                        const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
+                                                                        setItemsBatch(prev => (prev.map((item) => (
+                                                                                {...item,
+                                                                                        costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
+                                                                                        costPriceAll: ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(item.quantFinal) * Number(rate))) / Number(item.quantFinal),
+                                                                                }
+                                                                        ))))
+                                                                        
+                                                                } else {
+                                                                        const insurCost = insCost; // общ. стоимость страховки
+                                                                        const commDel = Number(commonCost) - Number(insurCost) + Number(extraCost); // Общ. стоимость доставки без страховки
+                                                                        const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
+                                                                        setItemsBatch(prev => (prev.map((item) => (
+                                                                                {...item,
+                                                                                        costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
+                                                                                        costPriceAll: ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(item.quantFinal) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(item.quantFinal),
+                                                                                }
+                                                                        ))))
+                                                                }
+                                                        }}
+                                                />
                                         </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
                                                         <Text size="s" className={cnMixSpace({ mB:'xs' })} >Комментарий:</Text>

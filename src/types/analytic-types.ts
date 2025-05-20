@@ -4,6 +4,7 @@ export interface TAnalyticFilter {
         users?: (string | undefined)[] | null;
         startDate?: Date | null;
         endDate?: Date | null;
+        account?: string | null;
 }
 
 
@@ -33,6 +34,7 @@ export interface TAnalyticGraphData {
 export interface TProdDeliver {
         name: string | undefined;
         quant: number | undefined;
+        cost: number | undefined;
 }
 
 export interface TAnalyticDeliversData {

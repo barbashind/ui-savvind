@@ -66,6 +66,11 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                         await getUserInfo().then((resp) => {
                                 setRole(resp.role);
                                 setUser(resp.username);
+                                if (resp.role === 'KUR') {
+                                        const utcDate = (new Date());
+                                        utcDate.setUTCHours(0, 0, 0, 0); 
+                                        setData(prev => ({ ...prev, createdAt: utcDate }));
+                                }
                         })
                 };
                 
@@ -101,7 +106,12 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                 } else {
                         setIsLoading(false);
                 }
-        }, [id, isOpen, setIsLoading]);
+                if (role === 'KUR') {
+                        const utcDate = (new Date());
+                        utcDate.setUTCHours(0, 0, 0, 0); 
+                        setData(prev => ({ ...prev, createdAt: utcDate }));
+                }
+        }, [id, isOpen, setIsLoading, role]);
 
         useEffect(() => {
                 const getAccountingData = async () => {
@@ -279,7 +289,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size={'s'}
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента' || (role === 'KUR')}
                                                 />
                                           {/* <Select
                                                 items={[{id: 'replenishment', label: 'Пополнение'}, {id: 'deduction', label: 'Расходы'}]}

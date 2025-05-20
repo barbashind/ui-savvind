@@ -21,6 +21,7 @@ import { Checkbox } from "@consta/uikit/Checkbox/index";
 import { Switch } from "@consta/uikit/Switch/index";
 import { formatNumber } from "../../utils/formatNumber.ts";
 import { Tag } from "@consta/uikit/Tag/index";
+import { Badge } from "@consta/uikit/Badge/index";
 
 
 
@@ -304,12 +305,14 @@ useEffect(() => {
                                                 {dataDelivers && dataDelivers?.length > 0 && dataDelivers?.map(deliver => (
                                                         <Layout direction="row" className={cnMixSpace({ mT: 's'})} style={{width: 'fit-content', alignItems: 'center', border: '1px solid #56b9f2', borderRadius: '4px'}} >
                                                                 <Text style={{width: '300px'}} size="xs" align="left" className={cnMixSpace({ pL: 'l'})}>{deliver.deliver}</Text>
+                                                                <Badge size="s" className={cnMixSpace({ mL: 'm'})} label={'Сумма: ' + deliver?.products?.reduce((total, item) => total + (item?.cost ?? 0), 0) + ' $'} view="filled"/>
                                                                 <Layout direction="column" style={{width: 'fit-content'}} className={cnMixSpace({ p: 'xs'})}>
                                                                         {deliver?.products && deliver?.products?.length > 0 && deliver?.products?.map(
                                                                                 item => (
                                                                                         <Layout direction="row" className={cnMixSpace({ p: '2xs', mV: '2xs'})} style={{width: 'fit-content', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0, 66, 105, .28)', borderRadius: '4px'}} > 
                                                                                                 <Text size="xs" style={{minWidth: '200px', maxWidth:'200px'}} align="left">{item.name}</Text>
                                                                                                 <Tag size="s" className={cnMixSpace({ mL: 'm'})} label={item.quant + ' шт'} mode="info"/>
+                                                                                                <Badge size="s" className={cnMixSpace({ mL: 'm'})} label={item.cost + ' $'} view="filled"/>
                                                                                         </Layout> 
                                                                                 )
                                                                         )}

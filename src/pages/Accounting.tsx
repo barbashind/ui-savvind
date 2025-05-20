@@ -13,9 +13,6 @@ import { Sort, useTableSorter } from "../hooks/useTableSorter.ts";
 import AccountingDetailsModal from "../components/AccountingPage/AccountingDetailsModal.tsx";
 import AccountingAccModal from "../components/AccountingPage/AccountingAccModal.tsx";
 import { getUserInfo } from "../services/AuthorizationService.ts";
-import { Text } from "@consta/uikit/Text/index";
-
-
 
 const Accounting = ( ) => {
 
@@ -73,7 +70,7 @@ const Accounting = ( ) => {
                                          setIsAccModalOpen={setIsAccModalOpen}
                                          role={role ?? ''}
                                 />
-                                {(role === 'ADM' || role === 'SLR') && (
+                                {(role === 'ADM' || role === 'SLR' || role === 'KUR' ) && (
                                         <AccountingTable 
                                                         updateFlag={updateFlag}
                                                         setUpdateFlag={setUpdateFlag}
@@ -90,9 +87,7 @@ const Accounting = ( ) => {
                                                         setIsEditModalOpen={setIsEditModalOpen}
                                         />
                                 )}
-                                {(role === ('KUR'))&& (
-                                        <Text>Нет полномочий</Text>
-                                )}
+                                
                                 
                                 <AccountingDetailsModal
                                         id={id}

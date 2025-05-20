@@ -32,6 +32,7 @@ import { TextField } from '@consta/uikit/TextField/index';
 import { IconArrowDown } from '@consta/icons/IconArrowDown/index';
 import { Tag } from '@consta/uikit/Tag/index';
 import { IconArrowUp } from '@consta/icons/IconArrowUp/index';
+import { Badge } from '@consta/uikit/Badge/index';
 
 
 interface TNomenclatureTableProps {
@@ -382,7 +383,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'isMessageActive',
                 align: 'center',
                 width: '150px',
-                minWidth: 150,
+                minWidth: 50,
                 render: (_value: boolean, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -415,7 +416,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 key: 'isMessageActive',
                 align: 'center',
                 width: '150px',
-                minWidth: 150,
+                minWidth: 50,
                 render: (_value: boolean, record: TNomenclatureRow) => {
                     return record.spacer ? (
                         <></>
@@ -430,6 +431,36 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                                         deleteNomenclatureData(record.itemId);
                                 }}
                                 />
+                        </div>
+                    );
+                },
+            },
+            {
+                title: (
+                    <TableColumnHeader
+                        header=""
+                        withoutSort
+                    />
+                ),
+                dataIndex: 'isMessageActive',
+                key: 'isMessageActive',
+                align: 'center',
+                width: '150px',
+                minWidth: 50,
+                render: (_value: boolean, record: TNomenclatureRow) => {
+                    return record.spacer ? (
+                        <></>
+                    ) : (
+                        <div>
+                            {!record.weight && (
+                                <Badge 
+                                    label='Не указан вес'
+                                    status='warning'
+                                    size='s'
+                                />
+                            )
+                            }
+                            
                         </div>
                     );
                 },

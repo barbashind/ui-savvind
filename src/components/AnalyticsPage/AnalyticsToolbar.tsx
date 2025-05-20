@@ -8,8 +8,8 @@ import { cnMixSpace } from "@consta/uikit/MixSpace";
 
 
 import { TAnalyticFilter } from "../../types/analytic-types.ts";
-import { getUsers } from "../../services/SettingsService.ts";
-import { TUser } from "../../types/settings-types.ts";
+import { getAccounts, getUsers } from "../../services/SettingsService.ts";
+import { TAccount, TUser } from "../../types/settings-types.ts";
 
 // иконки
 import { IconSearchStroked } from '@consta/icons/IconSearchStroked';
@@ -17,6 +17,7 @@ import { Combobox } from "@consta/uikit/Combobox/index";
 import { DatePicker } from "@consta/uikit/DatePicker/index";
 import { getUserInfo, UserInfo } from "../../services/AuthorizationService.ts";
 import { Checkbox } from "@consta/uikit/Checkbox/index";
+import { Select } from "@consta/uikit/Select/index";
 
 
 
@@ -34,6 +35,7 @@ const [users, setUsers] = useState<(string | undefined)[]>([]);
 const [user, setUser] = useState<UserInfo | undefined>(undefined);
 const [today, setToday] = useState<Date | null>(null);
 const [dayWeekBack, setDayWeekBack] = useState<Date | null>(null);
+const [accounts, setAccounts] = useState<TAccount[]>([]);
         
 useEffect(() => {
         
@@ -44,6 +46,15 @@ useEffect(() => {
         };
         
         void getUserInfoData();
+
+        const getAccountsData = async () => {
+                        await getAccounts((resp) => {
+                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
+                        })
+                }
+                
+        void getAccountsData();
+
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0); 
         setToday(currentDate); 
@@ -151,7 +162,7 @@ useEffect(() => {
                                         value={filterValues.endDate}
                                         onChange={(value) => {
                                                 setFilterValues(prev => (
-                                                        {...prev, endDate: value}
+                                                        {...prev, endDate: new Date(value?.setHours(23, 59, 59, 999) ?? 0)}
                                                 ))
                                         }}
                                         className={cnMixSpace({ mL: 'xs'})}
@@ -181,10 +192,6 @@ useEffect(() => {
                                                         }))  
                                                 }
                                         }}
-                                        onClick={()=> {
-                                                console.log( today);
-                                                console.log( filterValues.startDate);
-                                        }}
                                 />
                                 <Checkbox 
                                         className={cnMixSpace({ mL: 'm'})} 
@@ -211,6 +218,28 @@ useEffect(() => {
                                                 }
                                         }}
                                         
+                                />
+                                <Select
+                                        items={accounts}
+                                        value={accounts?.find(account => filterValues.account === account.name)}
+                                        getItemKey={item   => (item.accountId ?? 0)}
+                                        getItemLabel={item  => (item.name ?? '')}
+                                        onChange={(value) => {
+                                                if (value) {
+                                                        setFilterValues(prev => ({...prev,
+                                                                account: value?.name,
+                                                        })) 
+                                                } else {
+                                                        setFilterValues(prev => ({...prev,
+                                                                account: undefined,
+                                                        }))
+                                                }
+                                        }}
+                                        size="s"
+                                        style={{minWidth: '200px', maxWidth: '200px'}}
+                                        disabled={user?.role !== 'ADM'}
+                                        placeholder="Выберите счет"
+                                        className={cnMixSpace({mL:'l'})}
                                 />
                         </Layout>
                         
