@@ -662,6 +662,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Масса</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость доставки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость страховки</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Цена закупки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Общ.сумма</Text>
                                                 </Layout>
 
@@ -698,7 +699,14 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         />
                                                                         <TextField 
                                                                                 size="s" 
-                                                                                value={(Number(elem?.costPriceAll) - Number(elem?.costDeliver) - Number(elem?.costPrice)).toFixed(2)}
+                                                                                value={(Number(elem?.costPriceAll) - Number(elem?.costDeliver) - Number(elem?.costPrice) * Number(rate)).toFixed(2)}
+                                                                                disabled
+                                                                                className={cnMixSpace({ mL:'s' })}
+                                                                                style={{minWidth: '100px', maxWidth: '100px'}}
+                                                                        />
+                                                                        <TextField 
+                                                                                size="s" 
+                                                                                value={(Number(elem?.costPrice) * Number(rate)).toFixed(2)}
                                                                                 disabled
                                                                                 className={cnMixSpace({ mL:'s' })}
                                                                                 style={{minWidth: '100px', maxWidth: '100px'}}
@@ -801,7 +809,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
                                                                                         costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
-                                                                                        costPriceAll: ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(item.quantFinal) * Number(rate))) / Number(item.quantFinal),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(item.quantFinal) * Number(rate))) / Number(item.quantFinal)),
                                                                                 }
                                                                         ))))
                                                                         
@@ -812,7 +820,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
                                                                                         costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
-                                                                                        costPriceAll: ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(item.quantFinal) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(item.quantFinal),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(item.quantFinal) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(item.quantFinal)),
                                                                                 }
                                                                         ))))
                                                                 }
