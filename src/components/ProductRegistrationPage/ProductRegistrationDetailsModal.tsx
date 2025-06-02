@@ -804,7 +804,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                         onClick={() => {
                                                                 if (!insCost) {
                                                                         const insurCost = Number(itemsBatch.filter(i => !i.serialNumber).reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(deliverIns) * 0.01 * Number(el.quantFinal));}, 0)); // общ. стоимость страховки
-                                                                        const commDel = Number(commonCost) - Number(insurCost) + Number(extraCost); // Общ. стоимость доставки без страховки
+                                                                        const commDel = Number(commonCost) - Number(insurCost) + (Number(extraCost) / (Number(rate))); // Общ. стоимость доставки без страховки
                                                                         const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
@@ -815,7 +815,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         
                                                                 } else {
                                                                         const insurCost = insCost; // общ. стоимость страховки
-                                                                        const commDel = Number(commonCost) - Number(insurCost) + Number(extraCost); // Общ. стоимость доставки без страховки
+                                                                        const commDel = Number(commonCost) - Number(insurCost) + (Number(extraCost) / (Number(rate))); // Общ. стоимость доставки без страховки
                                                                         const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
