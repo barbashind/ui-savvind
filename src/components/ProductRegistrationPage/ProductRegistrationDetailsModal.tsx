@@ -521,6 +521,12 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                                               createdAt: null,
                                                                                                                                               updatedAt: null,
                                                                                                                                             }]));
+                                                                                                                                            setItemsBatch(prev => 
+                                                                                                                                                prev.map(product => (product.itemId === itemBatch.itemId &&  !product.serialNumber && (product.partner === itemBatch.partner)) ? 
+                                                                                                                                                        { ...product, 
+                                                                                                                                                        quantFinal: (product?.quantFinal ?? 0 )+ 1, 
+                                                                                                                                                        } : product
+                                                                                                                                                ));
                                                                                                                                           }
                                                                                                                                         }
                                                                                                                                       }}
@@ -659,7 +665,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                 </Layout>
                                                 <Layout direction="row">
                                                         <Text size="s" style={{minWidth: '200px', maxWidth: '200px'}} >Товар</Text>
-                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Масса</Text>
+                                                        <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })} onClick={()=>{console.log(productList)}}>Масса</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость доставки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость страховки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Цена закупки</Text>
@@ -808,8 +814,8 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
-                                                                                        costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
-                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(item.quantFinal) * Number(rate))) / Number(item.quantFinal)),
+                                                                                        costDeliver: (commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
                                                                                 }
                                                                         ))))
                                                                         
@@ -819,8 +825,8 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         const commWeight = itemsBatch?.filter(element => !element.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.quantFinal) * Number(productList?.find(item => (item.itemId === el.itemId))?.weightProduct));}, 0)
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
-                                                                                        costDeliver: (commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(item.quantFinal),
-                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(item.quantFinal) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(item.quantFinal) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(item.quantFinal)),
+                                                                                        costDeliver: (commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
                                                                                 }
                                                                         ))))
                                                                 }
