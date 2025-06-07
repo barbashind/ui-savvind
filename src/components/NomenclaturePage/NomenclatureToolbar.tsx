@@ -96,9 +96,7 @@ const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchTex
                                                 setUpdateFlag(true);
                                         }}
                                 />
-                                {role !== 'KUR' && (
-                                        <Button size='s' view='secondary' label={'Добавить'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mH: 's'})}/>
-                                )}
+                                <Button size='s' view='secondary' label={'Добавить'} iconLeft={IconAdd} onClick={()=>{setIsEditModalOpen(true)}} className={cnMixSpace({mH: 's'})}/>
                                 {role !== 'KUR' && (
                                         <div style={{ minWidth: 'fit-content' }}>
                                                 <FileField

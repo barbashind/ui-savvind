@@ -54,12 +54,14 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                 productSim: null,
                 remainsSum: null,
                 hasSerialNumber: false,
+                EAN: null,
         }
         const [data, setData] = useState<TNomenclature>(defaultData);
         const [types, setTypes] = useState<IdLabel[]>([]);
         const [type, setType] = useState<IdLabel>();
         const [isLoading, setIsLoading] = useState<boolean>(id ? true : false);
         const [caption, setCaption] = useState<string | undefined>(undefined);
+        const [captionEAN, setCaptionEAN] = useState<string | undefined>(undefined);
         // Инициализация данных
         
         
@@ -111,6 +113,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         isMessageActive: data.isMessageActive,
                         remainsSum: (data.lastCostPrice && data.remainsSum) ? data.lastCostPrice * data.remainsSum : null,
                         hasSerialNumber: data.hasSerialNumber,
+                        EAN: data.EAN,
                                 }).then(() => {  setUpdateFlag(true)
                                 setIsOpen(false);
                                 setData(defaultData);
@@ -118,7 +121,13 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                 setType(undefined);
                         }).catch(
                                 (error) => {
-                                        setCaption(error?.error?.statusText);
+                                        if (error?.error?.advice === 'name') {
+                                                setCaption(error?.error?.statusText);
+                                        }
+                                        if (error?.error?.advice === 'ean') {
+                                                setCaptionEAN(error?.error?.statusText);
+                                        }
+
                                 }
                         )
                 }
@@ -146,6 +155,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                         isMessageActive: data.isMessageActive,
                         remainsSum: (data.lastCostPrice && data.remainsSum) ? data.lastCostPrice * data.remainsSum : null,
                         hasSerialNumber: data.hasSerialNumber,
+                        EAN: data.EAN,
                 }).then(
                        () => { 
                                 setUpdateFlag(true);
@@ -289,6 +299,35 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 />        
                                         </Layout>
                                 </Layout>
+                                <Layout direction="column" flex={0.845} className={cnMixSpace({mT:'m'})}>
+                                                <Text size="s" >EAN/UPC:</Text>
+                                                <TextField
+                                                        size="s" 
+                                                        value={data.EAN}
+                                                        type="number"
+                                                        incrementButtons={false}
+                                                        placeholder="Введите EAN/UPC"
+                                                        onChange={(value) => {
+                                                                if (value) {
+                                                                        setData(prev => ({
+                                                                                ...prev,
+                                                                                EAN:  value,
+                                                                        }));
+                                                                } else {
+                                                                        setData(prev => ({
+                                                                                ...prev,
+                                                                                EAN:  undefined,
+                                                                        }));
+                                                                }
+                                                                
+                                                        }}
+                                                        className={cnMixSpace({ mT:'2xs' })}
+                                                        caption={captionEAN}
+                                                        status={captionEAN ? 'alert' : undefined}
+                                                        onFocus={()=>{setCaptionEAN(undefined)}}
+                                                        disabled={!!data.itemId}
+                                                />     
+                                        </Layout>
                                 <Layout direction="row" className={cnMixSpace({ mT:'m' })}>
                                         <Layout direction="column" flex={0.845}>
                                                 <Text size="s" >Тип товара:</Text>

@@ -24,6 +24,7 @@ export interface TNomenclature {
     remainsSum: number | null;
     hasSerialNumber: boolean;
     lastCostPriceAll?: number | null;
+    EAN?: string | null;
 }
 
 export type TNomenclatureRow = TNomenclature & {
