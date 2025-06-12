@@ -26,6 +26,7 @@ import { getAccounts, getUsers } from "../../services/SettingsService";
 import { Select } from "@consta/uikit/Select";
 import { Tooltip } from "../global/Tooltip";
 import { Direction, Position } from "@consta/uikit/Popover";
+import { SnackBar } from '@consta/uikit/SnackBar';
 
 import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
@@ -485,6 +486,33 @@ const updateCheckData = async (checkId : number | undefined, isEnding : boolean 
         
 }
 
+const updateCheckExtraData = async (checkId : number | undefined) => {
+        try {
+                await updateCheck(checkId, {
+                        customer: data.customer ?? '-',
+                        summ: data.summ,
+                        isBooking: data.isBooking,
+                        isUnpaid: data.isUnpaid,
+                        createdAt: data.createdAt,
+                        updatedAt: data.updatedAt,
+                        isCancelled: data.isCancelled,
+                        partners: data.partners,
+                        isEnding: data.isEnding,
+                        seller: data.seller,
+                        courier: data.courier,
+                        account: data.account,
+        }).then(() => {
+                setUpdateFlag(true)
+                setTextInfo('Данные успешно обновлены')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        })} catch (error : any) {
+                        console.error('Ошибка при создании партий или элементов:', error);
+                        setCaptionList(error?.response?.errors)
+                        setIsLoading(false);
+        }
+        
+}
+
                 
 const ruToEnMap: Record<string, string> = {
         а: 'F', б: ',', в: 'D', г: 'U', д: 'L', е: 'T', ё: '`', ж: ';', з: 'P',
@@ -542,6 +570,8 @@ const formatDate = (date: Date): string => {
         const formattedDate = new Intl.DateTimeFormat('en-CA', options).format(date);
         return formattedDate;
     };
+
+const [textInfo, setTextInfo] = useState<string | null>(null);
 
         return (
                 <Modal
@@ -924,11 +954,23 @@ const formatDate = (date: Date): string => {
                                                                 className={cnMixSpace({mR:'m'})}
                                                         />       
                                         </Layout>
+                                {textInfo && (
+                                                <Layout direction="row" style={{justifyContent: 'right', alignItems: 'end'}}>
+                                                        <SnackBar
+                                                                items={ [{key: 1, message: textInfo, status: 'success', progressMode: "line"}] }
+                                                                getItemAutoClose={() => (3)}
+                                                                onItemAutoClose={()=> {setTextInfo(null)}}
+                                                                getItemShowProgress = {(item) => item.progressMode === "line" ? item.progressMode : 'timer'}
+                                                                onItemClose={() => {setTextInfo(null)}}
+                                                                style={{position:'absolute'}}
+                                                        />
+                                                </Layout>
+                                )}
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })} onClick={() => {console.log(sales)}}>Общая сумма:</Text> 
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{(sales?.length > 0 ? sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0).toString() : 0) + ' руб'}</Text>  
-                                        </Layout>
+                                        </Layout>                                
                                         <Layout direction="row" style={{justifyContent: 'right'}}>
                                                 <Button 
                                                         label={'Закрыть'}
@@ -1080,6 +1122,22 @@ const formatDate = (date: Date): string => {
                                                                         if (checkId) {
                                                                                 deleteCheckData(checkId, salesDef)
                                                                                 closeWindow();
+                                                                        } 
+                                                                }}
+                                                        />
+                                                )}
+
+                                                {checkId && 
+                                                 (role ==='ADM' || (role === 'SLR' && formatDate(new Date()) === data.createdAt?.toString()))
+                                                  && (
+                                                        <Button 
+                                                                label={'Скорректировать доп.данные'}
+                                                                view="primary"
+                                                                size="s"
+                                                                className={cnMixSpace({ mL:'m' })}
+                                                                onClick={()=>{
+                                                                        if (checkId) {
+                                                                                updateCheckExtraData(checkId);
                                                                         } 
                                                                 }}
                                                         />

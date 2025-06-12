@@ -343,6 +343,36 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
             {
                 title: (
                     <TableColumnHeader
+                        header=""
+                        withoutSort
+                    />
+                ),
+                dataIndex: 'isMessageActive',
+                key: 'isMessageActive',
+                align: 'center',
+                width: '150px',
+                minWidth: 50,
+                render: (_value: boolean, record: TNomenclatureRow) => {
+                    return record.spacer ? (
+                        <></>
+                    ) : (
+                        <div>
+                            {(record?.booked && record?.booked > 0) ? (
+                                <Badge 
+                                    label={`Бронь: ${record.booked}`}
+                                    status='success'
+                                    size='s'
+                                />
+                            ) : <></>
+                            }
+                            
+                        </div>
+                    );
+                },
+            },
+            {
+                title: (
+                    <TableColumnHeader
                         header="Активировать бота"
                         withoutSort
                     />
@@ -392,7 +422,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                             <Button 
                                 size="s" 
                                 iconLeft={IconLineAndBarChart} 
-                                view="clear" 
+                                view="secondary" 
                                 onClick={(e) => {
                                         e.stopPropagation();
                                         setIsStatModalOpen(true);

@@ -79,8 +79,19 @@ useEffect(() => {
                                                 item.username))
                                 }))
                         }
-                        if (user?.role === 'SLR') {
+                        if (user?.role === 'SLR' && user?.username !== 'Matvei') {
                                 setUsers(resp?.filter(elem => (elem.role === 'SLR' && (elem.username === user.username)))?.map((item : TUser) => (
+                                        item.username)))
+                                setFilterValues(prev => ({
+                                        ...prev,
+                                        startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 25),
+                                        endDate: new Date(),
+                                        users: resp?.filter(elem => (elem.role === 'SLR' && (elem.username === user.username)))?.map((item : TUser) => (
+                                                item.username))
+                                }))
+                        }
+                        if (user?.role === 'SLR' && user?.username === 'Matvei') {
+                                setUsers(resp?.filter(elem => (elem.role === 'SLR' && ((elem.username === user.username) || (elem.username === 'djiSeller'))))?.map((item : TUser) => (
                                         item.username)))
                                 setFilterValues(prev => ({
                                         ...prev,

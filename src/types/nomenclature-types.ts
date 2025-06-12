@@ -25,6 +25,7 @@ export interface TNomenclature {
     hasSerialNumber: boolean;
     lastCostPriceAll?: number | null;
     EAN?: string | null;
+    booked?: number | null;
 }
 
 export type TNomenclatureRow = TNomenclature & {
