@@ -267,7 +267,7 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
             ) : (
                 <div>
                     <Text size="s" weight="medium" style={{minWidth: '250px'}}>
-                        {Number( Number(record.salePrice) - Number(record.costPrice)).toString() + ' руб' || '-'}
+                        {Number( Number(record.salePrice) - Number(record.costPrice)).toFixed(2) + ' руб' || '-'}
                     </Text>
                 </div>
             );

@@ -31,6 +31,7 @@ import errorAudio from '../../assets/Audio/errorSignal.mp3';
 import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
 import { getUserInfo } from "../../services/AuthorizationService.ts";
 import { formatNumber } from "../../utils/formatNumber.ts";
+import { updateNomenclature } from "../../services/NomenclatureService.ts";
 
 
 
@@ -666,6 +667,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                 <Layout direction="row">
                                                         <Text size="s" style={{minWidth: '200px', maxWidth: '200px'}} >Товар</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })} onClick={()=>{console.log(productList)}}>Масса</Text>
+                                                        <div style={{minWidth: '110px', maxWidth: '110px'}} className={cnMixSpace({ mL:'2xs' })}/>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость доставки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Стоимость страховки</Text>
                                                         <Text size="s" style={{minWidth: '100px', maxWidth: '100px'}} className={cnMixSpace({ mL:'s' })}>Цена закупки</Text>
@@ -695,6 +697,18 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                 className={cnMixSpace({ mL:'s' })}
                                                                                 status={!productList?.find(item => (item.itemId === elem.itemId))?.weightProduct ? 'alert' : undefined}
                                                                                 style={{minWidth: '100px', maxWidth: '100px'}}
+                                                                        />
+                                                                        <Button
+                                                                                label={'Сохр.массу'}
+                                                                                view="clear"
+                                                                                onClick={async () => {
+                                                                                        await updateNomenclature( elem.itemId, {
+                                                                                                                weight: Number(productList?.find(item => (item.itemId === elem.itemId))?.weightProduct),
+                                                                                                        })
+                                                                                }}
+                                                                                size='s'
+                                                                                style={{minWidth: '110px', maxWidth: '110px'}}
+                                                                                className={cnMixSpace({ mL:'2xs' })}
                                                                         />
                                                                         <TextField 
                                                                                 size="s"

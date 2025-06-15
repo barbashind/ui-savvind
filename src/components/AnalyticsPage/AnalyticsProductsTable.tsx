@@ -189,7 +189,7 @@ const columns: ColumnType<TProdDataRow>[] = [
                 <Layout direction="column" style={{ minWidth: '300px', maxWidth: '300px'  }}>
                     {!isWithPartner &&
                                 <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                        {formatNumber(value?.toFixed(2)) + ' ₽'}
+                                        {formatNumber(value?.toFixed(0))}
                                 </Text>
                 }
                     {isWithPartner &&
@@ -201,7 +201,7 @@ const columns: ColumnType<TProdDataRow>[] = [
                                         {'Партнеров: ' + record.quantPartner}
                                 </Text>
                                 <Text style={{border: '1px solid var(--color-typo-secondary)', borderRadius:'4px', padding: '4px'}} size="xs" weight="medium" className={cnMixSpace({mL:'2xs', mT: '3xs'})}>
-                                        {'Суммарно: ' + formatNumber(value?.toFixed(2))}
+                                        {'Суммарно: ' + formatNumber(value?.toFixed(0))}
                                 </Text>
                         </Layout>
                         }
