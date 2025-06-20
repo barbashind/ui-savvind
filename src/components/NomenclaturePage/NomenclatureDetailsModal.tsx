@@ -533,7 +533,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 <Text size="s">Плотность:</Text>
                                                 <TextField 
                                                         size="s" 
-                                                        value={data?.weight && data?.productLength &&  data?.productHeight && data?.productWidth ? ((Number(data?.weight))/((Number(data?.productLength) * Number(data?.productHeight) * Number(data?.productWidth)))).toString() : '0'}
+                                                        value={data?.weight && data?.productLength &&  data?.productHeight && data?.productWidth ? ((Number(data?.weight))/((Number(data?.productLength) * Number(data?.productHeight) * Number(data?.productWidth)))).toFixed(2) : '0'}
                                                         className={cnMixSpace({ mT:'2xs' })}
                                                         disabled
                                                 />        
@@ -542,7 +542,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 <Text size="s">Цена за 1кг:</Text>
                                                 <TextField 
                                                         size="s" 
-                                                        value={data?.weight && data?.productLength &&  data?.productHeight && data?.productWidth ? ((Number(data?.weight))/((Number(data?.productLength) * Number(data?.productHeight) * Number(data?.productWidth)))).toString() : '0'}
+                                                        value={data?.weight && data?.productLength &&  data?.productHeight && data?.productWidth &&  data?.productPrice ? ((Number(data?.weight))/(Number(data?.productPrice ))).toString() : '0'}
                                                         className={cnMixSpace({ mT:'2xs' })}
                                                         disabled
                                                 />        
