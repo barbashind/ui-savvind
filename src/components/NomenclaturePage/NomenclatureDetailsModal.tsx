@@ -542,7 +542,7 @@ const NomenclatureDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag}
                                                 <Text size="s">Цена за 1кг:</Text>
                                                 <TextField 
                                                         size="s" 
-                                                        value={data?.weight && data?.productLength &&  data?.productHeight && data?.productWidth &&  data?.productPrice ? ((Number(data?.weight))/(Number(data?.productPrice ))).toString() : '0'}
+                                                        value={data?.weight && data?.productPrice ? ((Number(data?.productPrice))/(Number(data?.weight ))).toFixed(2) : '0'}
                                                         className={cnMixSpace({ mT:'2xs' })}
                                                         disabled
                                                 />        
