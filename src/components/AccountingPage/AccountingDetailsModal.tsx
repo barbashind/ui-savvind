@@ -66,7 +66,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                         await getUserInfo().then((resp) => {
                                 setRole(resp.role);
                                 setUser(resp.username);
-                                if (resp.role === 'KUR') {
+                                if (resp.role === 'KUR' || resp.username === 'Matvei') {
                                         const utcDate = (new Date());
                                         utcDate.setUTCHours(0, 0, 0, 0); 
                                         setData(prev => ({ ...prev, createdAt: utcDate }));
