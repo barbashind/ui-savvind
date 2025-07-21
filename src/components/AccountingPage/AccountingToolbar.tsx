@@ -21,9 +21,10 @@ export interface TAccountingToolbarProps {
         setUpdateFlag: React.Dispatch<React.SetStateAction<boolean>>;
         setIsAccModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
         role: string;
+        isMatvei: boolean;
 }
 
-const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues, searchText, setUpdateFlag, setIsAccModalOpen, role} : TAccountingToolbarProps) => {
+const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues, searchText, setUpdateFlag, setIsAccModalOpen, role, isMatvei} : TAccountingToolbarProps) => {
 
 
         return (
@@ -73,7 +74,7 @@ const AccountingToolbar = ({setIsEditModalOpen, setSearchText,  setFilterValues,
                                         iconLeft={IconAdd} 
                                         onClick={()=>{setIsEditModalOpen(true)}} 
                                         className={cnMixSpace({mL: 's'})}
-                                        disabled={role === 'SLR'}
+                                        disabled={role === 'SLR' && !isMatvei}
                                 />
                                 <Button size='s' view='secondary' label={'Проверить счета'} iconLeft={IconBook} onClick={()=>{setIsAccModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
 

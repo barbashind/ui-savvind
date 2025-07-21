@@ -46,12 +46,16 @@ const Accounting = ( ) => {
         const [searchText, setSearchText] = useState<string | null> (null);
         
         const [role, setRole] = useState<string | undefined>(undefined);
+        const [isMatvei, setIsMatvei] = useState<boolean>(false);
         
                      useEffect(() => {
                                 
                                 const getUserInfoData = async () => {
                                         await getUserInfo().then((resp) => {
                                                 setRole(resp.role);
+                                                if (resp.username === 'Matvei') {
+                                                       setIsMatvei(true); 
+                                                }
                                         })
                                 };
                                 
@@ -69,6 +73,7 @@ const Accounting = ( ) => {
                                          setUpdateFlag={setUpdateFlag}
                                          setIsAccModalOpen={setIsAccModalOpen}
                                          role={role ?? ''}
+                                         isMatvei={isMatvei}
                                 />
                                 {(role === 'ADM' || role === 'SLR' || role === 'KUR' ) && (
                                         <AccountingTable 

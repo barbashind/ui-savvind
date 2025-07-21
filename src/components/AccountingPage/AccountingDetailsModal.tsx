@@ -289,7 +289,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size={'s'}
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента' || (role === 'KUR')}
+                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента' || (role === 'KUR') || (role === 'SLR')}
                                                 />
                                           {/* <Select
                                                 items={[{id: 'replenishment', label: 'Пополнение'}, {id: 'deduction', label: 'Расходы'}]}
