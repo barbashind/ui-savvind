@@ -162,7 +162,6 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                 setIsLoading(false);
                                                 await getDelivers((res) => {
                                                         setDeliverIns(res?.find(el => (el.deliverId === resp.deliver))?.insurance ?? 0);
-                                                        console.log(res?.find(el => (el.deliverId === resp.deliver))?.insurance)
                                                 })
                                             });
                                 }
@@ -719,14 +718,14 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         />
                                                                         <TextField 
                                                                                 size="s" 
-                                                                                value={(Number(elem?.costPriceAll) - Number(elem?.costDeliver) - Number(elem?.costPrice) * Number(rate)).toFixed(2)}
+                                                                                value={(Number(elem?.costPriceAll) - Number(elem?.costDeliver) - Number(elem?.costPrice) * Number(data.rate)).toFixed(2)}
                                                                                 disabled
                                                                                 className={cnMixSpace({ mL:'s' })}
                                                                                 style={{minWidth: '100px', maxWidth: '100px'}}
                                                                         />
                                                                         <TextField 
                                                                                 size="s" 
-                                                                                value={(Number(elem?.costPrice) * Number(rate)).toFixed(2)}
+                                                                                value={(Number(elem?.costPrice) * Number(data.rate)).toFixed(2)}
                                                                                 disabled
                                                                                 className={cnMixSpace({ mL:'s' })}
                                                                                 style={{minWidth: '100px', maxWidth: '100px'}}
@@ -829,7 +828,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
                                                                                         costDeliver: (commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0),
-                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(data.rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + (Number(item.costPrice) * Number(deliverIns) * 0.01 * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
                                                                                 }
                                                                         ))))
                                                                         
@@ -840,7 +839,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                         setItemsBatch(prev => (prev.map((item) => (
                                                                                 {...item,
                                                                                         costDeliver: (commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0),
-                                                                                        costPriceAll: ((Number(item.costPrice) * Number(rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
+                                                                                        costPriceAll: ((Number(item.costPrice) * Number(data.rate)) + ((commDel * (Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(productList?.find(el => (item.itemId === el.itemId))?.weightProduct)) * Number(rate) /  commWeight) + ((Number(insurCost) * Number(item.costPrice) * Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0) * Number(rate) ) / Number(itemsBatch?.filter(el => !el.serialNumber)?.reduce((sum, el) => {return sum + (Number(el.costPrice) * Number(el.quantFinal));}, 0)))) / Number(itemsBatch.find(el=> (el.itemId === item.itemId && !el.serialNumber))?.quantFinal ?? 0)),
                                                                                 }
                                                                         ))))
                                                                 }
