@@ -22,6 +22,12 @@ export type TAccountingRow = TAccounting & {
 
 export interface TAccountingFilter {
         searchText: string | null;
+        accountFrom: string | null;
+        accountTo: string | null;
+        valueFrom: number | null;
+        valueTo: number | null;
+        dateFrom: Date | null;
+        dateTo: Date | null;
 }
 
 export interface TAccountingSortFields {

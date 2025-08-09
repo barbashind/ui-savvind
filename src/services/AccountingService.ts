@@ -71,6 +71,38 @@ export const updateAccounting = async (id : number | undefined, data: object): P
         return resp;
     };
 
+export const findAccounting = async (
+        data: object,
+        getCallback: (arg0: TAccounting) => void
+    ) => {
+        await HttpService.post<TAccounting>('/api/accounting/find-by-batch', {
+            ...data,
+        }
+        )
+            .then((response) => {
+                getCallback(response);
+            })
+            .catch(() => {
+                console.log('failed');
+            });
+    };
+
+    export const findAccountingNewBatch = async (
+        data: object,
+        getCallback: (arg0: TAccounting) => void
+    ) => {
+        await HttpService.post<TAccounting>('/api/accounting/find-by-new-batch', {
+            ...data,
+        }
+        )
+            .then((response) => {
+                getCallback(response);
+            })
+            .catch(() => {
+                console.log('failed');
+            });
+    };
+
 export const deleteAccounting = async (id : number | undefined): Promise<object> => {
     const token = localStorage.getItem('token');
         const response = await fetch(`/api/delete-accounting/${id}`, {

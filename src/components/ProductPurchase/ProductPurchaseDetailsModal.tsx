@@ -28,6 +28,8 @@ import NumberMaskTextField from "../../utils/NumberMaskTextField";
 import { Tooltip } from "../global/Tooltip";
 import { Direction, Position } from "@consta/uikit/__internal__/src/components/Popover/Popover";
 import { formatNumber } from "../../utils/formatNumber";
+import { addAccounting, deleteAccounting, findAccountingNewBatch } from "../../services/AccountingService";
+import { TAccounting } from "../../types/accounting-types";
 
 
 
@@ -170,6 +172,42 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                 
             }, [batchId, setData, isOpen]);
 
+        interface AggregatedData {
+                        partner: string;
+                        costPrice: number;
+                }
+        
+        const aggregateData = (records: TPurchaseItem[]) => {
+                return records.reduce<AggregatedData[]>((acc, record) => {
+                const partner = record.partner;
+
+                // Пропускаем записи с пустым полем partner или значением "Деньги в офисе"
+                if (!partner || partner === "Деньги в офисе") {
+                        return acc;
+                }
+
+                // Ищем существующий объект для данного партнера
+                const existingPartner = acc.find(item => item.partner === partner);
+
+                if (existingPartner) {
+                        // Если объект уже существует, суммируем значения
+                        existingPartner.costPrice = (Number(existingPartner.costPrice) + (Number(record.costPrice) * Number(rate) * Number(record.quant)));
+                } else {
+                        // Если объекта нет, создаем новый
+                        acc.push({
+                        partner: partner,
+                        costPrice: (Number(record.costPrice) * Number(rate) * Number(record.quant)),
+                        });
+                }
+
+                return acc;
+                }, []);
+        };
+
+        const createAccounting = async (tranzData : TAccounting) => {
+                await addAccounting(tranzData);
+        }
+
         const createBatch  = async (e: any) => {
                 setIsLoading(true);
                 e.preventDefault();
@@ -189,8 +227,43 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                         rate: rate,
                         body: body,
                         }).then(async(resp) => {
-
+                                const aggregatedDeletedData = aggregateData(itemsBatch);
                                 
+                                // Создаем массив промисов для удаления
+                                const deletePromises = aggregatedDeletedData.map(async (el) => {
+                                        const searchData = {
+                                        accountTo: el.partner,
+                                        batchId: data.batchId?.toString(),
+                                        };
+                                        return findAccountingNewBatch(searchData, async (resp) => {
+                                        await deleteAccounting(resp.id);
+                                        });
+                                });
+        
+                                // Ждем завершения всех операций удаления
+                                await Promise.all(deletePromises);
+        
+                                const aggregatedData = aggregateData(itemsBatch);
+                                
+                                // Проходим по каждому элементу aggregatedData и создаем tranzData
+                                for (const item of aggregatedData) {
+                                        const tranzData: TAccounting = {
+                                        id: undefined,
+                                        accountFrom: undefined,
+                                        accountTo: item.partner,
+                                        justification: data.batchId?.toString(),
+                                        form: undefined,
+                                        isDraft: undefined,
+                                        value: Number((item.costPrice).toFixed(2)),
+                                        category: 'Начисление по закупке товара',
+                                        createdAt: new Date(),
+                                        updatedAt: new Date(),
+                                        };
+        
+                                        // Запускаем запрос createAccounting для каждого tranzData
+                                        await createAccounting(tranzData);
+                                }
+
                                 // Создаем новый массив с обновленным batchId
                                 const updatedItemsBatch = itemsBatch?.map(product => ({
                                 ...product,
@@ -238,6 +311,43 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                 body: body,
 
                         }).then(async(resp) => {
+                                const aggregatedDeletedData = aggregateData(itemsBatch);
+                                
+                                // Создаем массив промисов для удаления
+                                const deletePromises = aggregatedDeletedData.map(async (el) => {
+                                        const searchData = {
+                                        accountTo: el.partner,
+                                        batchId: data.batchId?.toString(),
+                                        };
+                                        return findAccountingNewBatch(searchData, async (resp) => {
+                                        await deleteAccounting(resp.id);
+                                        });
+                                });
+        
+                                // Ждем завершения всех операций удаления
+                                await Promise.all(deletePromises);
+        
+                                const aggregatedData = aggregateData(itemsBatch);
+                                
+                                // Проходим по каждому элементу aggregatedData и создаем tranzData
+                                for (const item of aggregatedData) {
+                                        const tranzData: TAccounting = {
+                                        id: undefined,
+                                        accountFrom: undefined,
+                                        accountTo: item.partner,
+                                        justification: data.batchId?.toString(),
+                                        form: undefined,
+                                        isDraft: undefined,
+                                        value: Number((item.costPrice).toFixed(2)),
+                                        category: 'Начисление по закупке товара',
+                                        createdAt: new Date(),
+                                        updatedAt: new Date(),
+                                        };
+        
+                                        // Запускаем запрос createAccounting для каждого tranzData
+                                        await createAccounting(tranzData);
+                                }
+
                                 const body = itemsBatch?.map(product => ({
                                         ...product,
                                         batchNumber: data.batchNumber,
@@ -411,7 +521,7 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })}>Итог. цена</Text>
                                         <Text size="s" style={{minWidth:'130px', maxWidth:'130px'}} className={cnMixSpace({ mL:'m' })}>Общая стоимость</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Сер. номер</Text>
-                                        <Text size="s" style={{minWidth:'170px', maxWidth:'170px'}} className={cnMixSpace({ mL:'m' })} align="center">Контрагент</Text>
+                                        <Text size="s" style={{minWidth:'170px', maxWidth:'170px'}} className={cnMixSpace({ mL:'m' })} align="center" onClick={()=> console.log(itemsBatch)}>Контрагент</Text>
                                         <div style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })}/>
                                 </Layout>
                                 <Layout direction="column">

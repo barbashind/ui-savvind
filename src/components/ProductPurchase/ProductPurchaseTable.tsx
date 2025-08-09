@@ -339,6 +339,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                                         <Layout direction="column" className={cnMixSpace({p:'xl'})}>
                                             <Text size="m" >{`Партия № ${record.batchNumber}`}</Text>
                                             <Text size="s" view="secondary" className={cnMixSpace({mT:'2xl'})}>Вы уверены, что хотите удалить закупку?</Text>
+                                            <Text size="s" view="secondary" className={cnMixSpace({mT:'2xl'})}>Не забудьте удалить транзакции с начислением по доставке и закупке при необходимости</Text>
                                             <Layout direction="row" style={{justifyContent: 'right'}} className={cnMixSpace({mT:'2xl'})}>
                                                 <Button
                                                     view="primary"

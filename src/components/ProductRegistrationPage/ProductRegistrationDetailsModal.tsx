@@ -32,6 +32,8 @@ import checkProductAudio from '../../assets/Audio/checkProduct.mp3';
 import { getUserInfo } from "../../services/AuthorizationService.ts";
 import { formatNumber } from "../../utils/formatNumber.ts";
 import { updateNomenclature } from "../../services/NomenclatureService.ts";
+import { addAccounting, deleteAccounting, findAccounting } from "../../services/AccountingService.ts";
+import { TAccounting } from "../../types/accounting-types.ts";
 
 
 
@@ -196,12 +198,112 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 
             }, [batchId, setData, isOpen]);
                        
+        interface AggregatedData {
+                partner: string;
+                costPriceAll: number;
+                costPrice: number;
+        }
 
-        
+        const aggregateData = (records: TPurchaseItem[]) => {
+                return records.reduce<AggregatedData[]>((acc, record) => {
+                const partner = record.partner;
+
+                // Пропускаем записи с пустым полем partner или значением "Деньги в офисе"
+                if (!partner || partner === "Деньги в офисе") {
+                        return acc;
+                }
+
+                // Ищем существующий объект для данного партнера
+                const existingPartner = acc.find(item => item.partner === partner);
+
+                if (existingPartner) {
+                        // Если объект уже существует, суммируем значения
+                        existingPartner.costPriceAll = (Number(existingPartner.costPriceAll) + (Number(record.costPriceAll)));
+                        existingPartner.costPrice = (Number(existingPartner.costPrice) + (Number(record.costPrice) * Number(data.rate)));
+                } else {
+                        // Если объекта нет, создаем новый
+                        acc.push({
+                        partner: partner,
+                        costPriceAll: Number(record.costPriceAll),
+                        costPrice: (Number(record.costPrice) * Number(data.rate)),
+                        });
+                }
+
+                return acc;
+                }, []);
+        };
+
+        const createAccounting = async (tranzData : TAccounting) => {
+                await addAccounting(tranzData);
+        }
 
         const acceptBatch = async (e: React.MouseEvent<Element, MouseEvent>, id : number) => {
                 setIsLoading(true);
                 e.preventDefault();
+                if (!data.isCalculated) {
+                        const aggregatedData = aggregateData(itemsBatch.filter(item => (!!item.serialNumber)))
+
+                        aggregatedData.forEach(item => {
+                                const tranzData: TAccounting = {
+                                id: undefined,
+                                accountFrom: undefined,
+                                accountTo: item.partner,
+                                justification: data.batchId?.toString(),
+                                form: undefined,
+                                isDraft: undefined,
+                                value: Number((Number(item.costPriceAll) - Number(item.costPrice)).toFixed(2)),
+                                category: 'Начисление по доставке',
+                                createdAt: new Date(), 
+                                updatedAt: new Date(),
+                                };
+
+                                // Запускаем запрос createAccounting для каждого tranzData
+                                void createAccounting(tranzData);
+                        });
+                        setData((prev) => ({...prev, isCalculated: true}))
+                }
+                
+                if (data.isCalculated) {
+                        const aggregatedDeletedData = aggregateData(itemsBatch.filter(item => (!item.serialNumber)));
+
+                        // Создаем массив промисов для удаления
+                        const deletePromises = aggregatedDeletedData.map(async (el) => {
+                                const searchData = {
+                                accountTo: el.partner,
+                                batchId: data.batchId?.toString(),
+                                };
+                                return findAccounting(searchData, async (resp) => {
+                                await deleteAccounting(resp.id);
+                                });
+                        });
+
+                        // Ждем завершения всех операций удаления
+                        await Promise.all(deletePromises);
+
+                        const aggregatedData = aggregateData(itemsBatch.filter(item => (!!item.serialNumber)));
+                        
+                        // Проходим по каждому элементу aggregatedData и создаем tranzData
+                        for (const item of aggregatedData) {
+                                const tranzData: TAccounting = {
+                                id: undefined,
+                                accountFrom: undefined,
+                                accountTo: item.partner,
+                                justification: data.batchId?.toString(),
+                                form: undefined,
+                                isDraft: undefined,
+                                value: Number((Number(item.costPriceAll) - Number(item.costPrice)).toFixed(2)),
+                                category: 'Начисление по доставке',
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                                };
+
+                                // Запускаем запрос createAccounting для каждого tranzData
+                                await createAccounting(tranzData);
+                        }
+
+                        // Обновляем состояние после обработки всех транзакций
+                        setData((prev) => ({ ...prev, isCalculated: true }));
+                        }
                 const totalSum = itemsBatch?.reduce((acc, item) => acc + (item.quant ?? 0) * (item.costPrice ?? 0), 0) ?? 0;
                 const chunkArray = (array : TPurchaseItem[]) => {
                         const result = [];
@@ -222,6 +324,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                 createdAt: data.createdAt,
                                 updatedAt: data.updatedAt,
                                 body: chunk,
+                                isCalculated: true,
 
                         }).then(async(resp) => {
                                 const body = chunk.map(product => ({
@@ -395,8 +498,8 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Количество</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mL:'m' })} align="center">Сер. номер</Text>
                                         <div style={{minWidth:'135px', maxWidth:'135px'}} className={cnMixSpace({ mR:'m' })}/>
-                                        <Text size="s" style={{minWidth:'235px', maxWidth:'235px'}} className={cnMixSpace({ mR:'m' })} align="center">Склад</Text>
-                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} align="center" onClick={()=> console.log(itemsBatch)}>Себестоимость</Text>
+                                        <Text size="s" style={{minWidth:'235px', maxWidth:'235px'}} className={cnMixSpace({ mR:'m' })} align="center" >Склад</Text>
+                                        <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} align="center" >Себестоимость</Text>
 
                                 </Layout>
                                 <Layout direction="column">

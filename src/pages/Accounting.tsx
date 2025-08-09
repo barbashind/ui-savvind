@@ -18,6 +18,12 @@ const Accounting = ( ) => {
 
         const defaultFilter : TAccountingFilter = {
                 searchText: null,
+                accountFrom: null,
+                accountTo: null,
+                valueFrom: null,
+                valueTo: null,
+                dateFrom: null,
+                dateTo: null
         }
 
         const PageSettings: {
@@ -43,7 +49,6 @@ const Accounting = ( ) => {
 
         const [id, setId] = useState<number | undefined>(undefined)
         const [updateFlag, setUpdateFlag] = useState<boolean>(true);
-        const [searchText, setSearchText] = useState<string | null> (null);
         
         const [role, setRole] = useState<string | undefined>(undefined);
         const [isMatvei, setIsMatvei] = useState<boolean>(false);
@@ -67,13 +72,12 @@ const Accounting = ( ) => {
                               <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({mL: 'm', p: 's'})}>
                                 <AccountingToolbar
                                          setIsEditModalOpen={setIsEditModalOpen} 
-                                         setSearchText={setSearchText}
                                          setFilterValues={setFilterValues}
-                                         searchText={searchText}
                                          setUpdateFlag={setUpdateFlag}
                                          setIsAccModalOpen={setIsAccModalOpen}
                                          role={role ?? ''}
                                          isMatvei={isMatvei}
+                                         filterValues={filterValues}
                                 />
                                 {(role === 'ADM' || role === 'SLR' || role === 'KUR' ) && (
                                         <AccountingTable 

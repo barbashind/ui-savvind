@@ -86,9 +86,14 @@ useEffect(() => {
             fieldname: value.column,
             isAsc: value.sortOrder === 'asc',
         }));
-    const searchText = filterValues.searchText ?? null;
     const filterParam : TAccountingFilter = {
-            searchText 
+        searchText: filterValues.searchText,
+        accountFrom: filterValues.accountFrom,
+        accountTo: filterValues.accountTo,
+        valueFrom: filterValues.valueFrom,
+        valueTo: filterValues.valueTo,
+        dateFrom: filterValues.dateFrom,
+        dateTo: filterValues.dateTo,
     }
 
     const getData = async () => {

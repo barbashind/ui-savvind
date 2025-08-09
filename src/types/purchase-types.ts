@@ -16,6 +16,7 @@ export interface TPurchase {
     totalQuantFinal?: number | null;
     rate?: number | null;
     author?: string;
+    isCalculated?: boolean;
 }
 
 export type TPurchaseData = TPurchase & {

@@ -134,6 +134,7 @@ const convertRuToEn = (value : string) => {
         const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
         const [serialNumber, setSerialNumber] = useState<string | null>(null);
         const [serialCaption, setSerialCaption] = useState<string | null>(null);
+        const [seller, setSeller] = useState<string | null>(null);
 
 const checkSerialNumberExists = async (serialNumber: string | null) => {
         if (!serialNumber) {
@@ -185,7 +186,7 @@ const createBatch  = async (e: any) => {
                         updatedAt: data.updatedAt,
                         rate: 0,
                         body: body,
-                        author: user?.username
+                        author: user?.username,
                         }).then(async(resp) => {
                                 // Создаем новый массив с обновленным batchId
                                 const updatedItemsBatch = purchases?.map(product => ({
@@ -648,6 +649,24 @@ const createBatch  = async (e: any) => {
                                                                 }}
                                                                 className={cnMixSpace({ mL:'2xs' })}
                                                                 disabled={!!data.batchId}
+                                                        />        
+                                        </Layout>
+                                        <Layout direction="row" className={cnMixSpace({ mT:'xl' })} style={{alignItems: 'end'}}>
+                                                        <Text size="s" className={cnMixSpace({ mB:'xs' })} style={{ minWidth: '130px', maxWidth: '130px'}}>Продавец:</Text>
+                                                        <TextField 
+                                                                size="s"
+                                                                type="textarea"
+                                                                rows={1}
+                                                                value={seller}
+                                                                onChange={(value) => {
+                                                                        if (value) {
+                                                                                setSeller(value)  
+                                                                        } else {
+                                                                                setSeller(null)      
+                                                                        }
+                                                                }}
+                                                                disabled={!!data.batchId}
+                                                                className={cnMixSpace({ mL:'2xs' })}
                                                         />        
                                         </Layout>
                                         
