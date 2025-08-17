@@ -227,41 +227,43 @@ const ProductPurchaseDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId,  s
                         rate: rate,
                         body: body,
                         }).then(async(resp) => {
-                                const aggregatedDeletedData = aggregateData(itemsBatch);
-                                
-                                // Создаем массив промисов для удаления
-                                const deletePromises = aggregatedDeletedData.map(async (el) => {
-                                        const searchData = {
-                                        accountTo: el.partner,
-                                        batchId: data.batchId?.toString(),
-                                        };
-                                        return findAccountingNewBatch(searchData, async (resp) => {
-                                        await deleteAccounting(resp.id);
+                                if (resp.createdBatch.batchId) {
+                                        const aggregatedDeletedData = aggregateData(itemsBatch);
+                                        
+                                        // Создаем массив промисов для удаления
+                                        const deletePromises = aggregatedDeletedData.map(async (el) => {
+                                                const searchData = {
+                                                accountTo: el.partner,
+                                                batchId: resp.createdBatch.batchId?.toString(),
+                                                };
+                                                return findAccountingNewBatch(searchData, async (resp) => {
+                                                await deleteAccounting(resp.id);
+                                                });
                                         });
-                                });
-        
-                                // Ждем завершения всех операций удаления
-                                await Promise.all(deletePromises);
-        
-                                const aggregatedData = aggregateData(itemsBatch);
-                                
-                                // Проходим по каждому элементу aggregatedData и создаем tranzData
-                                for (const item of aggregatedData) {
-                                        const tranzData: TAccounting = {
-                                        id: undefined,
-                                        accountFrom: undefined,
-                                        accountTo: item.partner,
-                                        justification: data.batchId?.toString(),
-                                        form: undefined,
-                                        isDraft: undefined,
-                                        value: Number((item.costPrice).toFixed(2)),
-                                        category: 'Начисление по закупке товара',
-                                        createdAt: new Date(),
-                                        updatedAt: new Date(),
-                                        };
-        
-                                        // Запускаем запрос createAccounting для каждого tranzData
-                                        await createAccounting(tranzData);
+                
+                                        // Ждем завершения всех операций удаления
+                                        await Promise.all(deletePromises);
+                
+                                        const aggregatedData = aggregateData(itemsBatch);
+                                        
+                                        // Проходим по каждому элементу aggregatedData и создаем tranzData
+                                        for (const item of aggregatedData) {
+                                                const tranzData: TAccounting = {
+                                                id: undefined,
+                                                accountFrom: undefined,
+                                                accountTo: item.partner,
+                                                justification: resp.createdBatch.batchId?.toString(),
+                                                form: undefined,
+                                                isDraft: undefined,
+                                                value: Number((item.costPrice).toFixed(2)),
+                                                category: 'Начисление по закупке товара',
+                                                createdAt: new Date(),
+                                                updatedAt: new Date(),
+                                                };
+                
+                                                // Запускаем запрос createAccounting для каждого tranzData
+                                                await createAccounting(tranzData);
+                                        }
                                 }
 
                                 // Создаем новый массив с обновленным batchId

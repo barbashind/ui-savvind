@@ -304,7 +304,6 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                         // Обновляем состояние после обработки всех транзакций
                         setData((prev) => ({ ...prev, isCalculated: true }));
                         }
-                const totalSum = itemsBatch?.reduce((acc, item) => acc + (item.quant ?? 0) * (item.costPrice ?? 0), 0) ?? 0;
                 const chunkArray = (array : TPurchaseItem[]) => {
                         const result = [];
                         for (let i = 0; i < array.length; i += 100) {
@@ -317,7 +316,7 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                 try {
                         await updatePurchase( id ,{
                                 comment: data.comment,
-                                sum: totalSum,
+                                sum: data.sum,
                                 batchId: batchId,
                                 batchNumber: data.batchNumber,
                                 batchStatus: 'COMPLETED',
@@ -354,12 +353,11 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
         const returnBatch = async (e: React.MouseEvent<Element, MouseEvent> , id : number) => {
                 setIsLoading(true);
                 e.preventDefault();
-                const totalSum = itemsBatch?.reduce((acc, item) => acc + (item.quant ?? 0) * (item.costPrice ?? 0), 0) ?? 0;
                 const body = itemsBatch;
                 try {
                         await updatePurchase( id , {
                                 comment: data.comment,
-                                sum: totalSum,
+                                sum: data.sum,
                                 batchId: batchId,
                                 batchNumber: data.batchNumber,
                                 batchStatus: 'REGISTRATION',

@@ -1,5 +1,5 @@
 import { HttpService } from '../system/HttpService';
-import { TAccounting, TAccountingFilter } from '../types/accounting-types.ts';
+import { TAccounting, TAccountingFilter, TSumms } from '../types/accounting-types.ts';
 
 import { TPageableResponse } from '../utils/types';
 import { ErrorResponse, getErrorResponse, TSortParam } from './utils';
@@ -16,6 +16,17 @@ export const getAccountings = (param: {
                     ?.map(sort => `${sort.fieldname},${sort.isAsc ? 'ASC' : 'DESC'}`)
                     .join('&sort=') ?? ''
             }` /* body */,
+    
+            param.filterParam ?? { searchCriteria: {} }
+        );
+        return response;
+    };
+
+export const getSumms = (param: {
+        filterParam?: TAccountingFilter;
+    }): Promise<TSumms> => {
+        const response = HttpService.post<TSumms>(
+            `/api/accounting/summs` /* body */,
     
             param.filterParam ?? { searchCriteria: {} }
         );

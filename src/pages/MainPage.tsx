@@ -32,6 +32,9 @@ import PurchaseImage from "../assets/PurchaseImage.tsx";
 import RegistrationImage from "../assets/RegistrationImage.tsx";
 import SalesImage from "../assets/SalesImage.tsx";
 import AccountingImage from "../assets/AccountingImage.tsx";
+import { Avatar } from "@consta/uikit/Avatar/index";
+import { getUserInfo } from "../services/AuthorizationService.ts";
+import { UserInfo } from "../services/AuthorizationService.ts";
 
 
 // сервисы
@@ -75,7 +78,7 @@ const pages : DefaultTabs[] = [
                 },
                 {
                         id: 6,
-                        label: 'Бухгултерия',
+                        label: 'Бухгалтерия',
                         navTo:  routeTarget.accounting,
                         leftIcon: IconCalculator,
                 },
@@ -109,6 +112,18 @@ const MainPage = () => {
             }, []);
 
         const [isOpenMenu, setIsOpenMenu] = useState<boolean>(true);
+        const [user, setUser] = useState<UserInfo | undefined>(undefined);
+                
+        useEffect(() => {
+                
+                const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setUser(resp);
+                        })
+                };
+                
+                void getUserInfoData();
+        }, []);
 
         return (
                 <div>
@@ -140,6 +155,10 @@ const MainPage = () => {
                                                                         view="bordered"
                                                                         className={cnMixSpace({mT: 's', mH: 's'})}
                                                                 />
+                                                                <Layout direction="row" className={cnMixSpace({mT: '2xl', mL: 's'})} style={{alignItems: 'center', justifyContent: 'left'}}>
+                                                                        <Avatar name={user?.username} className={cnMixSpace({mR: 'xs'})}/>
+                                                                        <Text view="secondary" weight="semibold">{user?.username}</Text>
+                                                                </Layout>
                                                                 <Button 
                                                                         label={'Выйти из системы'}
                                                                         onClick={()=>{
@@ -147,10 +166,11 @@ const MainPage = () => {
                                                                                 window.location.reload();
                                                                         }}
                                                                         view="primary"
-                                                                        className={cnMixSpace({mT: '2xl', mH: 's'})}
+                                                                        className={cnMixSpace({mT: 's', mH: 's'})}
                                                                         iconLeft={IconExit}
                                                                         size="s"
                                                                 />
+                                                                
                                                         </Layout>
                                                 
                                                 ) : (

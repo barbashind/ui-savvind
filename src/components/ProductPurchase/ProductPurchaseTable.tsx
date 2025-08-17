@@ -24,6 +24,7 @@ import { ErrorResponse, IPagination, TSortParam } from "../../services/utils.ts"
 import { usePaginationStore } from "../../hooks/usePaginationStore.ts";
 import { Pagination } from "../global/Pagination.tsx";
 import { Modal } from "@consta/uikit/Modal/index";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 
 
@@ -191,7 +192,7 @@ const ProductPurchaseTable = ({updateFlag, setUpdateFlag, setId, currentPage, se
                 ) : (
                     <Layout direction="row" style={{ width: '200px' }}>
                         <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                            {record.batchNumber !== 0 ? '(' + (value?.toString() || '0') + ' $)' : '(' + (value?.toString() || '0') + ' ₽)' }
+                            {record.batchNumber !== 0 ? '(' + (formatNumber(value?.toString()) || '0') + ' $)' : '(' + (formatNumber(value?.toString()) || '0') + ' ₽)' }
                         </Text>
                     </Layout>
                 );

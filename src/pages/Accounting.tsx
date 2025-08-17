@@ -23,7 +23,9 @@ const Accounting = ( ) => {
                 valueFrom: null,
                 valueTo: null,
                 dateFrom: null,
-                dateTo: null
+                dateTo: null,
+                justification: null,
+                category: null,
         }
 
         const PageSettings: {

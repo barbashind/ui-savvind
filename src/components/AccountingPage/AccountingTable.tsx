@@ -25,7 +25,7 @@ import { TPageableResponse } from "../../utils/types.ts";
 
 
 // сервисы
-import { deleteAccounting, getAccountings } from "../../services/AccountingService.ts";
+import { deleteAccounting, getAccountings, getSumms } from "../../services/AccountingService.ts";
 import { Button } from "@consta/uikit/Button/index";
 import { formatNumber } from "../../utils/formatNumber.ts";
 
@@ -70,7 +70,9 @@ const AccountingTable = ({
             });        
     const [rows, setRows] = useState<TAccountingRow[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
+    
+    const [summRUB, setSummRUB] = useState<number>(0);
+    const [summUSD, setSummUSD] = useState<number>(0);
    
     useEffect(() => {
             setStoredPageSize(pagination.pageSize);
@@ -94,6 +96,24 @@ useEffect(() => {
         valueTo: filterValues.valueTo,
         dateFrom: filterValues.dateFrom,
         dateTo: filterValues.dateTo,
+        justification: filterValues.justification,
+        category: filterValues.category,
+    }
+
+    const getSumm = async () => {
+        try {
+            await getSumms({
+                    filterParam: filterParam,
+                }).then((resp) => {
+                    setSummRUB(Number(resp.summRUB.toFixed(2)));
+                    setSummUSD(Number(resp.summUSD.toFixed(2)));
+                })
+
+        } catch (e: unknown) {
+                if (e instanceof ErrorResponse || e instanceof Error) {
+                    console.log(e);
+                }
+            }
     }
 
     const getData = async () => {
@@ -145,6 +165,7 @@ useEffect(() => {
             setUpdateFlag(false);
         };
         void getData();
+        void getSumm();
     }
 }, [updateFlag, setUpdateFlag, filterValues, columnSort, currentPage, pagination.pageSize, setCount]);
 
@@ -482,6 +503,12 @@ tableProps.className = (classNames(
 
     return (
         <Layout flex={1} direction="column" style={{ height: '100%' }}>
+            <Layout direction="row" className={cnMixSpace({mV: 'm'})} >
+                <Text size="s" className={cnMixSpace({mR: 'm'})}>Сумма трат:</Text>
+                <Text className={cnMixSpace({mR: 'm'})}>{formatNumber(summRUB) + ' RUB;'} </Text>
+                <Text className={cnMixSpace({mR: 'm'})}>{formatNumber(summUSD) + ' USD;'}</Text>
+                
+            </Layout>
             <Layout flex={1} direction="column" style={{
                     minHeight: 'calc(90vh - 155px)',
                     overflow: 'auto',

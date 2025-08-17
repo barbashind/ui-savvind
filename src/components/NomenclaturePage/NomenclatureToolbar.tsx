@@ -17,6 +17,9 @@ import { IconUpload } from '@consta/icons/IconUpload';
 import { updateNomenclatureRemains, uploadProductsFile } from "../../services/NomenclatureService";
 import { IconRevert } from "@consta/icons/IconRevert";
 import { getUserInfo } from "../../services/AuthorizationService";
+import { Combobox } from "@consta/uikit/Combobox";
+import { getWarehouses } from "../../services/SettingsService";
+import { TWarehouse } from "../../types/settings-types";
 
 export interface TNomeclatureToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,23 +33,41 @@ export interface TNomeclatureToolbarProps {
 const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchText,  searchText, setUpdateFlag, setIsFilterModalOpen } : TNomeclatureToolbarProps) => {
         
         const element = useRef<HTMLInputElement>(null);
-        const updateRemains = async() => {
-                await updateNomenclatureRemains().then(()=> {
+        const updateRemains = async () => {
+                await updateNomenclatureRemains(warehousesFilter).then(()=> {
                         setUpdateFlag(true);
+                        setIsLoading(false);
                 })
         }
         const [role, setRole] = useState<string | undefined>(undefined);
+        const [isLoading, setIsLoading] = useState<boolean>(false);
+        const [warehouses, setWarehouses] = useState<TWarehouse[]>([]);
+        const [warehousesFilter, setWarehousesFilter] = useState<TWarehouse[]>([]);
+        
+        useEffect(() => {
+                        
+                const getWarehousesData = async () => {
+                        await getWarehouses((resp) => {
+                                setWarehouses(resp.map((item : TWarehouse) => ({
+                                        warehouseId: item.warehouseId, 
+                                        name: item.name, 
+                                })))
+                        });
+                }
+                void getWarehousesData()
                 
-                             useEffect(() => {
-                                        
-                                        const getUserInfoData = async () => {
-                                                await getUserInfo().then((resp) => {
-                                                        setRole(resp.role);
-                                                })
-                                        };
-                                        
-                                        void getUserInfoData();
-                                }, []);
+        }, []);
+                
+        useEffect(() => {
+                
+                const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setRole(resp.role);
+                        })
+                };
+                
+                void getUserInfoData();
+        }, []);
         
         return (
                 <Layout direction="row" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({mB: 'm', p:'m'})} >
@@ -61,9 +82,11 @@ const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchTex
                                         view="secondary"
                                         onClick={()=>{
                                                 updateRemains();
+                                                setIsLoading(true);
                                         }}
                                         iconLeft={IconRevert}
                                         size="s"
+                                        loading={isLoading}
                                 />
                                 <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})}>
                                         Поиск:
@@ -85,6 +108,26 @@ const NomenclatureToolbar = ({setIsEditModalOpen, setFilterValues,  setSearchTex
                                             }}
                                         withClearButton
                                         className={cnMixSpace({mL: 's'})}
+                                />
+                                <Text size="xs" className={cnMixSpace({mR:'xs', mL:'m'})}>Выберите склад:</Text>
+                                <Combobox
+                                        items={warehouses}
+                                        getItemKey={item => item.warehouseId ?? 0}
+                                        getItemLabel={item => item.name ?? ''}
+                                        placeholder="Выберите склад"
+                                        multiple
+                                        value={warehousesFilter} 
+                                        onChange={(value)=> {
+                                                if (value) {
+                                                        setWarehousesFilter(value);
+                                                } else {
+                                                        setWarehousesFilter([]);
+                                                }
+                                                }
+                                                } 
+                                        size="s"
+                                        style={{minWidth:'235px', maxWidth:'235px'}}
+                                        className={cnMixSpace({mR:'m'})}
                                 />
                                 <Button 
                                         size='s' 

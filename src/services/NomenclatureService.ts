@@ -1,3 +1,4 @@
+import { TWarehouse } from '#/types/settings-types';
 import { HttpService } from '../system/HttpService';
 import { DataStat, TNomenclature, TNomenclatureFilter } from '../types/nomenclature-types';
 
@@ -73,21 +74,21 @@ export const updateNomenclature = async (id: number | undefined, data: object): 
     return resp;
 };
 
-// Обновление данных по остаткам
-export const updateNomenclatureRemains = async (): Promise<object> => {
+export const updateNomenclatureRemains = async (data: TWarehouse[]): Promise<object> => {
     const token = localStorage.getItem('token');
-    const response = await fetch(`/api/update-nomenclature/remains`, {
-        method: 'GET',
+    const response = await fetch('/api/update-nomenclature-remains', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify(data),
     });
     if (!response.ok) {
         const errorResponse = await getErrorResponse(response);
         throw new ErrorResponse(errorResponse);
     }
-    const resp: object = (await response.json()) as Promise<object>;
+    const resp: object = (await response.json()) as object;
     return resp;
 };
 

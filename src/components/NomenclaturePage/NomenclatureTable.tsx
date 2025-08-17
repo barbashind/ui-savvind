@@ -110,7 +110,7 @@ useEffect(() => {
         productColor: filterValues.productColor,
         productPrice: filterValues.productPrice,
         productModel: filterValues.productModel,
-        productCountry: filterValues.productCountry
+        productCountry: filterValues.productCountry,
     }
 
     const getData = async () => {

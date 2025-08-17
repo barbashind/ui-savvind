@@ -1,4 +1,5 @@
 import { SortOrder } from "../components/global/TableColumnHeader";
+import { TCategory } from "./settings-types";
 
 export interface TAccounting {
         id?: number;
@@ -24,10 +25,16 @@ export interface TAccountingFilter {
         searchText: string | null;
         accountFrom: string | null;
         accountTo: string | null;
+        justification: string | null;
         valueFrom: number | null;
         valueTo: number | null;
         dateFrom: Date | null;
         dateTo: Date | null;
+        category: TCategory[] | null;
+}
+export interface TSumms {
+        summRUB: number;
+        summUSD: number;
 }
 
 export interface TAccountingSortFields {

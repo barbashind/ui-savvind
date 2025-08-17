@@ -17,6 +17,7 @@ import { ErrorResponse, IPagination, TSortParam } from "../../services/utils.ts"
 import { getSales } from "../../services/SalesService.ts";
 import { TableColumnHeader } from "../global/TableColumnHeader.tsx";
 import { Pagination } from "../global/Pagination.tsx";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 
 interface TSalesTableProductsProps {
@@ -243,7 +244,7 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
                 ) : (
                     <div>
                         <Text size="s" weight="medium" style={{minWidth: '250px'}}>
-                            {value + ' руб'  || '-'}
+                            {formatNumber(value) + ' руб'  || '-'}
                         </Text>
                     </div>
                 );
@@ -267,7 +268,7 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
             ) : (
                 <div>
                     <Text size="s" weight="medium" style={{minWidth: '250px'}}>
-                        {Number( Number(record.salePrice) - Number(record.costPrice)).toFixed(2) + ' руб' || '-'}
+                        {formatNumber(Number( Number(record.salePrice) - Number(record.costPrice)).toFixed(2)) + ' руб' || '-'}
                     </Text>
                 </div>
             );

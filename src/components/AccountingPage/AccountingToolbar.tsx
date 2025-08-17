@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 // компоненты Consta
 import { Layout } from "@consta/uikit/Layout"
@@ -16,6 +16,9 @@ import { IconArrowDown } from "@consta/icons/IconArrowDown/index";
 import { IconArrowUp } from "@consta/icons/IconArrowUp/index";
 import { DatePicker } from "@consta/uikit/DatePicker/index";
 import NumberMaskTextField from "../../utils/NumberMaskTextField.tsx";
+import { Combobox } from "@consta/uikit/Combobox/index";
+import { TCategory } from "../../types/settings-types.ts";
+import { getCategories } from "../../services/SettingsService.ts";
 
 export interface TAccountingToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +33,19 @@ export interface TAccountingToolbarProps {
 const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, setIsAccModalOpen, role, isMatvei, filterValues} : TAccountingToolbarProps) => {
 
         const [isVisible, setIsVisible] = useState<boolean>(false)
+        const [categories, setCategories] = useState<TCategory[]>([]);
+        
+        // Инициализация данных
+        useEffect(() => {
+                const getCategoriesData = async () => {
+                        await getCategories((resp) => {
+                                setCategories(resp.map((item : TCategory) => ({id: item.id, name: item.name})))
+                                
+                        })
+                }
+                void getCategoriesData();
+        }, [])
+        
 
         return (
                 <Layout direction="row" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2', flexWrap: 'wrap'}} className={cnMixSpace({mB: 'm', p:'m'})} >
@@ -127,6 +143,51 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                         withClearButton
                                         className={cnMixSpace({mL: 's'})}
                                         disabled={role === 'SLR'}
+                                />
+                        </Layout>
+                        <Layout direction="row" className={cnMixSpace({mT: 'm'})} style={{ alignItems: 'center', alignSelf: 'end', width: '70%'}} >
+                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
+                                        Обоснование:
+                                </Text>
+                                <TextField
+                                        size='s'
+                                        value={filterValues.justification}
+                                        onChange={(value) => {
+                                                setFilterValues(prev => ({...prev, justification: value}))
+                                                if (!value) {
+                                                        setFilterValues(prev => ({...prev, justification: null}))
+                                                }
+                                        }}
+                                        onKeyPress={(event) => {
+                                                if (event.key === 'Enter') {
+                                                        setUpdateFlag(true);
+                                                }
+                                            }}
+                                        withClearButton
+                                        className={cnMixSpace({mL: 's'})}
+                                />
+                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
+                                        Категории:
+                                </Text>
+                                <Combobox
+                                        multiple={true}
+                                        items={categories}
+                                        getItemKey={item => item.id ?? 0}
+                                        getItemLabel={item => item.name ?? ''}
+                                        size='s'
+                                        value={filterValues.category}
+                                        onChange={(value) => {
+                                                setFilterValues(prev => ({...prev, category: value}))
+                                                if (!value) {
+                                                        setFilterValues(prev => ({...prev, category: null}))
+                                                }
+                                        }}
+                                        onKeyPress={(event) => {
+                                                if (event.key === 'Enter') {
+                                                        setUpdateFlag(true);
+                                                }
+                                            }}
+                                        className={cnMixSpace({mL: 's'})}
                                 />
                         </Layout>
                         <Layout direction="row" style={{ alignItems: 'center', justifyContent: 'right', alignSelf: 'end', width: '70%'}} className={cnMixSpace({mT: 'm'})}>
