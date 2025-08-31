@@ -248,7 +248,7 @@ useEffect(() => {
                                         }}
                                         size="s"
                                         style={{minWidth: '200px', maxWidth: '200px'}}
-                                        disabled={user?.role !== 'ADM'}
+                                        disabled={user?.role !== 'ADM' && user?.username !== 'Matvei'}
                                         placeholder="Выберите счет"
                                         className={cnMixSpace({mL:'l'})}
                                 />

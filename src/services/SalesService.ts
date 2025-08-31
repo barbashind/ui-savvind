@@ -299,3 +299,19 @@ export const getAnalyticProd = (param: {
         );
         return response;
     };
+
+interface Debt {
+    isUnpaid?: number;
+    isBooked?: number;
+}
+export const getDebtSales = async (
+        getCallback: (arg0: Debt) => void
+    ) => {
+        await HttpService.get<Debt>('/api/sales-dept')
+            .then((response) => {
+                getCallback(response);
+            })
+            .catch(() => {
+                console.log('failed');
+            });
+    };

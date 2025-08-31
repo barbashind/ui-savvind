@@ -185,7 +185,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
         {
             title: (
                 <TableColumnHeader
-                    header="Наименование"
+                    header="Товар"
                     sortOrder={getColumnSortOrder('name')}
                     sortOrderIndex={getColumnSortOrderIndex('name')}
                     onSort={(sortOrder, isAdd) => {
@@ -203,61 +203,79 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                     <></>
                 ) : (
                     <div>
-                        <Text size="s" weight="medium">
+                        <Text size="xs" weight="medium">
                             {value || '-'}
                         </Text>
+                        <Layout direction='row'>
+                            <Text size="xs" weight="medium" view='secondary'>
+                                Бренд:
+                            </Text>
+                            <Text size="xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                            {record.brand}
+                            </Text>
+                        </Layout>
+                        <Layout direction='row'>
+                            <Text size="xs" weight="medium" view='secondary'>
+                                Тип:
+                            </Text>
+                            <Text size="xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                                {' ' + (record.productType ?? '-')}
+                            </Text>
+                        </Layout>
+                        
+                        
                     </div>
                 );
             },
         },
-        {
-                title: (
-                    <TableColumnHeader
-                        header="Бренд"
-                        withoutSort={true}
-                    />
-                ),
-                dataIndex: 'brand',
-                key: 'brand',
-                align: 'left',
-                width: '240px',
-                minWidth: 240,
-                render: (value: string, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            <Text size="s" weight="medium" style={{minWidth: '250px'}}>
-                                {value || '-'}
-                            </Text>
-                        </div>
-                    );
-                },
-        },
-        {
-                title: (
-                    <TableColumnHeader
-                        header="Тип товара"
-                        withoutSort={true}
-                    />
-                ),
-                dataIndex: 'productType',
-                key: 'productType',
-                align: 'left',
-                width: '240px',
-                minWidth: 240,
-                render: (value: string, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            <Text size="s" weight="medium" style={{minWidth: '150px'}}>
-                                {value || '-'}
-                            </Text>
-                        </div>
-                    );
-                },
-        },
+        // {
+        //         title: (
+        //             <TableColumnHeader
+        //                 header="Бренд"
+        //                 withoutSort={true}
+        //             />
+        //         ),
+        //         dataIndex: 'brand',
+        //         key: 'brand',
+        //         align: 'left',
+        //         width: '240px',
+        //         minWidth: 240,
+        //         render: (value: string, record: TNomenclatureRow) => {
+        //             return record.spacer ? (
+        //                 <></>
+        //             ) : (
+        //                 <div>
+        //                     <Text size="s" weight="medium" style={{minWidth: '250px'}}>
+        //                         {value || '-'}
+        //                     </Text>
+        //                 </div>
+        //             );
+        //         },
+        // },
+        // {
+        //         title: (
+        //             <TableColumnHeader
+        //                 header="Тип товара"
+        //                 withoutSort={true}
+        //             />
+        //         ),
+        //         dataIndex: 'productType',
+        //         key: 'productType',
+        //         align: 'left',
+        //         width: '240px',
+        //         minWidth: 240,
+        //         render: (value: string, record: TNomenclatureRow) => {
+        //             return record.spacer ? (
+        //                 <></>
+        //             ) : (
+        //                 <div>
+        //                     <Text size="s" weight="medium" style={{minWidth: '150px'}}>
+        //                         {value || '-'}
+        //                     </Text>
+        //                 </div>
+        //             );
+        //         },
+        // },
         {
                 title: (
                     <TableColumnHeader
@@ -512,6 +530,7 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
             <Layout flex={1} direction="column" style={{ height: '100%' }}>
             <Layout flex={1} direction="column" style={{
                     minHeight: 'calc(90vh - 155px)',
+                    // minWidth:'calc(100vw - 55px)',
                     overflow: 'auto',
                     display: 'flex',
                     width: '100%',

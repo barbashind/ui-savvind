@@ -14,6 +14,7 @@ import { TAccount } from "../../types/settings-types.ts";
 import { Combobox } from "@consta/uikit/Combobox/index";
 import { TextField } from "@consta/uikit/TextField/index";
 import TextHighlith from "../global/TextHighlith.tsx";
+import { getUserInfo } from "../../services/AuthorizationService.ts";
 
 
 
@@ -38,9 +39,18 @@ const [currencies, setCurrencies] = useState<(string | undefined)[]>([]);
 const [currency, setCurrency] = useState<string | undefined>(undefined);
 const [searchText, setSearchText] = useState<string | null>(null);
 
+const [user, setUser] = useState<string | undefined>(undefined);
+                
 // Инициализация данных
 useEffect(() => {
         setIsLoading(true);
+        const getUserInfoData = async () => {
+                        await getUserInfo().then((resp) => {
+                                setUser(resp.username);
+                        })
+                };
+                
+        void getUserInfoData();
         const getAccountsData = async () => {
                 await getAccounts((resp) => {
                         setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, value: item.value, currency: item.currency})))
@@ -48,6 +58,8 @@ useEffect(() => {
                         setCurrencies([...new Set(resp.map((item: TAccount) => item.currency))]);
                 })
         }
+        
+
 
         void getAccountsData().then(()=> {
                 setIsLoading(false);
@@ -138,7 +150,15 @@ useEffect(() => {
                                 </Layout>
                                 )}
                                 <Layout direction="column">
-                                        {!isLoading && accounts?.map((acc : TAccount) => (
+                                        {!isLoading && user !== 'Matvei' && accounts?.map((acc : TAccount) => (
+                                                <Layout direction="row" className={cnMixSpace({mT: 's', p:'s'})} style={{border: '1px solid rgba(0,65,102,.2)', borderRadius: '4px'}}>
+                                                        <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s">{acc?.accountId?.toString()}</Text>
+                                                        <Text style={{width: '100%'}} size="s">{TextHighlith(acc?.name, searchText)}</Text>
+                                                        <Text style={{minWidth: '150px', maxWidth: '150px'}} size="s">{acc.value?.toString()}</Text>
+                                                        <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s" className={cnMixSpace({mL: 's'})}>{acc?.currency}</Text>
+                                                </Layout>
+                                        ))}
+                                        {!isLoading && user === 'Matvei' && accounts?.filter((el) => (el.name !== 'Матвей Старцев'))?.map((acc : TAccount) => (
                                                 <Layout direction="row" className={cnMixSpace({mT: 's', p:'s'})} style={{border: '1px solid rgba(0,65,102,.2)', borderRadius: '4px'}}>
                                                         <Text style={{minWidth: '50px', maxWidth: '50px'}} size="s">{acc?.accountId?.toString()}</Text>
                                                         <Text style={{width: '100%'}} size="s">{TextHighlith(acc?.name, searchText)}</Text>

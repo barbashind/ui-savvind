@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 // компоненты Consta
 import { Layout } from "@consta/uikit/Layout"
@@ -18,6 +18,7 @@ import { IconRevert } from "@consta/icons/IconRevert";
 
 import { TCheckFilter } from "../../types/sales-types";
 import { IconStorage } from "@consta/icons/IconStorage";
+import { getDebtSales } from "../../services/SalesService";
 
 export interface TSalesToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -47,6 +48,17 @@ const SalesToolbar = ({
                 setIsProducts
         } : TSalesToolbarProps) => {
 
+const [isUnpaid, seIsUnpaid] = useState<number | undefined>(0)
+const [isBooked, seIsBooked] = useState<number | undefined>(0)
+useEffect(()=>{
+        const getDebtData = async () => {
+                await getDebtSales((resp)=> {
+                        seIsUnpaid(resp.isUnpaid);
+                        seIsBooked(resp.isBooked);
+                })
+        };
+        void getDebtData();
+})
 
         return (
                 <Layout direction="column">
@@ -58,7 +70,7 @@ const SalesToolbar = ({
                                         Продажи
                                 </Text>
                         </Layout>
-                        <Layout direction="row">
+                        <Layout direction="row" >
                                 <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})} style={{minWidth: '140px'}} align="right">
                                         По продукции:
                                 </Text>
@@ -104,7 +116,14 @@ const SalesToolbar = ({
                         </Layout>
                         
                 </Layout>
+                <Layout direction="row"   style={{ justifyContent: 'end'}}>
+                        <Text size="s" className={cnMixSpace({mR: 'm', mT: 'm'  })} >{'Бронь - ' + isBooked?.toFixed(2) } </Text>
+                        <Text size="s" className={cnMixSpace({mR: 'm', mT: 'm'})}>{'Не оплачено - ' + isUnpaid?.toFixed(2)}</Text>
+                        <Text size="s" className={cnMixSpace({ mT: 'm', mR: '2xl'  })}>{'Общ.задолж. -  '+ (Number(isBooked) + Number(isUnpaid))?.toFixed(2)}</Text> 
+                </Layout>
+                        
                 <Layout direction="row" style={{ justifyContent: 'end', borderBottom: '2px solid #56b9f2'}} className={cnMixSpace({m: 'm', pB:'m', pH:'m'})} >
+                        
                         <Checkbox
                                 checked={filterValues.isPaid}
                                 onChange={()=>{

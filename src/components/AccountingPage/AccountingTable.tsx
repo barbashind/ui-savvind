@@ -28,6 +28,7 @@ import { TPageableResponse } from "../../utils/types.ts";
 import { deleteAccounting, getAccountings, getSumms } from "../../services/AccountingService.ts";
 import { Button } from "@consta/uikit/Button/index";
 import { formatNumber } from "../../utils/formatNumber.ts";
+import { formatDate } from "../../utils/formatDate.ts";
 
 interface TProductAccountingTableProps {
         updateFlag: boolean;
@@ -196,41 +197,44 @@ const columns: ColumnType<TAccountingRow>[] = [
             return record.spacer ? (
                 <></>
             ) : (
-                <div>
-                    <Text size="s" weight="medium" style={{ minWidth: '150px', maxWidth: '150px'  }}>
+                <Layout direction="column">
+                    <Text size="s" weight="medium" style={{minWidth: '140px'}}>
                         {value || '-'}
                     </Text>
-                </div>
-            );
-        },
-    },
-    {
-        title: (
-            <TableColumnHeader
-                header="Дата создания"
-                sortOrder={getColumnSortOrder('createdAt')}
-                sortOrderIndex={getColumnSortOrderIndex('createdAt')}
-                onSort={(sortOrder, isAdd) => {
-                    onColumnSort('createdAt', sortOrder, isAdd);
-                }}
-            />
-        ),
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        align: 'left',
-        width: '150px',
-        render: (value: string, record: TAccountingRow) => {
-            return record.spacer ? (
-                <></>
-            ) : (
-                <Layout direction="row" style={{ minWidth: '150px', maxWidth: '150px'  }}>
-                    <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                        {value}
+                    <Text size="xs" weight="medium" view="secondary" style={{minWidth: '140px'}}>
+                        {formatDate(record.createdAt)  || '-'}
                     </Text>
                 </Layout>
             );
         },
     },
+    // {
+    //     title: (
+    //         <TableColumnHeader
+    //             header="Дата создания"
+    //             sortOrder={getColumnSortOrder('createdAt')}
+    //             sortOrderIndex={getColumnSortOrderIndex('createdAt')}
+    //             onSort={(sortOrder, isAdd) => {
+    //                 onColumnSort('createdAt', sortOrder, isAdd);
+    //             }}
+    //         />
+    //     ),
+    //     dataIndex: 'createdAt',
+    //     key: 'createdAt',
+    //     align: 'left',
+    //     width: '150px',
+    //     render: (value: string, record: TAccountingRow) => {
+    //         return record.spacer ? (
+    //             <></>
+    //         ) : (
+    //             <Layout direction="row" style={{ minWidth: '150px', maxWidth: '150px'  }}>
+    //                 <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+    //                     {value}
+    //                 </Text>
+    //             </Layout>
+    //         );
+    //     },
+    // },
     {
         title: (
             <TableColumnHeader

@@ -270,6 +270,9 @@ const SalesTableProducts = ({updateFlag, setUpdateFlag, setId, currentPage, setC
                     <Text size="s" weight="medium" style={{minWidth: '250px'}}>
                         {formatNumber(Number( Number(record.salePrice) - Number(record.costPrice)).toFixed(2)) + ' руб' || '-'}
                     </Text>
+                    <Text size="xs" view='secondary' weight="medium" style={{minWidth: '250px'}}>
+                        {formatNumber((Number( Number(record.salePrice) - Number(record.costPrice)) * 100 / Number(record.costPrice)).toFixed(2)) + ' %' || '-'}
+                    </Text>
                 </div>
             );
         },
