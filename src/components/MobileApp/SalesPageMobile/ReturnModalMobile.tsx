@@ -11,11 +11,12 @@ import { Loader } from '@consta/uikit/Loader';
 
 import { IconClose } from '@consta/icons/IconClose';
 
-import { TNomenclature } from "../../types/nomenclature-types";
-import {  TCheckFilter, TSale } from "../../types/sales-types";
-import { deleteCheckSales, getCheckSalesBySerial, getProductBySerial, getSalesFilter } from "../../services/SalesService";
-import { getNomenclatures } from "../../services/PurchaseService";
+import { TNomenclature } from "../../../types/nomenclature-types";
+import {  TCheckFilter, TSale } from "../../../types/sales-types";
+import { deleteCheckSales, getCheckSalesBySerial, getProductBySerial, getSalesFilter } from "../../../services/SalesService";
+import { getNomenclatures } from "../../../services/PurchaseService";
 import { DatePicker } from "@consta/uikit/DatePicker";
+import { Card } from "@consta/uikit/Card";
 
 interface TReturnModalProps {
         isOpen: boolean;
@@ -23,7 +24,7 @@ interface TReturnModalProps {
         setUpdateFlag: React.Dispatch<React.SetStateAction<boolean>>;
     }
 
-const ReturnModal = ({isOpen, setIsOpen, setUpdateFlag} : TReturnModalProps) => {
+const ReturnModalMobile = ({isOpen, setIsOpen, setUpdateFlag} : TReturnModalProps) => {
 
         const closeWindow = () => {
                 setSales([]);
@@ -140,10 +141,10 @@ const convertRuToEn = (value : string) => {
                         style={{width: '75%'}}
                 >
                         {!isLoading && (
-                        <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({ p:'xl' })}>
+                        <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({ p:'s' })}>
                                 <Layout direction="row" style={{justifyContent: 'space-between'}}>
                                         <Layout direction="row" >
-                                                <Text size="xl" view="brand" style={{width: '100%'}} className={cnMixSpace({ mL:'m', mT: '2xs' })}>
+                                                <Text size="xl" view="brand" style={{width: '100%'}} className={cnMixSpace({ mT: '2xs' })}>
                                                         {'Возврат товара'}
                                                 </Text>
                                         </Layout>
@@ -158,75 +159,76 @@ const convertRuToEn = (value : string) => {
                                         />
                                 </Layout>
                                 {!isSearch && (
-                                <Layout direction="column" className={cnMixSpace({ mT:'m' })}>
-                                        <Text size="s" weight="semibold" align="center">По серийному номеру</Text>
-                                        <Layout direction="row" className={cnMixSpace({ mT:'m' })}>
-                                                <TextField
-                                                        size="s"
-                                                        value={serialNumber}
-                                                        onChange={(value)=>{
-                                                                if (value) {
-                                                                        const convertedValue = convertRuToEn(value);
-                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
-                                                                        setSerialNumber(filteredValue);
-                                                                } else {
-                                                                        setSerialNumber(null)
-                                                                }
-                                                        }}
-                                                        placeholder="Введите сер. номер"
-                                                        caption={caption ?? undefined}
-                                                        status={caption === 'Товар не найден' ? 'alert' : caption === 'Товар найден' ? 'success' : undefined}
-                                                        onFocus={()=>{
-                                                                setCaption(null);
-                                                        }}
-                                                />
-                                                <Button 
-                                                        label={'Проверить'}
-                                                        view="secondary"
-                                                        className={cnMixSpace({mL:'s'})}
-                                                        size="s"
-                                                        onClick={()=>{
-                                                                getProduct(serialNumber);
-                                                        }}
-                                                />
-                                                <Button 
-                                                        label={'Оформить возврат'}
-                                                        view="primary"
-                                                        size="s"
-                                                        className={cnMixSpace({ mL:'m' })}
-                                                        onClick={()=>{
-                                                                if (sale) {
-                                                                        returnProduct(sale);
-                                                                }
-                                                        }}
-                                                />
+                                        <Card className={cnMixSpace({ p:'m', mT: 'xs'})} style={{border: '1px solid var(--color-typo-brand)'}}>
+                                        <Layout direction="column" >
+                                                <Text size="s" weight="semibold" align="left">По серийному номеру</Text>
+                                                <Layout direction="column" className={cnMixSpace({ mT:'m' })}>
+                                                        <TextField
+                                                                size="s"
+                                                                value={serialNumber}
+                                                                onChange={(value)=>{
+                                                                        if (value) {
+                                                                                const convertedValue = convertRuToEn(value);
+                                                                                const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
+                                                                                setSerialNumber(filteredValue);
+                                                                        } else {
+                                                                                setSerialNumber(null)
+                                                                        }
+                                                                }}
+                                                                placeholder="Введите сер. номер"
+                                                                caption={caption ?? undefined}
+                                                                status={caption === 'Товар не найден' ? 'alert' : caption === 'Товар найден' ? 'success' : undefined}
+                                                                onFocus={()=>{
+                                                                        setCaption(null);
+                                                                }}
+                                                        />
+                                                        <Button 
+                                                                label={'Проверить'}
+                                                                view="secondary"
+                                                                className={cnMixSpace({mT:'s'})}
+                                                                size="s"
+                                                                onClick={()=>{
+                                                                        getProduct(serialNumber);
+                                                                }}
+                                                        />
+                                                        <Button 
+                                                                label={'Оформить возврат'}
+                                                                view="primary"
+                                                                size="s"
+                                                                className={cnMixSpace({ mT:'s' })}
+                                                                onClick={()=>{
+                                                                        if (sale) {
+                                                                                returnProduct(sale);
+                                                                        }
+                                                                }}
+                                                        />
+                                                </Layout>
+                                                
                                         </Layout>
-                                        
-                                </Layout>
+                                        </Card>
                                 )}
                                 {!isSearch && (
-                                        <Layout direction="column" className={cnMixSpace({ mT:'l' })}>
-                                        <Text size="s" weight="semibold" align="center">По поиску товара</Text>
-                                        <Layout direction="row" className={cnMixSpace({ mT:'m' })} style={{alignItems: 'center'}}>
-                                                <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} align="right" className={cnMixSpace({ mR:'xs' })}>Товар:</Text>
-                                                <Combobox
-                                                        value={product}
-                                                        items={productList}
-                                                        onChange={(value)=>{
-                                                                if (value) {
-                                                                        setProduct(value);
-                                                                } else {
-                                                                        setProduct(null);
-                                                                }
-                                                        }}
-                                                        getItemKey={item => item.itemId ?? 0}
-                                                        getItemLabel={item => item.name ?? ''}
-                                                        placeholder="Выберите товар"
-                                                        size="s"
-                                                />
-                                        </Layout>
-                                        <Layout direction="row" className={cnMixSpace({ mT:'s' })} style={{alignItems: 'center'}}>
-                                                <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} align="right" className={cnMixSpace({ mR:'xs' })}>Дата продажи:</Text>
+                                        <Card className={cnMixSpace({ p:'m', mT: 'xs'})} style={{border: '1px solid var(--color-typo-brand)'}}>
+                                        <Layout direction="column" >
+                                        <Text size="s" weight="semibold" align="left">По поиску товара</Text>
+                                        <Combobox
+                                                value={product}
+                                                items={productList}
+                                                onChange={(value)=>{
+                                                        if (value) {
+                                                                setProduct(value);
+                                                        } else {
+                                                                setProduct(null);
+                                                        }
+                                                }}
+                                                getItemKey={item => item.itemId ?? 0}
+                                                getItemLabel={item => item.name ?? ''}
+                                                placeholder="Выберите товар"
+                                                size="s"
+                                                className={cnMixSpace({ mT:'s' })}
+                                        />
+                                        <Layout direction="column" className={cnMixSpace({ mT:'s' })} >
+                                                <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} align="left" className={cnMixSpace({ mR:'xs' })}>Дата продажи:</Text>
                                                 <DatePicker
                                                         value={date}
                                                         onChange={(value) => {
@@ -237,10 +239,11 @@ const convertRuToEn = (value : string) => {
                                                                 }
                                                         }}
                                                         size="s"
+                                                        className={cnMixSpace({ mT:'2xs' })}
                                                 />
                                         </Layout>
-                                        <Layout direction="row" className={cnMixSpace({ mT:'s' })} style={{alignItems: 'center'}}>
-                                                <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} align="right" className={cnMixSpace({ mR:'xs' })}>Покупатель:</Text>
+                                        <Layout direction="column" className={cnMixSpace({ mT:'s' })} >
+                                                <Text size="s" style={{minWidth: '150px', maxWidth: '150px'}} align="left" className={cnMixSpace({ mR:'xs' })}>Покупатель:</Text>
                                                 <TextField
                                                         size="s"
                                                         value={customer}
@@ -252,6 +255,8 @@ const convertRuToEn = (value : string) => {
                                                                 }
                                                         }}
                                                         placeholder="Введите покупателя"
+                                                        className={cnMixSpace({ mT:'2xs' })}
+
                                                 />
                                         </Layout>
                                         <Layout direction="row" style={{ justifyContent: 'center'}} className={cnMixSpace({mT:'s'})}>
@@ -267,6 +272,7 @@ const convertRuToEn = (value : string) => {
                                                 />
                                         </Layout>
                                 </Layout>
+                                </Card>
                         )}
                         {isSearch && (
                                 <Layout direction="column">
@@ -278,14 +284,14 @@ const convertRuToEn = (value : string) => {
                                         )}
                                         {(sales.length > 0) && sales.map((sale) => (
                                                 <Layout 
-                                                        direction="row" 
+                                                        direction="column" 
                                                         className={cnMixSpace({mT:'s', p: 's'})} 
                                                         style={{border: '1px solid rgba(0,65,102,.2)', borderRadius: '4px', cursor: 'pointer'}}
                                                         onClick={()=>{
                                                                 returnProduct(sale);
                                                         }}
                                                 >
-                                                        <Text size="xs" className={cnMixSpace({mR:'s'})} style={{minWidth: '30px', maxWidth: '30px'}}>{sales.indexOf(sale) + 1}</Text>
+                                                        <Text size="xs" className={cnMixSpace({mR:'s'})} style={{minWidth: '30px', maxWidth: '30px'}}>{sale.checkId}</Text>
                                                         <Text size="xs" className={cnMixSpace({mR:'s'})} style={{ width: '100%'}}>{sale.name}</Text>
                                                         <Text size="xs" className={cnMixSpace({mR:'s'})} style={{minWidth: '150px', maxWidth: '150px'}}>{sale.salePrice}</Text>
                                                         <Text size="xs" className={cnMixSpace({mR:'s'})} style={{minWidth: '150px', maxWidth: '150px'}}>{sale.customer}</Text>
@@ -319,4 +325,4 @@ const convertRuToEn = (value : string) => {
                 </Modal>
         )
 }
-export default ReturnModal;
+export default ReturnModalMobile;

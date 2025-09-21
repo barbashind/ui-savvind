@@ -28,7 +28,7 @@ export interface TAnalyticGraphData {
         user: string | undefined;
         revenue: number | undefined;
         margProfit: number | undefined;
-        date: Date;
+        date: Date | string;
 }
 
 export interface TProdDeliver {

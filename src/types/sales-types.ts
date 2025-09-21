@@ -44,8 +44,8 @@ export type TSaleRow = TSale & {
 
 export interface TCheckFilter {
         searchText: string | null;
-        dateMin: Date | null;
-        dateMax: Date | null;
+        dateMin?: Date;
+        dateMax?: Date;
         customer: string | null;
         isUnpaid: boolean;
         isBooking: boolean;

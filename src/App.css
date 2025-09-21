@@ -68,3 +68,23 @@
     text-decoration-color: #002033;
     cursor: pointer;
 }
+.TabsFitModeDropdownWrapper{
+    justify-content: center;
+}
+.selectMobile .Select-SelectContainer {
+    max-height: 32px;
+    overflow-y: hidden;
+}
+.selectMobile .Select-SelectContainer_multiple .Select-ControlValueContainer {
+    max-height: 30px;
+    overflow: hidden;
+}
+
+.selectMobile .Select-SelectContainer_multiple .Select-ControlValue {
+    max-height: 30px;
+    overflow: hidden;
+}
+
+.selectMobile .Select-Input {
+    display: none;
+}

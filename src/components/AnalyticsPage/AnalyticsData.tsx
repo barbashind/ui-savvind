@@ -176,7 +176,7 @@ useEffect(() => {
                                                                                                         className={cnMixSpace({ mR: 'xs'})}
                                                                                                 />
                                                                                                 <Text size="s">
-                                                                                                        {(item?.user ?? '') + ' - ' + formatNumber((Number(item.margProfit ?? 0 ) * 0.03).toFixed(2))  + ' руб' }
+                                                                                                        {(item?.user ?? '') + ' - ' + formatNumber((Number(item.margProfit ?? 0 ) * 0.04).toFixed(2))  + ' руб' }
                                                                                                 </Text>
                                                                                         </Layout>
                                                                                 )}

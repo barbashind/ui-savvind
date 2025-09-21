@@ -15,3 +15,18 @@ export const formatDate = (iso?: string | Date | null): string => {
 
   return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`;
 };
+
+export const formatDay = (iso?: string | Date | null): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return ''; // некорректная дата
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  // Приводим дату к локальному времени, компенсируя сдвиг UTC
+  const day = pad(d.getDate());
+  const month = pad(d.getMonth() + 1);
+  const year = d.getFullYear().toString();
+
+  return `${day}.${month}.${year}`;
+};

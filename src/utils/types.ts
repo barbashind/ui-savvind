@@ -1,5 +1,4 @@
 
-
 export interface DefaultTabs {
         id: number;
         label: string;

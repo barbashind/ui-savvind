@@ -28,7 +28,7 @@ import { TPageableResponse } from "../../utils/types.ts";
 import { deleteAccounting, getAccountings, getSumms } from "../../services/AccountingService.ts";
 import { Button } from "@consta/uikit/Button/index";
 import { formatNumber } from "../../utils/formatNumber.ts";
-import { formatDate } from "../../utils/formatDate.ts";
+import { formatDate, formatDay } from "../../utils/formatDate.ts";
 
 interface TProductAccountingTableProps {
         updateFlag: boolean;
@@ -192,17 +192,20 @@ const columns: ColumnType<TAccountingRow>[] = [
         dataIndex: 'id',
         key: 'id',
         align: 'left',
-        width: '150px',
+        width: '250px',
         render: (value: string, record: TAccountingRow) => {
             return record.spacer ? (
                 <></>
             ) : (
                 <Layout direction="column">
-                    <Text size="s" weight="medium" style={{minWidth: '140px'}}>
+                    <Text size="s" weight="medium" style={{minWidth: '240px'}}>
                         {value || '-'}
                     </Text>
-                    <Text size="xs" weight="medium" view="secondary" style={{minWidth: '140px'}}>
-                        {formatDate(record.createdAt)  || '-'}
+                    <Text size="xs" weight="medium" view="secondary" style={{minWidth: '240px'}}>
+                        {'Дата транзакции: ' + formatDay(record.createdAt)  || '-'}
+                    </Text>
+                     <Text size="xs" weight="medium" view="secondary" style={{minWidth: '240px'}}>
+                        {'Изменено: ' +formatDate(record.updatedAt)  || '-'}
                     </Text>
                 </Layout>
             );

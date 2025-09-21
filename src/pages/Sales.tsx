@@ -25,8 +25,8 @@ const Sales = () => {
         const [updateFlag, setUpdateFlag] = useState<boolean>(true);
         const [searchText, setSearchText] = useState<string | null> (null);
         const defaultFilter : TCheckFilter = {
-                dateMin: null,
-                dateMax: null,
+                dateMin: undefined,
+                dateMax: undefined,
                 customer: null,
                 searchText: null,
                 isUnpaid: true,

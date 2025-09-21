@@ -29,7 +29,7 @@ const Auth = () => {
       <div className="App">
             <Theme preset={presetGpnDefault}>
               <div style={{width: '100%', height: '100vh', alignContent: 'center', justifyItems: 'center', backgroundColor: '#ecf1f4'}}>
-                <Card className={cnMixSpace({p: 'xl'})} style={{width: '20%', alignSelf: 'center', backgroundColor: '#ffff'}}>
+                <Card className={cnMixSpace({p: 'xl'})} style={{width: '300px', alignSelf: 'center', backgroundColor: '#ffff'}}>
                   <Text view='brand' size='2xl'>Авторизация</Text>
                   <Layout direction='column' >
                     <Layout direction='column' style={{width: '100%',  }} className={cnMixSpace({mT: 'm'})}>

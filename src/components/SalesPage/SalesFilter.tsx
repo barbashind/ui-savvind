@@ -26,8 +26,8 @@ interface TSalesFilterProps {
 const SalesFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, filterValues, setFilterValues} : TSalesFilterProps) => {
 
         const defaultFilter : TCheckFilter = {
-                dateMin: null,
-                dateMax: null,
+                dateMin: undefined,
+                dateMax: undefined,
                 customer: null,
                 searchText: null,
                 isUnpaid: true,
@@ -98,7 +98,7 @@ const SalesFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, filterValue
                                                 } else {
                                                         setFilterValues(prev => ({
                                                                 ...prev,
-                                                                dateMin:  null,
+                                                                dateMin:  undefined,
                                                                 }))  
                                                 }
                                         }}
@@ -119,7 +119,7 @@ const SalesFilter = ({isFilterOpen, setIsFilterOpen,  setUpdateFlag, filterValue
                                                 } else {
                                                         setFilterValues(prev => ({
                                                                 ...prev,
-                                                                dateMax:  null,
+                                                                dateMax:  undefined,
                                                                 }))  
                                                 }
                                         }}
