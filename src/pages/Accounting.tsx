@@ -22,8 +22,8 @@ const Accounting = ( ) => {
                 accountTo: null,
                 valueFrom: null,
                 valueTo: null,
-                dateFrom: null,
-                dateTo: null,
+                dateFrom: undefined,
+                dateTo: undefined,
                 justification: null,
                 category: null,
         }

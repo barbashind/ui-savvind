@@ -13,26 +13,24 @@ import { Button } from "@consta/uikit/Button/index";
 import { Loader } from '@consta/uikit/Loader/index';
 
 //иконки
-import { IconTrash } from '@consta/icons/IconTrash';
 
 // собственные компоненты
-import { DataStat, TNomenclature, TNomenclatureFilter, TNomenclatureRow, TNomenclatureSortFields } from "../../types/nomenclature-types";
-import { TableColumnHeader } from '../global/TableColumnHeader.tsx';
-import { TPageableResponse } from "../../utils/types.ts";
-import { GetColumnSortOrder, GetColumnSortOrderIndex, OnColumnSort, Sort } from '../../hooks/useTableSorter.ts';
-import { ErrorResponse, IPagination, TSortParam } from '../../services/utils.ts';
-import { usePaginationStore } from '../../hooks/usePaginationStore.ts';
-import { Pagination } from '../global/Pagination.tsx';
-import { deleteNomenclature, getNomenclatures, getNomenclatureStat, updateNomenclature } from '../../services/NomenclatureService.ts';
-import { formatNumber } from '../../utils/formatNumber.ts';
+import { DataStat, TNomenclature, TNomenclatureFilter, TNomenclatureRow, TNomenclatureSortFields } from "../../../types/nomenclature-types";
+import { TableColumnHeader } from '../../global/TableColumnHeader.tsx';
+import { TPageableResponse } from "../../../utils/types.ts";
+import { GetColumnSortOrder, GetColumnSortOrderIndex, OnColumnSort, Sort } from '../../../hooks/useTableSorter.ts';
+import { ErrorResponse, IPagination, TSortParam } from '../../../services/utils.ts';
+import { usePaginationStore } from '../../../hooks/usePaginationStore.ts';
+import { getNomenclatures, getNomenclatureStat, updateNomenclature } from '../../../services/NomenclatureService.ts';
+import { formatNumber } from '../../../utils/formatNumber.ts';
 import { IconLineAndBarChart } from '@consta/icons/IconLineAndBarChart/index';
 import { Modal } from '@consta/uikit/Modal/index';
 import { IconClose } from '@consta/icons/IconClose/index';
-import { TextField } from '@consta/uikit/TextField/index';
 import { IconArrowDown } from '@consta/icons/IconArrowDown/index';
 import { Tag } from '@consta/uikit/Tag/index';
 import { IconArrowUp } from '@consta/icons/IconArrowUp/index';
 import { Badge } from '@consta/uikit/Badge/index';
+import { PaginationMobile } from '../../../components/global/PaginationMobile.tsx';
 
 interface TNomenclatureTableProps {
         updateFlag: boolean;
@@ -51,7 +49,7 @@ interface TNomenclatureTableProps {
     }
 
 
-const NomenclatureTable = ({updateFlag, setUpdateFlag, setId, currentPage, setCurrentPage, getColumnSortOrder, getColumnSortOrderIndex, columnSort, onColumnSort,   setIsEditModalOpen, filterValues, count, setCount} : TNomenclatureTableProps) => {
+const NomenclatureTableMobile = ({updateFlag, setUpdateFlag, setId, currentPage, setCurrentPage, getColumnSortOrder, getColumnSortOrderIndex, columnSort, onColumnSort,   setIsEditModalOpen, filterValues, count, setCount} : TNomenclatureTableProps) => {
 const { getStoredPageSize, setStoredPageSize } = usePaginationStore('Records');
     const [pagination, setPagination] = useState<IPagination>({
                     totalPages: 0,
@@ -173,18 +171,11 @@ const activeMessageNomenclature = async (record: TNomenclatureRow, itemId: numbe
     })
 }
 
-const deleteNomenclatureData = async (itemId: number | undefined) => {
-    await deleteNomenclature(itemId).then(()=>{
-        setUpdateFlag(true);
-    })
-}
- 
-
     const columns: ColumnType<TNomenclatureRow>[] = [
         {
             title: (
                 <TableColumnHeader
-                    header="Товар"
+                    header="Сортировать по остатку"
                     sortOrder={getColumnSortOrder('name')}
                     sortOrderIndex={getColumnSortOrderIndex('name')}
                     onSort={(sortOrder, isAdd) => {
@@ -196,7 +187,6 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
             key: 'name',
             align: 'left',
             width: '100%',
-            minWidth: 150,
             render: (value: string, record: TNomenclatureRow) => {
                 return record.spacer ? (
                     <></>
@@ -206,19 +196,36 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                             {value || '-'}
                         </Text>
                         <Layout direction='row'>
-                            <Text size="xs" weight="medium" view='secondary'>
+                            <Text size="2xs" weight="medium" view='secondary'>
                                 Бренд:
                             </Text>
-                            <Text size="xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                            <Text size="2xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
                             {record.brand}
+                            </Text>
+                            <Text size="2xs" weight="medium" view='secondary' className={cnMixSpace({mL:'xs'})}>
+                                Тип:
+                            </Text>
+                            <Text size="2xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                                {' ' + (record.productType ?? '-')}
                             </Text>
                         </Layout>
                         <Layout direction='row'>
-                            <Text size="xs" weight="medium" view='secondary'>
-                                Тип:
+                            <Text size="2xs" weight="medium" view='secondary'>
+                                Посл. цена закуп.:
                             </Text>
-                            <Text size="xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                {' ' + (record.productType ?? '-')}
+                            <Text size="2xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                                {record.lastCostPrice ? (record.lastCostPrice) : '-'}
+                            </Text>
+                        </Layout>
+                        <Layout direction='row'>
+                            <Text size="2xs" weight="medium" view='secondary'>
+                                Остаток:
+                            </Text>
+                            <Text size="2xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                                 {record.remainsSum ? Math.round(record.remainsSum) + ' шт' : '0 шт'}
+                            </Text>
+                            <Text size="2xs" weight="medium" className={cnMixSpace({mL:'2xs'})}>
+                                 {'(' + formatNumber((Number(Number(record.remainsSum) * Number(record?.lastCostPrice)).toFixed(2)) || '0') + ' $)' }
                             </Text>
                         </Layout>
                         
@@ -227,170 +234,10 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 );
             },
         },
-        // {
-        //         title: (
-        //             <TableColumnHeader
-        //                 header="Бренд"
-        //                 withoutSort={true}
-        //             />
-        //         ),
-        //         dataIndex: 'brand',
-        //         key: 'brand',
-        //         align: 'left',
-        //         width: '240px',
-        //         minWidth: 240,
-        //         render: (value: string, record: TNomenclatureRow) => {
-        //             return record.spacer ? (
-        //                 <></>
-        //             ) : (
-        //                 <div>
-        //                     <Text size="s" weight="medium" style={{minWidth: '250px'}}>
-        //                         {value || '-'}
-        //                     </Text>
-        //                 </div>
-        //             );
-        //         },
-        // },
-        // {
-        //         title: (
-        //             <TableColumnHeader
-        //                 header="Тип товара"
-        //                 withoutSort={true}
-        //             />
-        //         ),
-        //         dataIndex: 'productType',
-        //         key: 'productType',
-        //         align: 'left',
-        //         width: '240px',
-        //         minWidth: 240,
-        //         render: (value: string, record: TNomenclatureRow) => {
-        //             return record.spacer ? (
-        //                 <></>
-        //             ) : (
-        //                 <div>
-        //                     <Text size="s" weight="medium" style={{minWidth: '150px'}}>
-        //                         {value || '-'}
-        //                     </Text>
-        //                 </div>
-        //             );
-        //         },
-        // },
-        {
-                title: (
-                    <TableColumnHeader
-                        header="Последняя цена закупки"
-                        sortOrder={getColumnSortOrder('lastCostPrice')}
-                        sortOrderIndex={getColumnSortOrderIndex('lastCostPrice')}
-                        onSort={(sortOrder, isAdd) => {
-                                onColumnSort('lastCostPrice', sortOrder, isAdd);
-                                }}
-                    />
-                ),
-                minWidth: 150,
-                dataIndex: 'lastCostPrice',
-                key: 'lastCostPrice',
-                align: 'left',
-                width: '150px',
-                render: (value: string, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            <Text size="s" weight="medium" style={{minWidth: '150px'}}>
-                                {value || '-'}
-                            </Text>
-                        </div>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header="Остаток"
-                        sortOrder={getColumnSortOrder('remainsSum')}
-                        sortOrderIndex={getColumnSortOrderIndex('remainsSum')}
-                        onSort={(sortOrder, isAdd) => {
-                                onColumnSort('remainsSum', sortOrder, isAdd);
-                                }}
-                    />
-                ),
-                dataIndex: 'remainsSum',
-                key: 'remainsSum',
-                align: 'left',
-                width: '120px',
-                minWidth: 120,
-                render: (value: number, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <Layout direction="row" style={{ width: '120px' }}>
-                            <Text size="s" weight="medium">
-                                {value ? Math.round(value) + ' шт' : '0 шт'}
-                            </Text>
-                            
-                        </Layout>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header="Остаток в $"
-                        withoutSort={true}
-                    />
-                ),
-                dataIndex: 'remainsSum',
-                key: 'remainsSum',
-                align: 'left',
-                width: '200px',
-                minWidth: 200,
-                render: (value: string, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <Layout direction="row" style={{ width: '200px' }}>
-                            
-                            <Text size="s" weight="medium" className={cnMixSpace({mL:'2xs'})}>
-                                {formatNumber((Number(Number(value) * Number(record?.lastCostPrice)).toFixed(2)) || '0') + ' $' }
-                            </Text>
-                        </Layout>
-                    );
-                },
-            },
             {
                 title: (
                     <TableColumnHeader
                         header=""
-                        withoutSort
-                    />
-                ),
-                dataIndex: 'isMessageActive',
-                key: 'isMessageActive',
-                align: 'center',
-                width: '150px',
-                minWidth: 50,
-                render: (_value: boolean, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            {(record?.booked && record?.booked > 0) ? (
-                                <Badge 
-                                    label={`Бронь: ${record.booked}`}
-                                    status='success'
-                                    size='s'
-                                />
-                            ) : <></>
-                            }
-                            
-                        </div>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header="Активировать бота"
                         withoutSort
                     />
                 ),
@@ -403,7 +250,19 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                     return record.spacer ? (
                         <></>
                     ) : (
-                        <div style={{minWidth: '150px'}}>
+                        <Layout direction='column'>
+                            {(record?.booked && record?.booked > 0) ? (
+                                <Badge 
+                                    label={`Бронь: ${record.booked}`}
+                                    status='success'
+                                    size='s'
+                                />
+                            ) : <></>
+                            }
+                            <Layout direction='row' style={{alignItems:'center'}}>
+                                <Text size="2xs" weight="medium" view='secondary'>
+                                    Актив. бота:
+                                </Text>
                                 <Switch 
                                         size="s" 
                                         checked={value}
@@ -414,91 +273,28 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                                                 e.stopPropagation();
                                                 activeMessageNomenclature(record, record.itemId);
                                         }}
+                                        className={cnMixSpace({mL:'2xs'})}
                                 />
-                        </div>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header=""
-                        withoutSort
-                    />
-                ),
-                dataIndex: 'isMessageActive',
-                key: 'isMessageActive',
-                align: 'center',
-                width: '150px',
-                minWidth: 50,
-                render: (_value: boolean, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            <Button 
-                                size="s" 
-                                iconLeft={IconLineAndBarChart} 
-                                view="secondary" 
-                                onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsStatModalOpen(true);
-                                        setIdProd(record.itemId);
-                                        setNameProd(record.name);
-                                        setHasSerialNumberProd(record.hasSerialNumber);
-                                }}
+                            </Layout>
+                            <Layout direction='row' style={{alignItems:'center'}} className={cnMixSpace({mV:'2xs'})}>
+                                <Text size="2xs" weight="medium" view='secondary'>
+                                    Статистика:
+                                </Text>
+                                <Button 
+                                    size="s" 
+                                    iconLeft={IconLineAndBarChart} 
+                                    view="secondary" 
+                                    onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsStatModalOpen(true);
+                                            setIdProd(record.itemId);
+                                            setNameProd(record.name);
+                                            setHasSerialNumberProd(record.hasSerialNumber);
+                                    }}
+                                    form='round'
+                                    className={cnMixSpace({mL:'2xs'})}
                                 />
-                        </div>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header=""
-                        withoutSort
-                    />
-                ),
-                dataIndex: 'isMessageActive',
-                key: 'isMessageActive',
-                align: 'center',
-                width: '150px',
-                minWidth: 50,
-                render: (_value: boolean, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
-                            <Button 
-                                size="s" 
-                                iconLeft={IconTrash} 
-                                view="clear" 
-                                onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteNomenclatureData(record.itemId);
-                                }}
-                                />
-                        </div>
-                    );
-                },
-            },
-            {
-                title: (
-                    <TableColumnHeader
-                        header=""
-                        withoutSort
-                    />
-                ),
-                dataIndex: 'isMessageActive',
-                key: 'isMessageActive',
-                align: 'center',
-                width: '150px',
-                minWidth: 50,
-                render: (_value: boolean, record: TNomenclatureRow) => {
-                    return record.spacer ? (
-                        <></>
-                    ) : (
-                        <div>
+                            </Layout>
                             {!record.weight && (
                                 <Badge 
                                     label='Не указан вес'
@@ -507,8 +303,9 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                                 />
                             )
                             }
+                        </Layout>
                             
-                        </div>
+                            
                     );
                 },
             },
@@ -526,15 +323,33 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
     } as TableProps<TNomenclatureRow>;
 
         return (
-            <Layout flex={1} direction="column" style={{ height: '100%' }}>
-            <Layout flex={1} direction="column" style={{
-                    minHeight: 'calc(90vh - 155px)',
-                    // minWidth:'calc(100vw - 55px)',
-                    overflow: 'auto',
-                    display: 'flex',
-                    width: '100%',
-                    flex: '1 1 auto',
-                    }}>
+            <Layout flex={1} direction="column" style={{ height: '100%', width: '100%'}} className={cnMixSpace({mT:'xs'})}>
+                <PaginationMobile
+                                    items={pagination.totalPages === 0 ? 1 : pagination.totalPages}
+                                    value={currentPage}
+                                    pageSize={pagination.pageSize}
+                                    onChange={(e) => {
+                                        setCurrentPage(e);
+                                        setUpdateFlag(true);
+                                    }}
+                                    onChangePageSize={(pageSize) => {
+                                        setCurrentPage(0);
+                                        setPagination((prev) => ({
+                                            ...prev,
+                                            pageSize,
+                                        }));
+                                        setUpdateFlag(true);
+                                    }}
+                                />
+            <Layout flex={1} direction="column" 
+                className={cnMixSpace({mV:'xs'})}
+                style={{
+                        minHeight: 'calc(90vh - 203px)',
+                        overflow: 'auto',
+                        display: 'flex',
+                        width: '100%',
+                        flex: '1 1 auto',
+                        }}>
                 {!isLoading ? (
                     <RCTable
                         {...tableProps}
@@ -582,25 +397,6 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                 )}
             </Layout>
 
-            {/* Пагинация, закреплена внизу */}
-                <Pagination
-                    items={pagination.totalPages === 0 ? 1 : pagination.totalPages}
-                    value={currentPage}
-                    pageSize={pagination.pageSize}
-                    onChange={(e) => {
-                        setCurrentPage(e);
-                        setUpdateFlag(true);
-                    }}
-                    onChangePageSize={(pageSize) => {
-                        setCurrentPage(0);
-                        setPagination((prev) => ({
-                            ...prev,
-                            pageSize,
-                        }));
-                        setUpdateFlag(true);
-                    }}
-                />
-
                 <Modal
                     isOpen={isStatModalOpen}
                     hasOverlay
@@ -618,13 +414,13 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                             setDataStat(undefined);
                             setDatesWithSerNum(null);
                     }}
-                    style={{width: '50%'}}
+                    style={{width: '90%'}}
             >
                     {!isStatLoading && (
-                        <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({ p:'xl' })}>
+                        <Layout direction="column" style={{width: '100%'}} className={cnMixSpace({ p:'s' })}>
                             <Layout direction="row" style={{justifyContent: 'space-between'}}>
-                                    <Text size="xl" view="brand" className={cnMixSpace({ mL:'m', mT: '2xs' })}>
-                                            {'Статистика товара ' + nameProd}
+                                    <Text size="xl" view="brand" className={cnMixSpace({ mL:'2xs', mT: '2xs' })}>
+                                            {nameProd}
                                     </Text>
                                     <Button
                                             view="clear"
@@ -640,28 +436,22 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
                             </Layout>
 
                             <Layout direction='column'>
-                                            <Layout direction='row' style={{ alignItems: 'center' }} className={cnMixSpace({mT:'l'})}>
-                                                <Text size='s' view='secondary' style={{minWidth: '120px', maxWidth: '120px'}}>Всего продано:</Text>
-                                                <TextField 
-                                                    disabled
-                                                    value={dataStat?.salledAll? dataStat?.salledAll?.toString() + ' шт' : '0 шт'}
-                                                    style={{minWidth: '150px', maxWidth: '150px'}}
-                                                    size='s'
-                                                />
+                                            <Layout direction='row' style={{ alignItems: 'center' }} className={cnMixSpace({mT:'s'})}>
+                                                <Text size='s' view='secondary'> Продано:</Text>
+                                                <Text size='s' view='primary' style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mL:'2xs'})}>{dataStat?.salledAll? dataStat?.salledAll?.toString() + ' шт' : '0 шт'}</Text>
                                             </Layout>
                                             <Layout direction='row' style={{ width: '100%', alignItems: 'center', borderTop: '1px solid rgba(0, 65, 102, .2)', borderBottom: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mT: 's', p:'s'})}>
-                                                <Text size='s' style={{ maxWidth: '150px', minWidth: '150px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>Дата</Text>
-                                                <Text size='s' style={{ width: '100%'}} onClick={()=> console.log(dataStat)}>Кол-во продано:</Text>
+                                                <Text size='s' style={{ maxWidth: '90px', minWidth: '90px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>Дата</Text>
+                                                <Text size='s' style={{ width: '100%'}} onClick={()=> console.log(dataStat)}>Кол-во:</Text>
                                                 <div style={{ maxWidth: '121px', minWidth: '121px'}}/>
                                             </Layout>
                                             {dataStat?.sales && dataStat?.sales?.length > 0 && dataStat?.sales?.map((sale) => (
                                                 <Layout direction='column' style={{ width: '100%', border: '1px solid rgb(86, 185, 242)', borderRadius: '4px'}} className={cnMixSpace({p:'s', mT: 's'})}>
                                                     <Layout direction='row'  style={{ width: '100%', alignItems: 'center'}}>
-                                                        <Text size='s' style={{ maxWidth: '150px', minWidth: '150px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>{sale?.date}</Text>
+                                                        <Text size='s' style={{ maxWidth: '90px', minWidth: '90px', borderRight: '1px solid rgba(0, 65, 102, .2)'}} className={cnMixSpace({mR: 'm'})} align='center'>{sale?.date}</Text>
                                                         <Text size='s' style={{ width: '100%'}}>{sale?.saled?.toString() + ' шт'}</Text>
                                                         {hasSerialNumberProd && (
                                                             <Button 
-                                                                label={'Серийники'}
                                                                 iconRight={datesWithSerNum?.find((el)=> (el === sale.date)) ? IconArrowUp : IconArrowDown }
                                                                 size='s'
                                                                 view='secondary'
@@ -703,4 +493,4 @@ const deleteNomenclatureData = async (itemId: number | undefined) => {
         </Layout>
         )
 }
-export default NomenclatureTable
+export default NomenclatureTableMobile;

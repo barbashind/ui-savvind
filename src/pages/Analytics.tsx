@@ -53,7 +53,7 @@ const [filterValues, setFilterValues] = useState<TAnalyticFilter>(defaultFilterV
                                         />
                                 </Layout>
                         )}
-                        {role !== 'ADM' && role === 'SLR' && (
+                        {role !== 'ADM' && role !== 'SLR' && (
                                 <Text>Нет полномочий</Text>
                         )}
                                 

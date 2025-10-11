@@ -20,7 +20,7 @@ import { getUserInfo } from "../../services/AuthorizationService.ts";
 import { UserInfo } from "../../services/AuthorizationService.ts";
 import { Button } from "@consta/uikit/Button/index";
 import { Avatar } from "@consta/uikit/Avatar/index";
-import { DollarOutlined, LineChartOutlined, ReadOutlined, SettingOutlined, ShopOutlined } from "@ant-design/icons";
+import { DollarOutlined, LineChartOutlined, LoginOutlined, ReadOutlined, SettingOutlined, ShopOutlined } from "@ant-design/icons";
 import { AntIcon } from "../../utils/AntIcon.ts";
 import { cnMixFontSize } from "../../utils/MixFontSize.ts";
 
@@ -117,16 +117,32 @@ const MainPageMobile = () => {
                                                 <Text view="brand" size="xs" weight="semibold" className={cnMixSpace({mL: 'xs'})}>ERP-ELECTRONICS</Text>
                                         </Layout>
                                         <Layout direction="row"  style={{alignItems: 'center', justifyContent: 'right'}}>
-                                                <Text size="2xs" view="secondary" weight="semibold" className={cnMixSpace({mR: 'xs'})}>{user?.username}</Text>
-                                                <Avatar size="s" name={user?.username} />
+                                                <Avatar size="s" name={user?.username} className={cnMixSpace({mR: 'xs'})}/>
+                                                <Text size="2xs" view="secondary" weight="semibold" >{user?.username}</Text>
+                                                <Button 
+                                                        onClick={()=>{
+                                                                localStorage.removeItem('token');
+                                                                window.location.reload();
+                                                        }}
+                                                        view="secondary"
+                                                        className={cnMixSpace({ mL: 's'})}
+                                                        iconLeft={AntIcon.asIconComponent(() => (
+                                                                <LoginOutlined 
+                                                                        className={cnMixFontSize('l')}
+                                                                />
+                                                        ))}
+                                                        form='round'
+                                                        size="s"
+                                                />
                                         </Layout>
+                                        
                                 </Layout>
                                 <Layout 
                                         direction="row" 
                                         className={cnMixSpace({p: 'xs'})} 
                                         style={{justifyContent: 'space-between', borderBottom: '1px solid var(--color-typo-brand)', alignItems: 'center'}}
                                 >
-                                        <Button
+                                        {(user?.role === 'ADM' || user?.role === 'SLR') && (<Button
                                                 iconLeft={AntIcon.asIconComponent(() => (
                                                         <LineChartOutlined 
                                                                 className={cnMixFontSize('l')}
@@ -138,7 +154,7 @@ const MainPageMobile = () => {
                                                 }}
                                                 form="round"
                                                 view={activePage?.id === 0 ? 'primary' : 'ghost'}
-                                        />
+                                        />)}
                                         <Button
                                                 iconLeft={AntIcon.asIconComponent(() => (
                                                         <DollarOutlined 
@@ -178,6 +194,7 @@ const MainPageMobile = () => {
                                                 form="round"
                                                 view={activePage?.id === 3 ? 'primary' : 'ghost'}
                                         />
+                                        {user?.role === 'ADM' && (
                                         <Button
                                                 iconLeft={AntIcon.asIconComponent(() => (
                                                         <SettingOutlined
@@ -190,7 +207,7 @@ const MainPageMobile = () => {
                                                 }}
                                                 form="round"
                                                 view={activePage?.id === 4 ? 'primary' : 'ghost'}
-                                        />
+                                        />)}
                                 </Layout>
                                 <Outlet/>
                         </Layout>

@@ -139,6 +139,25 @@ export const getProductBySerial = async (
         const resp: TCreatedCheck = (await response.json()) as TCreatedCheck;
         return resp;
     };
+    
+    // Обновление брони
+    export const updateBooking = async (data: TCheckData): Promise<TCreatedCheck> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/update-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const errorResponse = await getErrorResponse(response);
+            throw new ErrorResponse(errorResponse);
+        }
+        const resp: TCreatedCheck = (await response.json()) as TCreatedCheck;
+        return resp;
+    };
 
 // Добавление товаров
 export const addCheckSales = async (data: TSale[]): Promise<TSale[]> => {
@@ -156,6 +175,24 @@ export const addCheckSales = async (data: TSale[]): Promise<TSale[]> => {
         throw new ErrorResponse(errorResponse);
     }
     const resp: TSale[] = (await response.json()) as TSale[];
+    return resp;
+};
+
+export const updatePrice = async (data: TSale): Promise<TSale> => {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/update-price', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        const errorResponse = await getErrorResponse(response);
+        throw new ErrorResponse(errorResponse);
+    }
+    const resp: TSale = (await response.json()) as TSale;
     return resp;
 };
 

@@ -22,7 +22,7 @@ export interface TSale {
         checkId?: number;
         itemId?: number;
         customer?: string;
-        salePrice: number | null;
+        salePrice: number | string | null;
         name: string | null;
         serialNumber?: string | null;
         createdAt: Date | null;

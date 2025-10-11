@@ -14,13 +14,13 @@ import { SaveOutlined } from "@ant-design/icons"
 import { IconAdd } from "@consta/icons/IconAdd";
 
 // собственные компоненты
-import { cnMixFontSize } from "d:/ui-savvind/src/utils/MixFontSize"
-import { AntIcon } from "d:/ui-savvind/src/utils/AntIcon"
-import { TCurrency } from "d:/ui-savvind/src/types/settings-types"
+import { cnMixFontSize } from "../../../utils/MixFontSize"
+import { AntIcon } from "../../../utils/AntIcon"
+import { TCurrency } from "../../../types/settings-types"
 import { TextField } from "@consta/uikit/TextField"
 import { IconTrash } from "@consta/icons/IconTrash"
 import { cnMixSpace } from "@consta/uikit/MixSpace"
-import { deleteCurrency, getCurrencies, updateCurrencies } from "d:/ui-savvind/src/services/SettingsService"
+import { deleteCurrency, getCurrencies, updateCurrencies } from "../../../services/SettingsService"
 import { Loader } from "@consta/uikit/Loader"
 
 // сервисы
@@ -84,10 +84,10 @@ const updateCurrenciesData = async (warehouses : TCurrency[]) => {
                 <Card border style={{width: '100%'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Валюты</Text>
-                                        <Layout direction="row">
+                                        
+                                        <Layout direction="row" style={{justifyContent: 'left', alignItems:'center'}}>
+                                                <Text view="brand" size="s" weight="semibold" className={cnMixSpace({mR: 'm'})}>Валюты</Text>
                                                 <Button
-                                                        label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
@@ -99,10 +99,9 @@ const updateCurrenciesData = async (warehouses : TCurrency[]) => {
                                                         className={cnMixSpace({mR: 'm'})}
                                                 />
                                                 <Button
-                                                        label={'Сохранить'}
                                                         iconLeft={AntIcon.asIconComponent(() => (
                                                                 <SaveOutlined
-                                                                className={cnMixFontSize('m') + ' ' + cnMixSpace({mR:'xs'})}
+                                                                className={cnMixFontSize('m')}
                                                                 />
                                                         ))}
                                                         view="primary"

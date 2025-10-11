@@ -1,4 +1,4 @@
-import { TWarehouse } from '#/types/settings-types';
+import { TWarehouse } from '../types/settings-types';
 import { HttpService } from '../system/HttpService';
 import { DataStat, TNomenclature, TNomenclatureFilter } from '../types/nomenclature-types';
 

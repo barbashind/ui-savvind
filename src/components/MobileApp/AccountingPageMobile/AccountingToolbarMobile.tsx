@@ -11,14 +11,15 @@ import { cnMixSpace } from "@consta/uikit/MixSpace";
 import { IconAdd } from '@consta/icons/IconAdd';
 import { IconBook } from '@consta/icons/IconBook';
 import { IconSearchStroked } from '@consta/icons/IconSearchStroked';
-import { TAccountingFilter } from "../../types/accounting-types.ts";
+import { TAccountingFilter } from "../../../types/accounting-types.ts";
 import { IconArrowDown } from "@consta/icons/IconArrowDown/index";
 import { IconArrowUp } from "@consta/icons/IconArrowUp/index";
 import { DatePicker } from "@consta/uikit/DatePicker/index";
-import NumberMaskTextField from "../../utils/NumberMaskTextField.tsx";
+import NumberMaskTextField from "../../../utils/NumberMaskTextField.tsx";
 import { Combobox } from "@consta/uikit/Combobox/index";
-import { TCategory } from "../../types/settings-types.ts";
-import { getCategories } from "../../services/SettingsService.ts";
+import { TCategory } from "../../../types/settings-types.ts";
+import { getCategories } from "../../../services/SettingsService.ts";
+import { Card } from "@consta/uikit/Card/index";
 
 export interface TAccountingToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,7 +31,7 @@ export interface TAccountingToolbarProps {
         filterValues: TAccountingFilter;
 }
 
-const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, setIsAccModalOpen, role, isMatvei, filterValues} : TAccountingToolbarProps) => {
+const AccountingToolbarMobile = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, setIsAccModalOpen, role, isMatvei, filterValues} : TAccountingToolbarProps) => {
 
         const [isVisible, setIsVisible] = useState<boolean>(false)
         const [categories, setCategories] = useState<TCategory[]>([]);
@@ -48,65 +49,36 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
         
 
         return (
-                <Layout direction="row" style={{ justifyContent: 'space-between', borderBottom: '2px solid #56b9f2', flexWrap: 'wrap'}} className={cnMixSpace({mB: 'm', p:'m'})} >
-                        <Layout direction="row">
-                                <Text size='2xl' weight="semibold" view="brand" >
-                                        Бухгалтерия
-                                </Text>
-                        </Layout>
-                        <Layout direction="row">
-                                {/* <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})}>
-                                        Поиск:
-                                </Text>
-                                <TextField
-                                        size='s'
-                                        value={searchText}
-                                        onChange={(value) => {
-                                                setSearchText(value);
-                                                setFilterValues(prev => ({...prev, searchText: value}))
-                                                if (!value) {
-                                                        setUpdateFlag(true);
-                                                }
-                                        }}
-                                        onKeyPress={(event) => {
-                                                if (event.key === 'Enter') {
-                                                        setUpdateFlag(true);
-                                                }
-                                            }}
-                                        withClearButton
-                                        className={cnMixSpace({mL: 's'})}
-                                        disabled={role === 'SLR'}
-                                /> */}
-                                
+                <Layout direction="column" style={{  borderBottom: '2px solid #56b9f2' }} className={cnMixSpace({pB: 'm'})} >
+                        <Layout direction="row"  className={cnMixSpace({mB: 'xs'})} style={{ justifyContent: 'space-between'}}>
                                 <Button 
-                                        size='s' 
+                                        size='m' 
                                         view='primary' 
-                                        label={'Сформировать транзакцию'} 
+                                        label={'Оформить транзакцию'} 
                                         iconLeft={IconAdd} 
                                         onClick={()=>{setIsEditModalOpen(true)}} 
-                                        className={cnMixSpace({mL: 's'})}
                                         disabled={role === 'SLR' && !isMatvei}
+                                        form="round"
                                 />
-                                <Button size='s' view='secondary' label={'Проверить счета'} iconLeft={IconBook} onClick={()=>{setIsAccModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
-                                <Button 
-                                        size='s' 
-                                        view='clear' 
-                                        label={!isVisible ? 'Показать фильтры' : 'Скрыть фильтры'} 
-                                        iconLeft={!isVisible ? IconArrowDown : IconArrowUp} 
-                                        onClick={()=>{setIsVisible(!isVisible)}} 
-                                        className={cnMixSpace({mL: 's'})}
-                                />
+                                <Layout>
+                                        <Button size='m' view='secondary' iconLeft={IconBook} onClick={()=>{setIsAccModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                                        <Button 
+                                                size='m' 
+                                                view='ghost' 
+                                                iconLeft={!isVisible ? IconArrowDown : IconArrowUp} 
+                                                onClick={()=>{setIsVisible(!isVisible)}} 
+                                                className={cnMixSpace({mL: 's'})}
+                                        />
+                                </Layout>
                                 
-
                         </Layout>
                         {isVisible && (
-                        <Layout direction="column" style={{ width: '100%'}}>
-                        <Layout direction="row" className={cnMixSpace({mT: 'm'})} style={{ alignItems: 'center', alignSelf: 'end', width: '70%'}} >
-                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
-                                        Счет списания:
-                                </Text>
+                        <Card  className={cnMixSpace({ mH: 's'})} style={{border: '1px solid var(--color-typo-brand)'}}>
+                        <Layout direction="row" className={cnMixSpace({mT: 'm'})} >
+                                
                                 <TextField
                                         size='s'
+                                        placeholder="Счет списания"
                                         value={filterValues.accountFrom}
                                         onChange={(value) => {
                                                 setFilterValues(prev => ({...prev, accountFrom: value}))
@@ -123,11 +95,10 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                         className={cnMixSpace({mL: 's'})}
                                         disabled={role === 'SLR'}
                                 />
-                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
-                                        Счет пополнения:
-                                </Text>
+                                
                                 <TextField
                                         size='s'
+                                        placeholder="Счет пополнения"
                                         value={filterValues.accountTo}
                                         onChange={(value) => {
                                                 setFilterValues(prev => ({...prev, accountTo: value}))
@@ -141,16 +112,14 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                                 }
                                             }}
                                         withClearButton
-                                        className={cnMixSpace({mL: 's'})}
+                                        className={cnMixSpace({mH: 's'})}
                                         disabled={role === 'SLR'}
                                 />
                         </Layout>
-                        <Layout direction="row" className={cnMixSpace({mT: 'm'})} style={{ alignItems: 'center', alignSelf: 'end', width: '70%'}} >
-                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
-                                        Обоснование:
-                                </Text>
+                        <Layout direction="row" className={cnMixSpace({mT: 's'})}>
                                 <TextField
                                         size='s'
+                                        placeholder="Обоснование"
                                         value={filterValues.justification}
                                         onChange={(value) => {
                                                 setFilterValues(prev => ({...prev, justification: value}))
@@ -166,10 +135,8 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                         withClearButton
                                         className={cnMixSpace({mL: 's'})}
                                 />
-                                <Text size="s" className={cnMixSpace({mL: 'xl'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
-                                        Категории:
-                                </Text>
                                 <Combobox
+                                        placeholder="Категории"
                                         multiple={true}
                                         items={categories}
                                         getItemKey={item => item.id ?? 0}
@@ -187,7 +154,15 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                                         setUpdateFlag(true);
                                                 }
                                             }}
-                                        className={cnMixSpace({mL: 's'})}
+                                        className={cnMixSpace({mH: 's'})+ ' ' + 'selectMobile'}
+                                        renderValue={(item) => {
+                                                const count = filterValues?.category?.length || 0;
+                                                const selected = filterValues?.category ?? [];
+                                                const primary = selected[0];
+                                                if (count === 0) return <Text size="m" className={cnMixSpace({ mT:'2xs' })}>-</Text>;
+                                                if (count === 1) return <Text size="m" className={cnMixSpace({ mT:'2xs' })}>{filterValues.category ? filterValues.category[0].name : '-'}</Text>;
+                                                return (item.item === primary) ? <Text size="m" className={cnMixSpace({ mT:'2xs' })} >{`Выбрано: ${count}`}</Text> : null;
+                                        }}
                                 />
                         </Layout>
                         <Layout direction="row" style={{ alignItems: 'center', justifyContent: 'right', alignSelf: 'end', width: '70%'}} className={cnMixSpace({mT: 'm'})}>
@@ -215,13 +190,13 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                         withClearButton
                                         className={cnMixSpace({mH: 's'})}
                                 />
+                                
                                 </Layout>
-                                <Layout direction="row" style={{ alignItems: 'center', justifyContent: 'right', alignSelf: 'end', width: '70%'}} className={cnMixSpace({mT: 'm'})}>
+                                <Layout direction="row" style={{ alignItems: 'center', justifyContent: 'right'}} className={cnMixSpace({mV: 's'})}>
                                 <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
                                         Сумма от:
                                 </Text>
                                 <NumberMaskTextField
-                                        size='s'
                                         value={filterValues.valueFrom}
                                         onChange={(value: string) => {
                                                 setFilterValues(prev => ({...prev, valueFrom: Number(value)}))
@@ -231,12 +206,13 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                         }}
                                         className={cnMixSpace({mL: 's'})}
                                         disabled={role === 'SLR'}
+                                        style={{minWidth: '60px'}}
+                                        size='xs'
                                 />
                                 <Text size="s" className={cnMixSpace({mL: 'xl', mT: 's'})} style={{width: 'fit-content', textWrap: 'nowrap'}}>
                                         до:
                                 </Text>
                                 <NumberMaskTextField
-                                        size='s'
                                         value={filterValues.valueTo}
                                         onChange={(value: string) => {
                                                 setFilterValues(prev => ({...prev, valueTo: Number(value)}))
@@ -244,28 +220,27 @@ const AccountingToolbar = ({setIsEditModalOpen, setFilterValues, setUpdateFlag, 
                                                         setFilterValues(prev => ({...prev, valueTo: null}))
                                                 }
                                         }}
-                                        className={cnMixSpace({mL: 's'})}
+                                        className={cnMixSpace({mH: 's'})}
                                         disabled={role === 'SLR'}
+                                        style={{minWidth: '60px'}}
+                                        size='xs'
                                 />
-                                <Button 
+                        </Layout>
+                        <Button 
                                         size='s' 
                                         view='secondary' 
                                         iconLeft={IconSearchStroked} 
                                         label="Поиск"  
-                                        className={cnMixSpace({mL: 's'})}
+                                        className={cnMixSpace({mB: 's'})}
                                         onClick={() => {
                                                 setUpdateFlag(true);
                                         }}
                                 />
-
-                        
-
-                        </Layout>
-                        </Layout>
+                        </Card>
                         )}
                         
                 </Layout>
                 
         )
 }
-export default AccountingToolbar;
+export default AccountingToolbarMobile;

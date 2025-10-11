@@ -18,7 +18,7 @@ import { TNomenclature } from "../../types/nomenclature-types";
 import { TCheck, TSale } from "../../types/sales-types";
 import { IconTrash } from "@consta/icons/IconTrash";
 import { TCaption } from "../../utils/types";
-import { addCheck, addCheckSales, deleteCheck, deleteCheckSales, getCheck, getCheckSales, getProductBySerial, updateCheck } from "../../services/SalesService";
+import { addCheck, addCheckSales, deleteCheck, deleteCheckSales, getCheck, getCheckSales, getProductBySerial, updateCheck, updatePrice } from "../../services/SalesService";
 import { getNomenclatures } from "../../services/PurchaseService";
 import { getUserInfo } from "../../services/AuthorizationService";
 import { TAccount, TUser } from "../../types/settings-types";
@@ -75,8 +75,10 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
                 setSales([defaultItem]);
                 setIsOpen(false);
                 setCheckId(undefined);
+                setIsChanged(false);
         }
         const [data, setData] = useState<TCheck>(defaultData);
+        const [isChanged, setIsChanged] = useState<boolean>(false);
         const [productList, setProductList] = useState<TProduct[]>([]);
         const [sales, setSales] = useState<TSale[]>([defaultItem]);
         const [salesDef, setSalesDef] = useState<TSale[]>([defaultItem]);
@@ -242,7 +244,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
         const createCheck  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                 setIsLoading(true);
                 e.preventDefault();
-                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                                 const partners = getPartners(sales);
                                 const body = sales?.filter((item => (!!item.itemId)));
                                 try {
@@ -301,7 +303,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
         const createBooking  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                                 setIsLoading(true);
                                 e.preventDefault();
-                                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                                                 const body = sales?.filter((item => (!!item.itemId)));
                                                 // const partners = getPartners(sales);
                                                 try {
@@ -360,7 +362,7 @@ const SalesDetailsModal = ({isOpen, setIsOpen, checkId, setCheckId,  setUpdateFl
         const createUnpaid  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                 setIsLoading(true);
                 e.preventDefault();
-                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0) ), 0);
                                 const body = sales?.filter((item => (!!item.itemId)));
                                 // const partners = getPartners(sales);
                                 try {
@@ -432,7 +434,7 @@ const deleteCheckData = async (checkId: number | undefined, sales : TSale[]) => 
 
 const updateCheckUnpaidData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
         try {
-                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                 const partners = getPartners(salesDef);
                 await updateCheck(checkId, {
                         customer: data.customer ?? '-',
@@ -460,7 +462,7 @@ const updateCheckUnpaidData = async (checkId : number | undefined, isEnding : bo
 
 const updateCheckData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
         try {
-                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                 const partners = getPartners(salesDef);
                 await updateCheck(checkId, {
                         customer: data.customer ?? '-',
@@ -573,6 +575,95 @@ const formatDate = (date: Date): string => {
 
 const [textInfo, setTextInfo] = useState<string | null>(null);
 
+const returnProduct = async (product : TSale | undefined) => {
+        if (product) {
+                await deleteCheckSales(data.checkId, [product])
+        }
+        }
+const updatePriceData = async (product : TSale | undefined) => {
+        if (product) {
+                await updatePrice(product).then(async () => {
+                        const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
+                                                try {
+                                                        await updateCheck(checkId, {
+                                                                customer: data.customer ?? '-',
+                                                                summ: totalSum,
+                                                                isBooking: true,
+                                                                isUnpaid: data.isUnpaid,
+                                                                createdAt: data.createdAt,
+                                                                updatedAt: data.updatedAt,
+                                                                isCancelled: null,
+                                                                seller: data.seller,
+                                                                courier: data.courier,
+                                                                account: data.account,
+                                                                // partners: partners,
+                                                        }).then(()=>{
+                                                                setUpdateFlag(true)
+                                                        })
+                                
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                } catch (error : any) {
+                                                        console.error('Ошибка при создании партий или элементов:', error);
+                                                        setCaptionList(error?.response?.errors)
+                                                        setIsLoading(false);
+                                                }
+                })
+        }
+}
+const updateBookingData  = async (e: React.MouseEvent<Element, MouseEvent>, checkId : number | undefined) => {
+                                setIsLoading(true);
+                                e.preventDefault();
+                                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
+                                                try {
+                                                        await updateCheck(checkId, {
+                                                                customer: data.customer ?? '-',
+                                                                summ: totalSum,
+                                                                isBooking: true,
+                                                                isUnpaid: data.isUnpaid,
+                                                                createdAt: data.createdAt,
+                                                                updatedAt: data.updatedAt,
+                                                                isCancelled: null,
+                                                                seller: data.seller,
+                                                                courier: data.courier,
+                                                                account: data.account,
+                                                                // partners: partners,
+                                                        }).then(async() => {
+                                                                // Создаем новый массив с обновленным checkId
+                                                                const transformedRecords: TSale[] = [];
+                    
+                                                                sales?.filter((item => (item.itemId && !item.checkId)))?.forEach(record => {
+                                                                const quantity = record.quant || 1; // Если quant пустой, то по умолчанию 1
+                                                                for (let i = 0; i < quantity; i++) {
+                                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                                        const { quant, ...rest } = record; // Удаляем поле quant
+                                                                        transformedRecords.push(rest);
+                                                                }
+                                                                });
+                
+                                                                const updatedItemsCheck = transformedRecords?.map(product => ({
+                                                                ...product,
+                                                                checkId: checkId,
+                                                                customer: data.customer,
+                                                                }));
+                                
+                                                                // Теперь отправляем обновленный массив с checkId
+                                                                const body = updatedItemsCheck;
+                                                                await addCheckSales(body).then(()=>{
+                                                                                setUpdateFlag(true);     
+                                                                });
+                                                                setIsLoading(false);
+                                                                setIsChanged(false);
+                                                                setUpdateFlag(true)
+                                                        })
+                                
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                } catch (error : any) {
+                                                        console.error('Ошибка при создании партий или элементов:', error);
+                                                        setCaptionList(error?.response?.errors)
+                                                        setIsLoading(false);
+                                                }
+        }
+
         return (
                 <Modal
                         isOpen={isOpen}
@@ -612,12 +703,12 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                         <Text size="s" style={{ width: '100%'}} className={cnMixSpace({  pH:'s' })}>Наименование</Text>
                                         <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Сер. номер</Text>
                                         <Text size="s" style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })} align="center"></Text>
-                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center">Количество</Text>
+                                        <Text size="s" style={{minWidth:'100px', maxWidth:'100px'}} className={cnMixSpace({ mR:'m' })} align="center" onClick={()=> {console.log(sales)}}>Количество</Text>
                                         <Text size="s" style={{minWidth:'150px', maxWidth:'150px'}} className={cnMixSpace({ mR:'m' })} onClick={()=> {console.log(captionList)}}>Цена продажи</Text>
                                         <div style={{minWidth:'38px', maxWidth:'38px'}} className={cnMixSpace({ mR:'m' })}/>
                                 </Layout>
                                 <Layout direction="column">
-                                {sales?.length > 0 && !checkId && sales?.map(itemCheck => (
+                                {sales?.length > 0 && (!checkId || data.isBooking) && sales?.map(itemCheck => (
                                                                 <Layout key={sales.indexOf(itemCheck).toString()} direction="row" className={cnMixSpace({ mT:'s' })}>
                                                                         <Text size="s" style={{minWidth:'15px', maxWidth:'15px'}} className={cnMixSpace({ mT:'l', mR:'m' })}>{(sales.indexOf(itemCheck) + 1).toString()}</Text>
                                                                         <Layout direction="column" style={{border:'1px solid #0078d2', borderRadius:'5px', width: '100%'}}>
@@ -799,14 +890,25 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                                                         );
                                                                                                 }
                                                                                                 }}
-                                                                                                onBlur={()=> {
-                                                                                                        setSales(prev => 
-                                                                                                                prev.map(product => (product.itemId === itemCheck.itemId && !product.salePrice) ? 
-                                                                                                                        { ...product, 
-                                                                                                                                salePrice: itemCheck.salePrice, 
-                                                                                                                        } : product
-                                                                                                                )
+                                                                                                onBlur={() => {
+                                                                                                        setSales(prev => {
+                                                                                                                const updated = prev.map(product =>
+                                                                                                                (product.itemId === itemCheck.itemId && (!product.salePrice || product.salePrice === '0.00'))
+                                                                                                                        ? { ...product, salePrice: itemCheck.salePrice }
+                                                                                                                        : product
                                                                                                                 );
+
+                                                                                                                if (data.isBooking) {
+                                                                                                                        console.log(updated)
+                                                                                                                updated.filter(product => product.itemId === itemCheck.itemId && product.checkId).forEach(el => {
+                                                                                                                        void updatePriceData((!el.salePrice || el.salePrice === '0.00') ? { ...el, salePrice: itemCheck.salePrice } : el);
+                                                                                                                        });
+                                                                                                                        console.log(itemCheck.salePrice)
+                                                                                                                        console.log(itemCheck.serialNumber)
+                                                                                                                }
+
+                                                                                                                return updated;
+                                                                                                        });
                                                                                                 }}
                                                                                                 style={{minWidth:'150px', maxWidth:'150px'}} 
                                                                                                 className={cnMixSpace({ mL:'m' })}
@@ -815,14 +917,19 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                                                 view='clear' 
                                                                                                 iconLeft={IconTrash} 
                                                                                                 onClick={()=>{
-                                                                                                setSales(sales?.filter(item=>(sales.indexOf(item) !== sales.indexOf(itemCheck))))}}
+                                                                                                        if (data.isBooking) {
+                                                                                                                returnProduct(sales.find(item=>(sales.indexOf(item) === sales.indexOf(itemCheck))))
+                                                                                                        }
+                                                                                                        setSales(sales?.filter(item=>(sales.indexOf(item) !== sales.indexOf(itemCheck))))
+                                                                                                }
+                                                                                                }
                                                                                                 className={cnMixSpace({ mL:'m' })}
                                                                                         /> 
                                                                                 </Layout>
                                                                         </Layout>  
                                                                 </Layout>
                                                 ))}
-                                                {sales?.length > 0 && checkId && sales?.map(itemCheck => (
+                                                {sales?.length > 0 && (checkId && !data.isBooking) && sales?.map(itemCheck => (
                                                                 <Layout direction="row" className={cnMixSpace({ mT:'s' })}>
                                                                         <Text size="s" style={{minWidth:'15px', maxWidth:'15px'}} className={cnMixSpace({ mT:'l', mR:'m' })}>{(sales.indexOf(itemCheck) + 1).toString()}</Text>
                                                                         <Layout direction="column" style={{border:'1px solid #0078d2', borderRadius:'5px', width: '100%'}}>
@@ -843,7 +950,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                         </Layout>  
                                                                 </Layout>
                                                 ))}
-                                        {!checkId && (<Layout direction="row" style={{justifyContent: 'center'}}>
+                                        {(!checkId || data.isBooking) && (<Layout direction="row" style={{justifyContent: 'center'}}>
                                                 <Button 
                                                         label={'Добавить товар'}
                                                         iconLeft={IconAdd}
@@ -854,6 +961,9 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                 setSales(prev => [...prev, 
                                                                         defaultItem
                                                                 ]);
+                                                                if (data.isBooking) {
+                                                                        setIsChanged(true);
+                                                                }
                                                         }}
                                                 />
                                         </Layout>
@@ -969,7 +1079,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems: 'end'}}  flex={1} className={cnMixSpace({ mT:'l' })}>
                                         <Layout direction="row" style={{justifyContent: 'left'}}>
                                                         <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })} onClick={() => {console.log(sales)}}>Общая сумма:</Text> 
-                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{(sales?.length > 0 ? sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0).toString() : 0) + ' руб'}</Text>  
+                                                        <Text size="m" style={{minWidth: '110px'}} weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{(sales?.length > 0 ? sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0).toString() : 0) + ' руб'}</Text>  
                                         </Layout>                                
                                         <Layout direction="row" style={{justifyContent: 'right'}}>
                                                 <Button 
@@ -1018,6 +1128,21 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                 )}
                                                 {checkId && data.isBooking && (
                                                         <Button 
+                                                                label={'Сохранить изменения'}
+                                                                view="primary"
+                                                                size="s"
+                                                                className={cnMixSpace({ mL:'m' })}
+                                                                onClick={(e)=>{
+                                                                        if (checkId) {
+                                                                                updateBookingData(e, checkId);
+                                                                        }
+                                                                }}
+                                                                disabled={!data.seller || !isChanged}
+                                                                title={!data.seller ? "Укажите продавца" : ''}
+                                                        />
+                                                )}
+                                                {checkId && data.isBooking && (
+                                                        <Button 
                                                                 label={'Завершить продажу'}
                                                                 view="primary"
                                                                 size="s"
@@ -1029,7 +1154,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                                 closeWindow();
                                                                         }
                                                                 }}
-                                                                disabled={!data.seller}
+                                                                disabled={!data.seller || isChanged}
                                                                 title={!data.seller ? "Укажите продавца" : ''}
                                                         />
                                                 )}
@@ -1046,6 +1171,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                                 closeWindow();
                                                                         } 
                                                                 }}
+                                                                disabled={isChanged}
                                                         />
                                                 )}
                                                 {checkId && data.isBooking && (
@@ -1061,6 +1187,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                                                 closeWindow();
                                                                         }
                                                                 }}
+                                                                disabled={isChanged}
                                                         />
                                                 )}
                                                 {checkId && data.isUnpaid && (

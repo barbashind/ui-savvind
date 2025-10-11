@@ -28,8 +28,8 @@ export interface TAccountingFilter {
         justification: string | null;
         valueFrom: number | null;
         valueTo: number | null;
-        dateFrom: Date | null;
-        dateTo: Date | null;
+        dateFrom: Date | undefined;
+        dateTo: Date | undefined;
         category: TCategory[] | null;
 }
 export interface TSumms {

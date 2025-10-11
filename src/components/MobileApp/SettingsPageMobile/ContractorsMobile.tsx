@@ -15,14 +15,13 @@ import { SaveOutlined } from "@ant-design/icons"
 import { IconAdd } from "@consta/icons/IconAdd";
 import { IconRevert } from "@consta/icons/IconRevert";
 import { IconTrash } from "@consta/icons/IconTrash"
+import { TAccount, TContractor } from "../../../types/settings-types"
+import { getContractors } from "../../../services/PurchaseService"
+import { deleteContractor, getAccounts, updateContractors } from "../../../services/SettingsService"
+import { AntIcon } from "../../../utils/AntIcon"
+import { cnMixFontSize } from "../../../utils/MixFontSize"
 
 // собственные компоненты
-import { cnMixFontSize } from "d:/ui-savvind/src/utils/MixFontSize"
-import { AntIcon } from "d:/ui-savvind/src/utils/AntIcon"
-import { TAccount, TContractor } from "d:/ui-savvind/src/types/settings-types"
-import { getContractors } from "d:/ui-savvind/src/services/PurchaseService"
-import { deleteContractor, getAccounts, updateContractors } from "d:/ui-savvind/src/services/SettingsService"
-
 
 // сервисы
 
@@ -92,20 +91,19 @@ const updateContractorData = async (contractors : TContractor[]) => {
                 <Card border style={{width: '100%'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="column" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Поставщики</Text>
-                                        <Layout direction="row">
+                                        <Layout direction="row" style={{justifyContent: 'left', alignItems:'center'}}>
+                                                <Text view="brand" size="m" weight="semibold" className={cnMixSpace({mR: 'm'})}>Поставщики</Text>
                                                 <Button
                                                         iconLeft={IconRevert}
                                                         view="secondary"
                                                         onClick={()=>{
                                                                 refreshAccountsData();
                                                         }}
-                                                        size="xs"
+                                                        size="s"
                                                         className={cnMixSpace({mR: 'm'})}
                                                         title="Обновить список счетов"
                                                 />
                                                 <Button
-                                                        label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
@@ -113,18 +111,17 @@ const updateContractorData = async (contractors : TContractor[]) => {
                                                                         [...prev, {contractorId: undefined, contractor: undefined, account: undefined}]
                                                                 )
                                                         }}
-                                                        size="xs"
+                                                        size="s"
                                                         className={cnMixSpace({mR: 'm'})}
                                                 />
                                                 <Button
-                                                        label={'Сохранить'}
                                                         iconLeft={AntIcon.asIconComponent(() => (
                                                                 <SaveOutlined
-                                                                className={cnMixFontSize('m')+ ' ' + cnMixSpace({mR:'xs'})}
+                                                                className={cnMixFontSize('m')}
                                                                 />
                                                         ))}
                                                         view="primary"
-                                                        size="xs"
+                                                        size="s"
                                                         onClick={() => {
                                                                 updateContractorData(contractors);
                                                         }}
@@ -134,7 +131,7 @@ const updateContractorData = async (contractors : TContractor[]) => {
                                 </Layout>
                                 {(contractors?.length > 0) && !isLoading && (
                                 <Layout direction="row" className={cnMixSpace({mT:'m'})}>
-                                        <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left">ID</Text>
+                                        <Text style={{minWidth: '50px', maxWidth: '50px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left">ID</Text>
                                         <Text style={{width: '100%'}} size="xs" align="left">Наименование</Text>
                                         <Text style={{minWidth: '200px', maxWidth: '200px'}} className={cnMixSpace({mL:'m'})} size="xs" align="left">Счет</Text>
                                         <div style={{minWidth: '40px', maxWidth: '40px'}}/>

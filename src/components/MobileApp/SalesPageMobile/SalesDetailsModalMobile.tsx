@@ -242,7 +242,7 @@ const SalesDetailsModalMobile = ({isOpen, setIsOpen, checkId, setCheckId,  setUp
         const createCheck  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                 setIsLoading(true);
                 e.preventDefault();
-                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                                 const partners = getPartners(sales);
                                 const body = sales?.filter((item => (!!item.itemId)));
                                 try {
@@ -301,7 +301,7 @@ const SalesDetailsModalMobile = ({isOpen, setIsOpen, checkId, setCheckId,  setUp
         const createBooking  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                                 setIsLoading(true);
                                 e.preventDefault();
-                                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                                                 const body = sales?.filter((item => (!!item.itemId)));
                                                 // const partners = getPartners(sales);
                                                 try {
@@ -360,7 +360,7 @@ const SalesDetailsModalMobile = ({isOpen, setIsOpen, checkId, setCheckId,  setUp
         const createUnpaid  = async (e: React.MouseEvent<Element, MouseEvent>) => {
                 setIsLoading(true);
                 e.preventDefault();
-                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                                 const body = sales?.filter((item => (!!item.itemId)));
                                 // const partners = getPartners(sales);
                                 try {
@@ -432,7 +432,7 @@ const deleteCheckData = async (checkId: number | undefined, sales : TSale[]) => 
 
 const updateCheckUnpaidData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
         try {
-                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                 const partners = getPartners(salesDef);
                 await updateCheck(checkId, {
                         customer: data.customer ?? '-',
@@ -460,7 +460,7 @@ const updateCheckUnpaidData = async (checkId : number | undefined, isEnding : bo
 
 const updateCheckData = async (checkId : number | undefined, isEnding : boolean | undefined) => {
         try {
-                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0);
+                const totalSum = sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0);
                 const partners = getPartners(salesDef);
                 await updateCheck(checkId, {
                         customer: data.customer ?? '-',
@@ -860,7 +860,7 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
 
                                 <Layout direction="row" style={{justifyContent: 'left'}}>
                                                 <Text size="m"  weight='semibold' view="brand"  className={cnMixSpace({ mT:'2xs' })}>Общая сумма:</Text> 
-                                                <Text size="m"  weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{(sales?.length > 0 ? sales.reduce((acc, item) => acc + (item.quant ?? 1) * (item.salePrice ?? 0), 0).toString() : 0) + ' руб'}</Text>  
+                                                <Text size="m"  weight='semibold' view="brand" className={cnMixSpace({ mT:'2xs', mL:'xs' })}>{(sales?.length > 0 ? sales.reduce((acc, item) => acc + (item.quant ?? 1) * (Number(item.salePrice ?? 0)), 0).toString() : 0) + ' руб'}</Text>  
                                 </Layout> 
 
                                 <Layout direction="column" className={cnMixSpace({ mT:'xl' })} >

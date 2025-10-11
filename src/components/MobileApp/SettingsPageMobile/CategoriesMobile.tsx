@@ -14,14 +14,14 @@ import { SaveOutlined } from "@ant-design/icons"
 import { IconAdd } from "@consta/icons/IconAdd";
 
 // собственные компоненты
-import { cnMixFontSize } from "d:/ui-savvind/src/utils/MixFontSize"
-import { AntIcon } from "d:/ui-savvind/src/utils/AntIcon"
-import { TCategory } from "d:/ui-savvind/src/types/settings-types"
+import { AntIcon } from "../../../utils/AntIcon"
+import { TCategory } from "../../../types/settings-types"
 import { TextField } from "@consta/uikit/TextField"
 import { IconTrash } from "@consta/icons/IconTrash"
 import { cnMixSpace } from "@consta/uikit/MixSpace"
-import { deleteCategory, getCategories, updateCategories } from "d:/ui-savvind/src/services/SettingsService"
+import { deleteCategory, getCategories, updateCategories } from "../../../services/SettingsService"
 import { Loader } from "@consta/uikit/Loader"
+import { cnMixFontSize } from "../../../utils/MixFontSize"
 
 // сервисы
 
@@ -77,13 +77,12 @@ const updateCategoriesData = async (categories : TCategory[]) => {
 
 
         return (
-                <Card border style={{width: '100%', flex: '1'}} className={cnMixSpace({mT: 'm', mL: 'm'})}>
+                <Card border style={{width: '100%', flex: '1'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="column" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Категории транзакций</Text>
-                                        <Layout direction="row">
+                                       <Layout direction="row" style={{justifyContent: 'left',  alignItems:'center'}}> 
+                                                <Text view="brand" size="s" weight="semibold" className={cnMixSpace({mR: 'm'})}>Категории транзакций</Text>
                                                 <Button
-                                                        label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
@@ -91,18 +90,17 @@ const updateCategoriesData = async (categories : TCategory[]) => {
                                                                         [...prev, {id: undefined, name: undefined}]
                                                                 )
                                                         }}
-                                                        size="xs"
+                                                        size="s"
                                                         className={cnMixSpace({mR: 'm'})}
                                                 />
                                                 <Button
-                                                        label={'Сохранить'}
                                                         iconLeft={AntIcon.asIconComponent(() => (
                                                                 <SaveOutlined
-                                                                className={cnMixFontSize('m') + ' ' + cnMixSpace({mR:'xs'})}
+                                                                className={cnMixFontSize('m')}
                                                                 />
                                                         ))}
                                                         view="primary"
-                                                        size="xs"
+                                                        size="s"
                                                         onClick={()=>{
                                                                 updateCategoriesData(categories);
                                                         }}

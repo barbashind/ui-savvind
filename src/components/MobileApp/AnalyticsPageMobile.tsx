@@ -208,7 +208,7 @@ const AnalyticsPageMobile = () => {
                                                 <Loader/>
                                         </Layout>
                                 )}
-                                {!isLoading && (
+                                {!isLoading && (user?.role === 'ADM' || user?.role === 'SLR') && (
                                         <Layout direction="column">
                                                 <Layout direction="row" style={{alignItems: 'center'}} className={cnMixSpace({ mT: 's' })}>
                                                         <Combobox

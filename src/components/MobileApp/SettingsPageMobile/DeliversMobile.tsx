@@ -14,154 +14,143 @@ import { SaveOutlined } from "@ant-design/icons"
 import { IconAdd } from "@consta/icons/IconAdd";
 
 // собственные компоненты
-import { cnMixFontSize } from "d:/ui-savvind/src/utils/MixFontSize"
-import { AntIcon } from "d:/ui-savvind/src/utils/AntIcon"
-import { TAccount, TCurrency } from "d:/ui-savvind/src/types/settings-types"
+import { cnMixFontSize } from "../../../utils/MixFontSize"
+import { AntIcon } from "../../../utils/AntIcon"
+import { TDeliver } from "../../../types/settings-types"
 import { TextField } from "@consta/uikit/TextField"
 import { IconTrash } from "@consta/icons/IconTrash"
 import { cnMixSpace } from "@consta/uikit/MixSpace"
-import { deleteAccount, getAccounts, getCurrencies, updateAccounts } from "d:/ui-savvind/src/services/SettingsService"
+import NumberMaskTextField from "../../../utils/NumberMaskTextField"
+import { getDelivers } from "../../../services/PurchaseService"
+import { deleteDeliver, updateDelivers } from "../../../services/SettingsService"
 import { Loader } from "@consta/uikit/Loader"
-import { Combobox } from "@consta/uikit/Combobox"
-import { IconRevert } from "@consta/icons/IconRevert"
 
 // сервисы
 
 
-const AccountsMobile = () => {
+const DeliversMobile = () => {
         
-const [accounts, setAccounts] = useState<TAccount[]>([]);
+const [delivers, setDelivers] = useState<TDeliver[]>([]);
 const [isLoading, setIsLoading] = useState<boolean>(true);
-const [currencies, setCurrencies] = useState<TCurrency[]>([]);
-
 // Инициализация данных
 useEffect(() => {
-        const getAccountsData = async () => {
-                await getAccounts((resp) => {
-                        setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        
-                })
+        const getDeliversData = async () => {
+                await getDelivers((resp) => {
+                        setDelivers(resp.map((item : TDeliver) => ({
+                                deliverId: item.deliverId, 
+                                name: item.name, priceDeliver: 
+                                item.priceDeliver, 
+                                insurance: item.insurance
+                        })))
+                });
         }
-        const getCurrenciesData = async () => {
-                await getCurrencies((resp) => {
-                        setCurrencies(resp.map((item : TCurrency) => ({id: item.id, currency: item.currency})))
-                        
-                })
-        }
-        void getCurrenciesData();
-        void getAccountsData().then(()=> {
+        void getDeliversData().then(()=>{
                 setIsLoading(false);
         });
 }, [])
 
-const refreshCurrenciesData = async () => {
-        await getCurrencies((resp) => {
-                setCurrencies(resp.map((item : TCurrency) => ({id: item.id, currency: item.currency})))
-                
-        })
-}
-
-const deleteAccountData = async (accountId: number | undefined) => {
+const deleteDeliverData = async (deliverId: number | undefined) => {
         setIsLoading(true);
-        await deleteAccount(accountId).then(()=>{
-                const getAccountsData = async () => {
-                        await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        })
+        await deleteDeliver(deliverId).then(()=>{
+                const getDeliversData = async () => {
+                        await getDelivers((resp) => {
+                                setDelivers(resp.map((item : TDeliver) => ({
+                                        deliverId: item.deliverId, 
+                                        name: item.name, priceDeliver: 
+                                        item.priceDeliver, 
+                                        insurance: item.insurance
+                                })))
+                        });
                 }
-                void getAccountsData().then(()=> {
+                void getDeliversData().then(()=>{
                         setIsLoading(false);
                 });
         })
 }
 
-const updateAccountsData = async (accounts : TAccount[]) => {
+const updateDeliversData = async (contractors : TDeliver[]) => {
         setIsLoading(true);
-        await updateAccounts(accounts).then(()=>{
-                const getAccountsData = async () => {
-                        await getAccounts((resp) => {
-                                setAccounts(resp.map((item : TAccount) => ({accountId: item.accountId, name: item.name, currency: item.currency})))
-                        })
+        await updateDelivers(contractors).then(()=>{
+                const getDeliversData = async () => {
+                        await getDelivers((resp) => {
+                                setDelivers(resp.map((item : TDeliver) => ({
+                                        deliverId: item.deliverId, 
+                                        name: item.name, priceDeliver: 
+                                        item.priceDeliver, 
+                                        insurance: item.insurance
+                                })))
+                        });
                 }
-                void getAccountsData().then(()=> {
+                void getDeliversData().then(()=>{
                         setIsLoading(false);
                 });
         })
 }
+
 
         return (
-                <Card border style={{width: '100%', flex: '2'}} className={cnMixSpace({mT: 'm'})}>
+                <Card border style={{width: '100%'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Счета</Text>
-                                        <Layout direction="row">
-                                                 <Button
-                                                        iconLeft={IconRevert}
-                                                        view="secondary"
-                                                        onClick={()=>{
-                                                                refreshCurrenciesData();
-                                                        }}
-                                                        size="s"
-                                                        className={cnMixSpace({mR: 'm'})}
-                                                        title="Обновить список валют"
-                                                />
+                                        
+                                        <Layout direction="row" style={{justifyContent: 'left', alignItems:'center'}}>
+                                                <Text view="brand" size="s" weight="semibold" className={cnMixSpace({mR: 'm'})}>Доставщики</Text>
                                                 <Button
-                                                        label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
-                                                                setAccounts(prev => 
-                                                                        [...prev, {accountId: undefined, name: undefined, currency: 'RUB'}]
+                                                                setDelivers(prev => 
+                                                                        [...prev, {deliverId: undefined, name: undefined, priceDeliver: undefined, insurance: undefined}]
                                                                 )
                                                         }}
                                                         size="s"
                                                         className={cnMixSpace({mR: 'm'})}
                                                 />
                                                 <Button
-                                                        label={'Сохранить'}
                                                         iconLeft={AntIcon.asIconComponent(() => (
                                                                 <SaveOutlined
-                                                                className={cnMixFontSize('m') + ' ' + cnMixSpace({mR:'xs'})}
+                                                                className={cnMixFontSize('m')}
                                                                 />
                                                         ))}
                                                         view="primary"
                                                         size="s"
                                                         onClick={()=>{
-                                                                updateAccountsData(accounts);
+                                                                updateDeliversData(delivers);
                                                         }}
                                                 />
                                         </Layout>
                                         
                                 </Layout>
-                                {(accounts?.length > 0) && !isLoading && (
+                                {(delivers?.length > 0) && !isLoading && (
                                 <Layout direction="row" className={cnMixSpace({mT:'m'})}>
-                                        <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left">ID</Text>
+                                        {/* <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} size="xs" align="left">ID</Text> */}
                                         <Text style={{width: '100%'}} size="xs" align="left">Наименование</Text>
-                                        <Text style={{minWidth: '200px', maxWidth: '200px'}} className={cnMixSpace({mL:'m'})} size="xs" align="left">Валюта</Text>
+                                        <Text style={{minWidth: '60px', maxWidth: '60px'}} className={cnMixSpace({mL:'m'})} size="xs" align="left">Цена за кг</Text>
+                                        <Text style={{minWidth: '60px', maxWidth: '60px'}} className={cnMixSpace({mL:'m'})} size="xs" align="left">% страховки</Text>
                                         <div style={{minWidth: '40px', maxWidth: '40px'}}/>
                                 </Layout>
                                 )}
                                 <Layout direction="column">
-                                        {!isLoading && accounts?.map((acc : TAccount) => (
+                                        {!isLoading && delivers?.map((acc : TDeliver) => (
                                                 <Layout direction="row" className={cnMixSpace({mT: 's'})}>
-                                                        <TextField
-                                                                value={acc?.accountId?.toString()}
+                                                        {/* <TextField
+                                                                value={acc?.deliverId?.toString()}
                                                                 size="s"
                                                                 placeholder="ID"
                                                                 onChange={(value)=>{
                                                                         if (value) {
-                                                                            setAccounts(prev => 
-                                                                                prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                prev.map(account => (delivers.indexOf(account) === delivers.indexOf(acc)) ? 
                                                                                         { ...account, 
-                                                                                                accountId: Number(value),
+                                                                                                deliverId: Number(value),
                                                                                         } : account
                                                                                 )
                                                                                 );    
                                                                         } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                        prev.map(account => (delivers.indexOf(account) === delivers.indexOf(acc)) ? 
                                                                                                 { ...account, 
-                                                                                                        accountId: undefined,
+                                                                                                        deliverId: undefined,
                                                                                                 } : account
                                                                                         )
                                                                                         );   
@@ -170,7 +159,7 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                 }}
                                                                 style={{minWidth: '120px', maxWidth: '120px'}}
                                                                 disabled
-                                                        />
+                                                        /> */}
                                                         <TextField
                                                                 value={acc?.name}
                                                                 size="s"
@@ -178,16 +167,16 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                 placeholder="Введите наименованование"
                                                                 onChange={(value)=>{
                                                                         if (value) {
-                                                                            setAccounts(prev => 
-                                                                                prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                prev.map(account => (delivers.indexOf(account) === delivers.indexOf(acc)) ? 
                                                                                         { ...account, 
                                                                                                 name: value,
                                                                                         } : account
                                                                                 )
                                                                                 );    
                                                                         } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(account => (accounts.indexOf(account) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                        prev.map(account => (delivers.indexOf(account) === delivers.indexOf(acc)) ? 
                                                                                                 { ...account, 
                                                                                                         name: undefined,
                                                                                                 } : account
@@ -196,30 +185,54 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                         }
                                                                         
                                                                 }}
-                                                                className={cnMixSpace({mL:'m'})}
+                                                                // className={cnMixSpace({mL:'m'})}
                                                         />
-                                                        <Combobox
-                                                                items={currencies}
-                                                                getItemLabel={(item)=> (item.currency ?? '')}
-                                                                getItemKey={(item) => (item.id ?? 0)}
-                                                                value={currencies.find(el => (el.currency === acc?.currency))}
+                                                        <NumberMaskTextField
+                                                                value={acc?.priceDeliver?.toString()}
                                                                 size="s"
-                                                                style={{minWidth: '200px', maxWidth: '200px'}}
-                                                                placeholder="Выберите валюту"
-                                                                onChange={(value)=>{
+                                                                style={{minWidth: '60px', maxWidth: '60px'}}
+                                                                placeholder="Введите цену доставки за кг"
+                                                                onChange={(value : string | null)=>{
                                                                         if (value) {
-                                                                                setAccounts(prev => 
-                                                                                prev.map(elem => (accounts.indexOf(elem) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                prev.map(elem => (delivers.indexOf(elem) === delivers.indexOf(acc)) ? 
                                                                                         { ...elem, 
-                                                                                                currency: value.currency,
+                                                                                                priceDeliver: Number(value),
                                                                                         } : elem
                                                                                 )
                                                                                 );    
                                                                         } else {
-                                                                                setAccounts(prev => 
-                                                                                        prev.map(elem => (accounts.indexOf(elem) === accounts.indexOf(acc)) ? 
+                                                                                setDelivers(prev => 
+                                                                                        prev.map(elem => (delivers.indexOf(elem) === delivers.indexOf(acc)) ? 
                                                                                                 { ...elem, 
-                                                                                                        currency: undefined,
+                                                                                                        priceDeliver: undefined,
+                                                                                                } : elem
+                                                                                        )
+                                                                                        );   
+                                                                        }
+                                                                        
+                                                                }}
+                                                                className={cnMixSpace({mL:'m'})}
+                                                        />
+                                                        <NumberMaskTextField
+                                                                value={acc?.insurance?.toString()}
+                                                                size="s"
+                                                                style={{minWidth: '60px', maxWidth: '60px'}}
+                                                                placeholder="Введите % страховки"
+                                                                onChange={(value : string | null)=>{
+                                                                        if (value) {
+                                                                                setDelivers(prev => 
+                                                                                prev.map(elem => (delivers.indexOf(elem) === delivers.indexOf(acc)) ? 
+                                                                                        { ...elem, 
+                                                                                                insurance: Number(value),
+                                                                                        } : elem
+                                                                                )
+                                                                                );    
+                                                                        } else {
+                                                                                setDelivers(prev => 
+                                                                                        prev.map(elem => (delivers.indexOf(elem) === delivers.indexOf(acc)) ? 
+                                                                                                { ...elem, 
+                                                                                                        insurance: undefined,
                                                                                                 } : elem
                                                                                         )
                                                                                         );   
@@ -234,17 +247,17 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                                                                         view="clear"
                                                                         size="s"
                                                                         onClick={()=>{
-                                                                                if (!acc.accountId) {
-                                                                                        setAccounts(prev => prev.filter(account => (accounts.indexOf(account) !== accounts.indexOf(acc))));  
+                                                                                if (!acc.deliverId) {
+                                                                                        setDelivers(prev => prev.filter(account => (delivers.indexOf(account) !== delivers.indexOf(acc))));  
                                                                                 } else {
-                                                                                        deleteAccountData(acc.accountId)
+                                                                                        deleteDeliverData(acc.deliverId)
                                                                                 }
                                                                         }}
                                                                 />
                                                         </div>
                                                 </Layout>
                                         ))}
-                                        {(accounts?.length === 0 || !accounts) && !isLoading && (
+                                        {!isLoading && (delivers?.length === 0 || !delivers) && (
                                                 <Text 
                                                         view="secondary" 
                                                         size="s" 
@@ -266,4 +279,4 @@ const updateAccountsData = async (accounts : TAccount[]) => {
                 
         )
 }
-export default AccountsMobile
+export default DeliversMobile

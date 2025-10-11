@@ -14,13 +14,13 @@ import { SaveOutlined } from "@ant-design/icons"
 import { IconAdd } from "@consta/icons/IconAdd";
 
 // собственные компоненты
-import { cnMixFontSize } from "d:/ui-savvind/src/utils/MixFontSize"
-import { AntIcon } from "d:/ui-savvind/src/utils/AntIcon"
-import { TUser } from "d:/ui-savvind/src/types/settings-types"
+import { cnMixFontSize } from "../../../utils/MixFontSize"
+import { AntIcon } from "../../../utils/AntIcon"
+import { TUser } from "../../../types/settings-types"
 import { TextField } from "@consta/uikit/TextField"
 import { IconTrash } from "@consta/icons/IconTrash"
 import { cnMixSpace } from "@consta/uikit/MixSpace"
-import { deleteUser, getUsers, updateUsers } from "d:/ui-savvind/src/services/SettingsService"
+import { deleteUser, getUsers, updateUsers } from "../../../services/SettingsService"
 import { Select } from "@consta/uikit/Select"
 import { Loader } from "@consta/uikit/Loader"
 
@@ -91,10 +91,10 @@ const updateUsersData = async (users : TUser[]) => {
                 <Card border style={{width: '100%'}} className={cnMixSpace({mT: 'm'})}>
                        <Layout direction="column" className={cnMixSpace({p: 'm'})}>
                                 <Layout direction="row" style={{justifyContent: 'space-between', alignItems:'center'}}>
-                                        <Text view="brand" size="l" weight="semibold">Пользователи</Text>
+                                        
                                         <Layout direction="row">
+                                                <Text view="brand" size="s" weight="semibold" className={cnMixSpace({mR: 'm'})}>Пользователи</Text>
                                                 <Button
-                                                        label={'Добавить'}
                                                         iconLeft={IconAdd}
                                                         view="secondary"
                                                         onClick={()=>{
@@ -106,7 +106,6 @@ const updateUsersData = async (users : TUser[]) => {
                                                         className={cnMixSpace({mR: 'm'})}
                                                 />
                                                 <Button
-                                                        label={'Сохранить'}
                                                         iconLeft={AntIcon.asIconComponent(() => (
                                                                 <SaveOutlined
                                                                 className={cnMixFontSize('m') + ' ' + cnMixSpace({mR:'xs'})}
@@ -123,42 +122,14 @@ const updateUsersData = async (users : TUser[]) => {
                                 </Layout>
                                 {!isLoading && (users?.length > 0) && (
                                 <Layout direction="row" style={{justifyContent: 'space-between'}} className={cnMixSpace({mT:'m'})}>
-                                        <Text style={{minWidth: '120px', maxWidth: '120px'}} className={cnMixSpace({mR:'m'})} align="left" size="xs">ID</Text>
                                         <Text style={{width: '100%'}} align="left" size="xs">Наименование</Text>
-                                        <Text style={{minWidth: '200px', maxWidth: '200px'}} className={cnMixSpace({mL:'m'})} align="left" size="xs">Роль</Text>
+                                        <Text style={{minWidth: '80px', maxWidth: '80px'}} className={cnMixSpace({mL:'m'})} align="left" size="xs">Роль</Text>
                                         <div style={{minWidth: '40px', maxWidth: '40px'}}/>
                                 </Layout>
                                 )}
                                 <Layout direction="column">
                                         {!isLoading && users?.map((acc : TUser) => (
                                                 <Layout direction="row" className={cnMixSpace({mT: 's'})}>
-                                                        <TextField
-                                                                value={acc?.id?.toString()}
-                                                                size="s"
-                                                                placeholder="ID"
-                                                                onChange={(value)=>{
-                                                                        if (value) {
-                                                                            setUsers(prev => 
-                                                                                prev.map(account => (users.indexOf(account) === users.indexOf(acc)) ? 
-                                                                                        { ...account, 
-                                                                                                id: Number(value),
-                                                                                        } : account
-                                                                                )
-                                                                                );    
-                                                                        } else {
-                                                                                setUsers(prev => 
-                                                                                        prev.map(account => (users.indexOf(account) === users.indexOf(acc)) ? 
-                                                                                                { ...account, 
-                                                                                                        id: undefined,
-                                                                                                } : account
-                                                                                        )
-                                                                                        );   
-                                                                        }
-                                                                        
-                                                                }}
-                                                                style={{minWidth: '120px', maxWidth: '120px'}}
-                                                                disabled
-                                                        />
                                                         <TextField
                                                                 value={acc?.username}
                                                                 size="s"
@@ -184,7 +155,6 @@ const updateUsersData = async (users : TUser[]) => {
                                                                         }
                                                                         
                                                                 }}
-                                                                className={cnMixSpace({mL:'m'})}
                                                         />
                                                         <Select
                                                                 items={roles}
@@ -213,7 +183,7 @@ const updateUsersData = async (users : TUser[]) => {
                                                                         }
                                                                         
                                                                 }}
-                                                                style={{minWidth: '200px', maxWidth: '200px'}}
+                                                                style={{minWidth: '80px', maxWidth: '80px'}}
                                                                 className={cnMixSpace({mL:'m'})}
                                                         />
                                                         <div style={{minWidth: '40px', maxWidth: '40px'}}>

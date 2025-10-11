@@ -19,6 +19,8 @@ import { IconRevert } from "@consta/icons/IconRevert";
 import { TCheckFilter } from "../../types/sales-types";
 import { IconStorage } from "@consta/icons/IconStorage";
 import { getDebtSales } from "../../services/SalesService";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { cnMixFontSize } from "../../utils/MixFontSize";
 
 export interface TSalesToolbarProps {
         setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -189,6 +191,10 @@ useEffect(()=>{
                                 style={{color: '#eb5757', borderColor: '#eb5757'}}
                         />
                         <Button size='s' view='secondary' iconLeft={IconSortDownCenter} title="Фильтр" onClick={()=>{setIsFilterModalOpen(true)}} className={cnMixSpace({mL: 's'})}/>
+                </Layout>
+                <Layout direction="row" className={cnMixSpace({p: 'xs', mB: 'xs'})} style={{backgroundColor: '#f38b00', borderRadius: '8px'}}>
+                        <InfoCircleOutlined className={cnMixSpace({mR: 'xs'}) + ' ' + cnMixFontSize('l')} style={{color: 'white'}}/>
+                        <Text size="m" style={{color: 'white'}}>Для отображения забронированных и/или неоплаченных заказов за все время снимите галочку "Оплачено"</Text>
                 </Layout>
                 </Layout>
         )
