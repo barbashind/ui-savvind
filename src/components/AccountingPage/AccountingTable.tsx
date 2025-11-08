@@ -483,7 +483,7 @@ const columns: ColumnType<TAccountingRow>[] = [
                             e.stopPropagation();
                             deleteAccountingData(record.id);
                         }}
-                        disabled={record.category === 'Продажа товара' || record.category === 'Продажа товара контрагента' }
+                        // disabled={record.category === 'Продажа товара' || record.category === 'Продажа товара контрагента' }
                     />
                 </Layout> 
             );

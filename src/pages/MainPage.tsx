@@ -20,6 +20,7 @@ import { IconSettings } from '@consta/icons/IconSettings';
 import { BarcodeOutlined } from "@ant-design/icons";
 import { IconExit } from '@consta/icons/IconExit';
 import { IconColoredEconomics } from '@consta/icons/IconColoredEconomics';
+import { IconListNumbered } from '@consta/icons/IconListNumbered';
 
 // собственные компоненты
 import { DefaultTabs } from "../utils/types.ts";
@@ -88,6 +89,12 @@ const pages : DefaultTabs[] = [
                         navTo: routeTarget.settings,
                         leftIcon: IconSettings,
                 },
+                 {
+                        id: 8,
+                        label: 'История',
+                        navTo: routeTarget.history,
+                        leftIcon: IconListNumbered,
+                },
 
         ]
 
@@ -115,7 +122,6 @@ const MainPage = () => {
         const [user, setUser] = useState<UserInfo | undefined>(undefined);
                 
         useEffect(() => {
-                
                 const getUserInfoData = async () => {
                         await getUserInfo().then((resp) => {
                                 setUser(resp);
@@ -124,6 +130,7 @@ const MainPage = () => {
                 
                 void getUserInfoData();
         }, []);
+        
 
         return (
                 <div>
