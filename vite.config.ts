@@ -21,7 +21,7 @@ export default defineConfig({
     port: 443,
     proxy: {
       '/api': {
-        target: 'https://erp.yes-electronics.com',
+        target: 'https://erp.venturamsk.com',
         changeOrigin: true,
         secure: false,
       },
