@@ -588,49 +588,73 @@ const ProductRegistrationDetailsModal = ({isOpen, setIsOpen, batchId, setBatchId
                                                                                                                                 }
                                                                                                                                 onPaste={async (event) => {
                                                                                                                                         event.preventDefault(); // Предотвращаем стандартное поведение вставки
-                                                                                                                                    
+
                                                                                                                                         const clipboardData = event.clipboardData.getData('text'); // Получаем данные из буфера обмена
                                                                                                                                         const serialNumbers = clipboardData.split('\n'); // Разделяем по строкам
-                                                                                                                                    
+                                                                                                                                        
+                                                                                                                                        // Множество для отслеживания уже обработанных номеров в текущей вставке
+                                                                                                                                        const processedInCurrentPaste = new Set();
+                                                                                                                                        
                                                                                                                                         for (const number of serialNumbers) {
-                                                                                                                                          const convertedValue = convertRuToEn(number);
-                                                                                                                                          const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
-                                                                                                                                          const trimmedNumber = filteredValue; // Удаляем лишние пробелы
-                                                                                                                                          if (trimmedNumber) { // Проверяем, что строка не пустая
-                                                                                                                                            const isUnique = await checkSerialNumberExists(trimmedNumber);
-                                                                                                                                            if (!isUnique) {
-                                                                                                                                              const audio = new Audio(errorAudio);
-                                                                                                                                              audio.play();
-                                                                                                                                              continue; // Если номер не уникален, переходим к следующему
-                                                                                                                                            }
-                                                                                                                                    
-                                                                                                                                            // Добавляем новый элемент в itemsBatch
-                                                                                                                                            setItemsBatch(prev => ([...prev, {
-                                                                                                                                              itemBatchId: null,
-                                                                                                                                              batchId: itemBatch.batchId,
-                                                                                                                                              itemId: itemBatch.itemId,
-                                                                                                                                              costPrice: itemBatch.costPrice,
-                                                                                                                                              costPriceAll: itemBatch.costPriceAll,
-                                                                                                                                              costDeliver: itemBatch.costDeliver,
-                                                                                                                                              batchNumber: itemBatch.batchNumber,
-                                                                                                                                              name: itemBatch.name,
-                                                                                                                                              hasSerialNumber: itemBatch.hasSerialNumber,
-                                                                                                                                              quant: itemBatch.quant,
-                                                                                                                                              serialNumber: trimmedNumber,
-                                                                                                                                              warehouse: itemBatch.warehouse,
-                                                                                                                                              partner: itemBatch.partner,
-                                                                                                                                              createdAt: null,
-                                                                                                                                              updatedAt: null,
-                                                                                                                                            }]));
-                                                                                                                                            setItemsBatch(prev => 
-                                                                                                                                                prev.map(product => (product.itemId === itemBatch.itemId &&  !product.serialNumber && (product.partner === itemBatch.partner)) ? 
-                                                                                                                                                        { ...product, 
-                                                                                                                                                        quantFinal: (product?.quantFinal ?? 0 )+ 1, 
-                                                                                                                                                        } : product
-                                                                                                                                                ));
-                                                                                                                                          }
+                                                                                                                                        const convertedValue = convertRuToEn(number);
+                                                                                                                                        const filteredValue = convertedValue.replace(/[^a-zA-Z0-9-]/g, '');
+                                                                                                                                        const trimmedNumber = filteredValue.trim(); // Добавил trim() для удаления пробелов
+                                                                                                                                        
+                                                                                                                                        if (!trimmedNumber) { // Проверяем, что строка не пустая
+                                                                                                                                        continue;
                                                                                                                                         }
-                                                                                                                                      }}
+                                                                                                                                        
+                                                                                                                                        // Проверка на дубликат в текущей вставке
+                                                                                                                                        if (processedInCurrentPaste.has(trimmedNumber)) {
+                                                                                                                                        console.warn(`Пропущен дубликат в текущей вставке: ${trimmedNumber}`);
+                                                                                                                                        continue; // Если номер уже был в этой вставке, пропускаем
+                                                                                                                                        }
+                                                                                                                                        
+                                                                                                                                        // Проверка на дубликат среди существующих элементов в itemsBatch
+                                                                                                                                        const existsInCurrentBatch = itemsBatch.some(item => item.serialNumber === trimmedNumber);
+                                                                                                                                        if (existsInCurrentBatch) {
+                                                                                                                                        console.warn(`Пропущен дубликат (уже есть в списке): ${trimmedNumber}`);
+                                                                                                                                        continue; // Если номер уже есть в текущем батче, пропускаем
+                                                                                                                                        }
+                                                                                                                                        
+                                                                                                                                        const isUnique = await checkSerialNumberExists(trimmedNumber);
+                                                                                                                                        if (!isUnique) {
+                                                                                                                                        const audio = new Audio(errorAudio);
+                                                                                                                                        audio.play();
+                                                                                                                                        continue; // Если номер не уникален в БД, переходим к следующему
+                                                                                                                                        }
+                                                                                                                                        
+                                                                                                                                        // Добавляем номер в множество обработанных в текущей вставке
+                                                                                                                                        processedInCurrentPaste.add(trimmedNumber);
+                                                                                                                                        
+                                                                                                                                        // Добавляем новый элемент в itemsBatch
+                                                                                                                                        setItemsBatch(prev => ([...prev, {
+                                                                                                                                        itemBatchId: null,
+                                                                                                                                        batchId: itemBatch.batchId,
+                                                                                                                                        itemId: itemBatch.itemId,
+                                                                                                                                        costPrice: itemBatch.costPrice,
+                                                                                                                                        costPriceAll: itemBatch.costPriceAll,
+                                                                                                                                        costDeliver: itemBatch.costDeliver,
+                                                                                                                                        batchNumber: itemBatch.batchNumber,
+                                                                                                                                        name: itemBatch.name,
+                                                                                                                                        hasSerialNumber: itemBatch.hasSerialNumber,
+                                                                                                                                        quant: itemBatch.quant,
+                                                                                                                                        serialNumber: trimmedNumber,
+                                                                                                                                        warehouse: itemBatch.warehouse,
+                                                                                                                                        partner: itemBatch.partner,
+                                                                                                                                        createdAt: null,
+                                                                                                                                        updatedAt: null,
+                                                                                                                                        }]));
+                                                                                                                                        
+                                                                                                                                        setItemsBatch(prev => 
+                                                                                                                                        prev.map(product => (product.itemId === itemBatch.itemId && !product.serialNumber && (product.partner === itemBatch.partner)) ? 
+                                                                                                                                                { ...product, 
+                                                                                                                                                quantFinal: (product?.quantFinal ?? 0) + 1, 
+                                                                                                                                                } : product
+                                                                                                                                        )
+                                                                                                                                        );
+                                                                                                                                        }
+                                                                                                                                        }}
                                                                                                                             caption={(focusedIndex === itemsBatch.indexOf(itemBatch)) ? (serialCaption ?? undefined) : undefined}
                                                                                                                             status={(serialCaption && (focusedIndex === itemsBatch.indexOf(itemBatch))) ? 'alert' : undefined}
                                                                                                                             onFocus={() => {setFocusedIndex(itemsBatch.indexOf(itemBatch))}}
