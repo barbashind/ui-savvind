@@ -31,6 +31,12 @@ export interface TAnalyticGraphData {
         date: Date | string;
 }
 
+export interface TAnalyticGraphDataAll {
+        revenue: number | undefined;
+        margProfit: number | undefined;
+        date: Date | string;
+}
+
 export interface TProdDeliver {
         name: string | undefined;
         quant: number | undefined;

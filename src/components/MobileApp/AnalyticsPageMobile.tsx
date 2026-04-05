@@ -8,7 +8,7 @@ import { cnMixSpace } from '@consta/uikit/MixSpace';
 import { getUserInfo } from "../../services/AuthorizationService.ts";
 import { UserInfo } from "../../services/AuthorizationService.ts";
 import { getAnalytics, getAnalyticsGraph } from "../../services/SalesService.ts";
-import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData } from "../../types/analytic-types.ts";
+import { TAnalyticData, TAnalyticFilter, TAnalyticGraphData, TAnalyticGraphDataAll } from "../../types/analytic-types.ts";
 import { Loader } from "@consta/uikit/Loader/index";
 import { getUsers } from "../../services/SettingsService.ts";
 import { TUser } from "../../types/settings-types.ts";
@@ -24,6 +24,7 @@ import { AntIcon } from "../../utils/AntIcon.ts";
 import { cnMixFontSize } from "../../utils/MixFontSize.ts";
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IdLabel } from "../../utils/types.ts";
+import { DatePicker } from "@consta/uikit/DatePicker/index";
 
 // сервисы
 
@@ -60,6 +61,16 @@ const AnalyticsPageMobile = () => {
         const [isLoading, setIsLoading]=useState<boolean>(false)
         const [users, setUsers] = useState<(string | undefined)[]>([]);
 
+
+        const [updateFlagAll, setUpdateFlagAll] = useState<boolean>(false);
+
+        const [dateMin, setDateMin]=useState<Date | null>(startDate)
+        const [dateMax, setDateMax]=useState<Date | null>(today)
+
+        const [filterValuesAll, setFilterValuesAll] = useState<TAnalyticFilter>(defaultFilterValues);
+
+        const [dataGraphAll, setDataGraphAll]=useState<TAnalyticGraphDataAll[]>([])
+
         // инициализация данных       
         
         useEffect(() => {
@@ -77,6 +88,11 @@ const AnalyticsPageMobile = () => {
                                                                         users:  resp?.filter(elem => (elem.role === 'SLR'))?.map((item : TUser) => (
                                                                         item.username)),
                                                                         }))
+                                                                setFilterValuesAll(prev => ({
+                                                                        ...prev,
+                                                                        users:  resp?.filter(elem => (elem.role === 'SLR'))?.map((item : TUser) => (
+                                                                        item.username)),
+                                                                        }))
                                                         }
                                                         if (user?.role === 'SLR' && user?.username !== 'Matvei') {
                                                                 setUsers(resp?.filter(elem => (elem.role === 'SLR' && (elem.username === user.username)))?.map((item : TUser) => (
@@ -86,11 +102,21 @@ const AnalyticsPageMobile = () => {
                                                                         users:  resp?.filter(elem => (elem.role === 'SLR' && (elem.username === user.username)))?.map((item : TUser) => (
                                                                         item.username)),
                                                                         }))
+                                                                setFilterValuesAll(prev => ({
+                                                                        ...prev,
+                                                                        users:  resp?.filter(elem => (elem.role === 'SLR' && (elem.username === user.username)))?.map((item : TUser) => (
+                                                                        item.username)),
+                                                                        }))
                                                         }
                                                         if (user?.role === 'SLR' && user?.username === 'Matvei') {
                                                                 setUsers(resp?.filter(elem => (elem.role === 'SLR' && ((elem.username === user.username) || (elem.username === 'djiSeller'))))?.map((item : TUser) => (
                                                                         item.username)))
                                                                 setFilterValues(prev => ({
+                                                                        ...prev,
+                                                                        users:  resp?.filter(elem => (elem.role === 'SLR' && ((elem.username === user.username) || (elem.username === 'djiSeller'))))?.map((item : TUser) => (
+                                                                        item.username)),
+                                                                        }))
+                                                                setFilterValuesAll(prev => ({
                                                                         ...prev,
                                                                         users:  resp?.filter(elem => (elem.role === 'SLR' && ((elem.username === user.username) || (elem.username === 'djiSeller'))))?.map((item : TUser) => (
                                                                         item.username)),
@@ -106,6 +132,50 @@ const AnalyticsPageMobile = () => {
                                                                 startDate: startDate,
                                                                 endDate: today
                                                         } 
+                                                        const getAnalyticDataGraphAll = async () => {
+                                                                await getAnalyticsGraph(defFilterValues).then((resp)=>{
+                                                                        const processedData = resp.map(item => ({
+                                                                                user: item.user,
+                                                                                date: new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }), // Преобразуем дату в день недели
+                                                                                revenue: Number((Number(item?.revenue) / 1000).toFixed(2)), 
+                                                                                margProfit: Number((Number(item?.margProfit) / 1000).toFixed(2)) 
+                                                                        }));
+
+
+                                                                        // 2. Агрегация: ключ - исходная дата (строка), значение - суммы
+                                                                        const aggregationMap = new Map<string, { revenue: number; margProfit: number }>();
+
+                                                                        for (const item of processedData) {
+                                                                        const revenue = Number(item.revenue);
+                                                                        const margProfit = Number(item.margProfit);
+                                                                        const dateKey = item.date; // группируем по полной дате, чтобы избежать пересечения недель
+
+                                                                        const existing = aggregationMap.get(dateKey);
+                                                                        if (existing) {
+                                                                        existing.revenue += revenue;
+                                                                        existing.margProfit += margProfit;
+                                                                        } else {
+                                                                        aggregationMap.set(dateKey, { revenue: revenue, margProfit: margProfit });
+                                                                        }
+                                                                        }
+
+                                                                        // 3. Преобразуем Map в массив, сортируем по дате (опционально)
+                                                                        const sortedEntries = Array.from(aggregationMap.entries()).sort(
+                                                                        ([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime()
+                                                                        );
+
+                                                                        const result: TAnalyticGraphDataAll[] = sortedEntries.map(([date, sums]) => ({
+                                                                                date: date,
+                                                                                revenue: Number((sums.revenue).toFixed(2)),
+                                                                                margProfit: Number((sums.margProfit).toFixed(2))
+                                                                        }));
+
+                                                                        setDataGraphAll(result);
+                                                                        setIsLoading(false);
+                                                                })
+                                                        }
+                                                        void getAnalyticDataGraphAll();
+
                                                         const getAnalyticDataGraph = async () => {
                                                                 await getAnalyticsGraph(defFilterValues).then((resp)=>{
                                                                         const processedData = resp.map(item => ({
@@ -119,6 +189,7 @@ const AnalyticsPageMobile = () => {
                                                                 })
                                                         }
                                                         void getAnalyticDataGraph();
+                                                        
                                                         const getAnalyticData = async () => {
                                                                         await getAnalytics(defFilterValues).then((resp)=>{
                                                                                 setData(resp);
@@ -180,7 +251,6 @@ const AnalyticsPageMobile = () => {
                 }
         }, [filterValues, period, setUpdateFlag, updateFlag])
 
-        const [data, setData]=useState<TAnalyticData[]>([])
         
         // меняем период расчета
         useEffect(() => {
@@ -199,18 +269,164 @@ const AnalyticsPageMobile = () => {
 
         }, [period]);
 
+        
+useEffect(() => {
+                if (updateFlagAll) {
+                        setIsLoading(true);
+                        const getAnalyticDataGraphAll = async () => {
+                                await getAnalyticsGraph(filterValuesAll).then((resp)=>{
+                                        const processedData = resp.map(item => ({
+                                                user: item.user,
+                                                date: new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
+                                                revenue: Number((Number(item?.revenue) / 1000).toFixed(2)), 
+                                                margProfit: Number((Number(item?.margProfit) / 1000).toFixed(2)) 
+                                        }));
+
+
+                                        // 2. Агрегация: ключ - исходная дата (строка), значение - суммы
+                                        const aggregationMap = new Map<string, { revenue: number; margProfit: number }>();
+
+                                        for (const item of processedData) {
+                                        const revenue = Number(item.revenue);
+                                        const margProfit = Number(item.margProfit);
+                                        const dateKey = item.date; // группируем по полной дате, чтобы избежать пересечения недель
+
+                                        const existing = aggregationMap.get(dateKey);
+                                        if (existing) {
+                                        existing.revenue += revenue;
+                                        existing.margProfit += margProfit;
+                                        } else {
+                                        aggregationMap.set(dateKey, { revenue: revenue, margProfit: margProfit });
+                                        }
+                                        }
+
+                                        // 3. Преобразуем Map в массив, сортируем по дате (опционально)
+                                        const sortedEntries = Array.from(aggregationMap.entries()).sort(
+                                        ([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime()
+                                        );
+
+                                        const result: TAnalyticGraphDataAll[] = sortedEntries.map(([date, sums]) => ({
+                                                date: date,
+                                                revenue: Number((sums.revenue).toFixed(2)),
+                                                margProfit: Number((sums.margProfit).toFixed(2))
+                                        }));
+
+                                        setDataGraphAll(result);
+                                        setIsLoading(false);
+                                })
+                        }
+                        void getAnalyticDataGraphAll();
+                        setUpdateFlagAll(false);
+                }
+        }, [filterValuesAll, setUpdateFlagAll, updateFlagAll])
+
+        const [data, setData]=useState<TAnalyticData[]>([])
+
+
+
         return (
                 <div>
                         <Layout direction="column" >
                                 
-                                {isLoading && (
+                                {(isLoading) && (
                                         <Layout style={{width: '100%', height: '50vh', justifyContent: 'center', alignItems: 'center'}}>
                                                 <Loader/>
                                         </Layout>
                                 )}
-                                {!isLoading && (user?.role === 'ADM' || user?.role === 'SLR') && (
+                                {(!isLoading) && (user?.role === 'ADM' || user?.role === 'SLR') && (
                                         <Layout direction="column">
-                                                <Layout direction="row" style={{alignItems: 'center'}} className={cnMixSpace({ mT: 's' })}>
+                                                <Layout direction="row" className={cnMixSpace({p:'m'})} style={{alignItems: 'center'}}>
+                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>C</Text>
+                                                        <DatePicker
+                                                                value={dateMin}
+                                                                onChange={(value : Date | null) => {
+                                                                        if (value) {
+                                                                                const utcDate = (value);
+                                                                                utcDate.setUTCHours(0, 0, 0, 0); 
+                                                                                utcDate.setDate(value.getDate() + 1);
+                                                                                setDateMin(utcDate);
+                                                                        } else {
+                                                                                setDateMin(null);
+                                                                        }
+                                                                }}
+                                                                size={'s'}
+                                                                style={{minWidth: '100px', maxWidth: '100px', maxHeight: '20px'}}
+                                                                className={cnMixSpace({mR:'m'})}
+                                                        />
+                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>по</Text>
+                                                        <DatePicker
+                                                                value={dateMax}
+                                                                onChange={(value : Date | null) => {
+                                                                        if (value) {
+                                                                                const utcDate = (value);
+                                                                                utcDate.setUTCHours(0, 0, 0, 0); 
+                                                                                utcDate.setDate(value.getDate() + 1);
+                                                                                setDateMax(utcDate);
+                                                                        } else {
+                                                                                setDateMax(null);
+                                                                        }
+                                                                }}
+                                                                size={'s'}
+                                                                style={{minWidth: '100px', maxWidth: '100px', maxHeight: '20px'}}
+                                                                className={cnMixSpace({mR:'m'})}
+                                                        />
+                                                        <Button
+                                                                iconLeft={AntIcon.asIconComponent(() => (
+                                                                        <SearchOutlined
+                                                                                className={cnMixFontSize('l')}
+                                                                        />
+                                                                ))}
+                                                                onClick={()=>{
+                                                                        setFilterValuesAll(prev => ({...prev, startDate: dateMin, endDate: dateMax}))
+                                                                        setUpdateFlagAll(true);
+                                                                }}
+                                                                size="s"
+                                                                view="secondary"
+                                                                className={cnMixSpace({mT:'xs'})}
+                                                        />
+                                                </Layout>
+                                                <Card className={cnMixSpace({ mT:'m', mH: 's'})} style={{border: '1px solid var(--color-typo-brand)', minWidth: '250px',}}>
+                                                                <Text size="m"  weight='bold' align="left" className={cnMixSpace({ mL: 'm', mT:'l'})} style={{color: 'var(--color-typo-brand)', justifyContent: 'left'}}>
+                                                                        Выручка (тыс. руб)
+                                                                </Text>
+                                                                <Layout direction="row" className={cnMixSpace({ p:'m'})} style={{width: '100%', minWidth: '250px',  maxHeight: '200px'}}>
+                                                                        {
+                                                                                dataGraph && dataGraph.length > 0 ? (
+                                                                                        <Line
+                                                                                                data={dataGraphAll}
+                                                                                                xField={'date'}
+                                                                                                yField={'revenue'}
+                                                                                                style={{width: '100%', minWidth: '250px'}}
+                                                                                        />
+                                                                                ) : (
+                                                                                        <Text view="secondary">Выберите хотя бы одного продавца</Text>
+                                                                                ) 
+                                                                        }
+                                                                        
+                                                                </Layout>
+                                                        </Card>
+                                                        
+                                                        <Card className={cnMixSpace({ mT:'m', mH: 's'})} style={{border: '1px solid var(--color-typo-brand)'}}>
+                                                                <Text size="m"  weight='bold' align="left" className={cnMixSpace({ mL: 'm', mT:'l'})} style={{color: 'var(--color-typo-brand)', justifyContent: 'left'}}>
+                                                                        Марж. прибыль (тыс. руб)
+                                                                </Text>
+                                                                <Layout direction="row" className={cnMixSpace({ p:'m', mT:'2xs'})} style={{width: '100%',  maxHeight: '200px'}} >
+                                                                        {
+                                                                                dataGraph && dataGraph.length > 0 ? (
+                                                                                        <Line 
+                                                                                                data={dataGraphAll}
+                                                                                                xField={'date'}
+                                                                                                yField={'margProfit'}
+                                                                                                style={{width: '100%'}} 
+                                                                                        />
+                                                                                ) : (
+                                                                                        <Text view="secondary">Выберите хотя бы одного продавца</Text>
+                                                                                ) 
+                                                                        }
+                                                                </Layout>  
+                                                        </Card>
+                                                
+                                                <Layout direction="row" style={{alignItems: 'center'}} className={cnMixSpace({ mT: 'xl' })}>
                                                         <Combobox
                                                                 size="s"
                                                                 items={users}
@@ -243,7 +459,8 @@ const AnalyticsPageMobile = () => {
                                                                 }}
                                                                 className={cnMixSpace({ mL: 's' }) + ' ' + 'selectMobile'}
                                                                 style={{minWidth: '170px', maxWidth: '170px'}}
-                                                        /> 
+                                                        />
+
                                                         <ChoiceGroup
                                                                 items={periods}
                                                                 value={period}
@@ -271,6 +488,7 @@ const AnalyticsPageMobile = () => {
                                                 </Layout>
                                                 
                                                 <Layout direction="column" className={cnMixSpace({ mB: 'm'})}>
+                                                        
                                                         <Card className={cnMixSpace({ mT:'m', mH: 's'})} style={{border: '1px solid var(--color-typo-brand)', minWidth: '250px',}}>
                                                                 <Text size="m"  weight='bold' align="left" className={cnMixSpace({ mL: 'm', mT:'l'})} style={{color: 'var(--color-typo-brand)', justifyContent: 'left'}}>
                                                                         Выручка (тыс. руб)
@@ -341,6 +559,7 @@ const AnalyticsPageMobile = () => {
                                                                         
                                                                 </Layout>  
                                                         </Card>
+
                                                         
                                                 </Layout>
                                         </Layout>
