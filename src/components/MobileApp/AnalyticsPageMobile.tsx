@@ -202,7 +202,7 @@ const [data, setData]=useState<TAnalyticData[]>([])
                                 {(!isLoading) && (user?.role === 'ADM' || user?.role === 'SLR') && (
                                         <Layout direction="column">
                                                 <Layout direction="row" className={cnMixSpace({p:'m'})} style={{alignItems: 'center'}}>
-                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>C</Text>
+                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>Период:</Text>
                                                         <DatePicker
                                                                 value={dateMin}
                                                                 onChange={(value : Date | null) => {
@@ -221,7 +221,7 @@ const [data, setData]=useState<TAnalyticData[]>([])
                                                                 style={{minWidth: '100px', maxWidth: '100px', maxHeight: '20px'}}
                                                                 className={cnMixSpace({mR:'m'})}
                                                         />
-                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>по</Text>
+                                                        <Text className={cnMixSpace({mR:'m', mT:'xs'})}>-</Text>
                                                         <DatePicker
                                                                 value={dateMax}
                                                                 onChange={(value : Date | null) => {
@@ -240,6 +240,9 @@ const [data, setData]=useState<TAnalyticData[]>([])
                                                                 style={{minWidth: '100px', maxWidth: '100px', maxHeight: '20px'}}
                                                                 className={cnMixSpace({mR:'m'})}
                                                         />
+                                                        </Layout>
+
+                                                        <Layout direction="row"  style={{alignItems: 'center'}}>
                                                         <Combobox
                                                                 size="s"
                                                                 items={users}
@@ -277,12 +280,13 @@ const [data, setData]=useState<TAnalyticData[]>([])
                                                         <Button
                                                                 iconLeft={AntIcon.asIconComponent(() => (
                                                                         <SearchOutlined
-                                                                                className={cnMixFontSize('l')}
+                                                                                className={cnMixFontSize('l') + ' ' + cnMixSpace({ mR:'2xs' })}
                                                                         />
                                                                 ))}
                                                                 onClick={()=>{
                                                                         setUpdateFlag(true);
                                                                 }}
+                                                                label='Применить'
                                                                 size="s"
                                                                 view="secondary"
                                                                 className={cnMixSpace({mL:'s',mT:'s'})}
