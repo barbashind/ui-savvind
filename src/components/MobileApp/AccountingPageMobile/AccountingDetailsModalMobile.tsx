@@ -151,6 +151,9 @@ const AccountingDetailsModalMobile = ({isOpen, setIsOpen, id, setId,  setUpdateF
                         );
                 }
                 
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0); 
+                
         return (
                 <Modal
                         isOpen={isOpen}
@@ -237,7 +240,7 @@ const AccountingDetailsModalMobile = ({isOpen, setIsOpen, id, setId,  setUpdateF
                                                         }}
                                                         size="s"
                                                         style={{maxWidth: '200px', minWidth: '200px', maxHeight: '20px'}}
-                                                        disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                        disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                                 />
                                         </Layout>
                                         <Layout direction="row" className={cnMixSpace({mT:'s'})} style={{alignItems: 'center'}}>
@@ -257,7 +260,7 @@ const AccountingDetailsModalMobile = ({isOpen, setIsOpen, id, setId,  setUpdateF
                                                                 setData(prev => ({...prev, category: undefined}))
                                                         }
                                                 }}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                         />
                                         </Layout>
                                         <Layout direction="row" className={cnMixSpace({mT:'s'})} style={{alignItems: 'center'}}>
@@ -273,7 +276,7 @@ const AccountingDetailsModalMobile = ({isOpen, setIsOpen, id, setId,  setUpdateF
                                                  }}
                                                 size={'s'}
                                                 style={{minWidth: '200px', maxWidth: '200px', maxHeight: '20px'}}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                          />
                                         </Layout>
                                        
