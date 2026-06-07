@@ -150,6 +150,8 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                 }
                         );
                 }
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0); 
                 
         return (
                 <Modal
@@ -239,7 +241,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size="s"
                                                 style={{width: '100%', minWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'  }
                                         />
                                         <Combobox
                                                 items={categories}
@@ -257,7 +259,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                         }
                                                 }}
                                                 className={cnMixSpace({mR:'m'})}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                         />
                                        
                                         <NumberMaskTextField
@@ -272,7 +274,7 @@ const AccountingDetailsModal = ({isOpen, setIsOpen, id, setId,  setUpdateFlag} :
                                                 size={'s'}
                                                 style={{minWidth: '150px', maxWidth: '150px', maxHeight: '20px'}}
                                                 className={cnMixSpace({mR:'m'})}
-                                                disabled={data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
+                                                disabled={(data.createdAt && (user === 'Artem') && (data.createdAt < today)) || data.category === 'Продажа товара' || data.category === 'Продажа товара контрагента'}
                                          />
                                          <DatePicker
                                                 value={data.createdAt}
