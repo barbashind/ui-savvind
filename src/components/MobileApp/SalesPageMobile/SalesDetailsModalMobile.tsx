@@ -573,6 +573,48 @@ const formatDate = (date: Date): string => {
 
 const [textInfo, setTextInfo] = useState<string | null>(null);
 
+const copyCheckInfo = (): void => {
+  const checkIdStr = data?.checkId?.toString() ?? '';
+  const groups = new Map<string, string[]>();
+
+  sales?.forEach(item => {
+    const name = item?.name?.trim();
+    if (!name) return; 
+
+    let serials: string[] = [];
+    if (Array.isArray(item.serialNumber)) {
+      serials = item.serialNumber.filter(sn => sn && typeof sn === 'string' && sn.trim() !== '');
+    } else if (typeof item.serialNumber === 'string' && item.serialNumber.trim() !== '') {
+      serials = [item.serialNumber.trim()];
+    }
+
+    if (serials.length === 0) return; 
+
+    if (groups.has(name)) {
+      groups.set(name, [...groups.get(name)!, ...serials]);
+    } else {
+      groups.set(name, [...serials]);
+    }
+  });
+
+  const itemsText = Array.from(groups.entries())
+    .map(([name, serials]) => {
+      const uniqueSerials = [...new Set(serials)];
+      return [name, ...uniqueSerials].join('\n');
+    })
+    .join('\n\n');
+    const customer = data?.customer?.toString() ?? '';
+
+  const finalText = [checkIdStr, itemsText, '\n', customer].filter(Boolean).join('\n');
+
+  navigator.clipboard.writeText(finalText)
+    .then(() => console.log('Скопировано в буфер обмена'))
+    .catch(err => {
+      console.error('Ошибка копирования:', err);
+      alert('Не удалось скопировать текст.');
+    });
+};
+
         return (
                 <Modal
                         isOpen={isOpen}
@@ -1132,6 +1174,19 @@ const [textInfo, setTextInfo] = useState<string | null>(null);
                                                 )}
 
                                         </Layout>
+                                        {checkId && (
+                                                <Button 
+                                                                label={'COPY'}
+                                                                view="primary"
+                                                                size="s"
+                                                                style={{width: '100%'}}
+                                                                className={cnMixSpace({ mT:'m' })}
+                                                                onClick={()=>{
+                                                                        copyCheckInfo();
+                                                                }}
+                                                        />
+                                                        )
+                                        }
                                 </Layout>
                         )}
                         {isLoading && (
